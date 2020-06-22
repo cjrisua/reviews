@@ -15,8 +15,8 @@ class Wine(models.Model):
         ('ESP','Spain'),
         ('ITA','Italy')
     )
+    producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
-    producer = models.ForeignKey(Producer, on_delete=models.CASCADE)
     country = models.CharField(choices=COUNTRY,max_length=3)
     region = models.CharField(max_length=255)
     terroir = models.CharField(max_length=125)

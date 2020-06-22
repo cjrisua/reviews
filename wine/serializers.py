@@ -27,8 +27,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['score','issuedate','observation','critic','market']
 
 class ProducerWinesSerializer(serializers.ModelSerializer):
-    producer_wine = ProducerSerializer(many=True)
-
+    #wines = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    wines = WineSerializer(many=True, read_only=True)
     class Meta:
-        module = Producer
-        fields = []
+        model = Producer
+        fields = ['name','wines']

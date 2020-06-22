@@ -1,6 +1,6 @@
 from .models import Producer,Wine, Critic, Market, Review
 from rest_framework import viewsets
-from .serializers import ProducerSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer
+from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer
 
 # Create your views here.
 
@@ -9,7 +9,7 @@ class ProducerViewSet(viewsets.ModelViewSet):
     API endpoint that allows producers to be viewed or edited.
     """
     queryset = Producer.objects.order_by('-name')
-    serializer_class = ProducerSerializer
+    serializer_class = ProducerWinesSerializer
 
 class WineViewSet(viewsets.ModelViewSet):
     """
