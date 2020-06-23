@@ -21,13 +21,17 @@ class Wine(models.Model):
     region = models.CharField(max_length=255)
     terroir = models.CharField(max_length=125)
 
+    class Meta:
+        unique_together = ['producer', 'id']
+        ordering = ['name']
+
 class Critic(models.Model):
      name = models.CharField(max_length=50)
 
 class Market(models.Model):
-    wine =  models.ForeignKey(Wine, on_delete=models.CASCADE, blank=False, default=None)
-    releaseprice = models.DecimalField(decimal_places=2,max_digits=10)
-    vintage = models.CharField(max_length=4, blank=False)
+    wine =  models.ForeignKey(Wine, related_name='vintage',  on_delete=models.CASCADE, blank=False, default=None)
+    price = models.DecimalField(decimal_places=2,max_digits=10)
+    year = models.CharField(max_length=4, blank=False)
     reviews = models.ManyToManyField(Critic, through='Review', blank=True)
     
 class Review(models.Model):

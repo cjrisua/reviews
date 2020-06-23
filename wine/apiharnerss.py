@@ -21,12 +21,18 @@ def Get(page):
 
 def Post(page, **kargs):
     headers = {'content-type': 'application/json'}
-    payload = {"name" : "Carlos"}
-    print(type(payload))
-    print(f"payloa = {payload} ")
-    print( str(f"{URL}/{page}/"))
+    payload = kargs
+    print(f"{payload}")
     response = requests.post(str(f"{URL}/{page}/") , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(payload), headers=headers)
     jsonResponse = response.json()
     print(jsonResponse)
 
-Post('producers',name='Duckhorn')
+Post('producers',name="Duckhorn", wines=
+    [
+        {"name":"name1","country":"FRA","region":"region1","terroir":"terroir1",
+        "vintage":{ 
+            "price" : "150.99",
+            "year" : "2017",
+            }
+        }
+    ])
