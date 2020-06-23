@@ -27,12 +27,13 @@ def Post(page, **kargs):
     jsonResponse = response.json()
     print(jsonResponse)
 
-Post('producers',name="Duckhorn", wines=
+Post('producers',name="Duckhorn2", wines=
     [
         {"name":"name1","country":"FRA","region":"region1","terroir":"terroir1",
-        "vintage":{ 
-            "price" : "150.99",
-            "year" : "2017",
-            }
+        "vintage":[
+                { 
+                "price" : "2050.99",
+                "year" : "2017",
+                }]
         }
     ])

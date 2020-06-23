@@ -42,7 +42,7 @@ class ProducerWinesSerializer(serializers.ModelSerializer):
         wines_data = validated_data.pop('wines')
         producer = Producer.objects.create(**validated_data)
         for wine_data in wines_data:
-            vintage_data = wine_data.pop('vintage')
+            vintage_data = wine_data.pop('vintage')[0]
             wine = Wine.objects.create(producer=producer, **wine_data)
             Market.objects.create(wine=wine, **vintage_data)
         return producer
