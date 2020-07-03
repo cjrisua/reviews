@@ -1,13 +1,14 @@
 import requests, json
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
+import pandas as pd
+import re
 
-URL = 'http://127.0.0.1:8000'
+URL = 'http://127.0.0.1:8000/'
 
 def Get(page):
     try:
-        URL = 'http://127.0.0.1:8000/producers/'
-        response = requests.get(URL)
+        response = requests.get(f"{URL}{page}")
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
@@ -21,13 +22,39 @@ def Get(page):
 
 def Post(page, **kargs):
     headers = {'content-type': 'application/json'}
-    payload = kargs
-    print(f"{payload}")
-    response = requests.post(str(f"{URL}/{page}/") , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(payload), headers=headers)
+    data=json.dumps(kargs["payload"])
+    print(f"{data}")
+    #response = requests.post(str(f"{URL}/{page}/") , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(payload), headers=headers)
     #jsonResponse = response.json()
     #print(jsonResponse)
 
+#read country file
+countrydf = pd.read_csv("country_code.csv")
 
+#open review csv fiew 
+df = pd.read_csv("winespectator.csv", encoding="utf-8")
+payload = []
+for house,wines in df.groupby(["house"]):
+    dataset = {"name": house, "wines":[]}
+    for index, row in wines.iterrows():
+        wineset = {
+                    "name" : row["terroir"], 
+
+                    "country": countrydf[countrydf.Country==row["country"]].Alpha3.head(1).values[0],
+                    "region": row["region"],
+                    "terroir": "",
+                    "vintage":
+                        [{"year": row["vintage"], 
+                        "price":  "N/A"  "N/A" if re.match(r"\$(\d+)(\.\d+)?",row["releasedprice"]) is None else re.search(r"[0-9\.,]+",row["releasedprice"])[0],
+                        }]
+                   }
+        dataset["wines"].append(wineset)
+    Post("api/wine/",payload = dataset)
+
+
+#Get("api/wine/")
+
+"""
 Post('producers',name="Duckhorn2", wines=
     [
         {
@@ -49,4 +76,5 @@ Post('producers',name="Duckhorn2", wines=
                     }
                 ]
             }
-    ])
+    ])    
+"""

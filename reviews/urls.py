@@ -20,7 +20,7 @@ from django.contrib import admin
 
 
 router = routers.DefaultRouter()
-router.register(r'reviews', views.WineReviewViewSet)
+router.register(r'wine', views.WineReviewViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

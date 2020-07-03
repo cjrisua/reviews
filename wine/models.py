@@ -1,10 +1,12 @@
 from django.db import models
 from django.utils.text import slugify
+from jsonfield import JSONField
 
 class Producer(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
 
     class Meta:
+        
         ordering = ('-name',)
     def __str__(self):
         return self.name
@@ -19,22 +21,25 @@ class Wine(models.Model):
         ('USA','United States'),
         ('PRT','Portugal'),
         ('ESP','Spain'),
-        ('ITA','Italy')
+        ('ITA','Italy'),
+        ('HUN','Hungary'),
+        ('DEU','Germany'),
+        ('AUT','Austria'),
+        ('CAN', 'Canada'),
+        ('ISR','Israel'),
+        ('ZAF', 'South Africa'),
     )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
     country = models.CharField(choices=COUNTRY,max_length=3)
     region = models.CharField(max_length=255)
-    terroir = models.CharField(max_length=125)
-
-    class Meta:
-        ordering = ('-producer',)
+    terroir = models.CharField(max_length=125, blank=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
-        unique_together = ['producer', 'id']
+        unique_together = ['producer', 'name']
         ordering = ['name']
 
 class Critic(models.Model):
@@ -73,3 +78,15 @@ class Review(models.Model):
     class Meta:
         unique_together = ['critic','marketitem']
         ordering = ['score']
+
+class InboundException(models.Model):
+    indoundid = models.IntegerField(blank=False)
+    house = models.CharField(max_length=150)
+    terroir = models.CharField(max_length=150)
+    metadata = JSONField()
+
+    class Meta:
+        unique_together = ['indoundid','id']
+
+    def __str__(self):
+        return f"{self.house} {self.terroir}"
