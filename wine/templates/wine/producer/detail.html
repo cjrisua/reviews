@@ -1,0 +1,16 @@
+{% extends "cellar/base.html" %}
+{% block content %}
+    <h2>{{wine.wine.producer.name}}</h2>
+    <h3>Vintage: {{wine.year}}</h3>
+    <h4>{{wine.wine.name}}</h4>
+    <h4>Release Price: {{wine.price}}</h4>
+    {% if review.all %}
+        <span>Reviews</span>
+        {% for r in review.all %}
+            <li>{{r.critic.name}}</li>
+            <span>{{r.observation}}</span>
+        {% endfor %}
+    {% else %}
+        <span>No Reviews</span>
+    {% endif %}
+{% endblock %}

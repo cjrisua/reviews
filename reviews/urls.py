@@ -16,15 +16,16 @@ Including another URLconf
 from django.urls import include, path
 from rest_framework import routers
 from wine import views
+from django.contrib import admin
+
 
 router = routers.DefaultRouter()
-router.register(r'producers', views.ProducerViewSet)
-router.register(r'wines', views.WineViewSet)
-router.register(r'critics', views.CriticViewSet)
-router.register(r'market', views.MarketViewSet)
-router.register(r'reviews', views.ReviewViewSet)
+router.register(r'reviews', views.WineReviewViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api/', include('rest_framework.urls', namespace='rest_framework'))
+    path('admin/', admin.site.urls),
+    path('cellar/', include('cellar.urls', namespace='cellar')),
+    path('wine/', include('wine.urls', namespace='wine')),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/',  include(router.urls)),
 ]

@@ -1,0 +1,11 @@
+{% extends "cellar/base.html" %}
+{% block content %}
+  <h3>My Cellar</h1>
+  {% for cellaritem in collection %}
+    <h4>
+      <a href="{{ cellaritem.get_absolute_url }}">
+        {{ cellaritem }}
+      </a>
+    </h4>
+  {% endfor %}
+{% endblock %}

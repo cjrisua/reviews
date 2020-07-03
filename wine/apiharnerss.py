@@ -24,16 +24,29 @@ def Post(page, **kargs):
     payload = kargs
     print(f"{payload}")
     response = requests.post(str(f"{URL}/{page}/") , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(payload), headers=headers)
-    jsonResponse = response.json()
-    print(jsonResponse)
+    #jsonResponse = response.json()
+    #print(jsonResponse)
+
 
 Post('producers',name="Duckhorn2", wines=
     [
-        {"name":"name1","country":"FRA","region":"region1","terroir":"terroir1",
-        "vintage":[
-                { 
-                "price" : "2050.99",
-                "year" : "2017",
-                }]
-        }
+        {
+            "name":"name1",
+            "country":"FRA",
+            "region":"region1",
+            "terroir":"terroir1",
+            "vintage":[
+                    { 
+                        "price" : "2050.99",
+                        "year" : "2017",
+                        "reviews" : [
+                                        {
+                                            "issuedate":"2020-01-01",
+                                            "observation" : "Hello World",
+                                            "score" : "100"           
+                                        }
+                ]
+                    }
+                ]
+            }
     ])

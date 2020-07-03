@@ -1,15 +1,30 @@
 from .models import Producer, Wine, Critic, Market, Review
 from rest_framework import serializers
 
+class CriticSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Critic
+        fields = ['name']
+
 class ProducerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producer
         fields = ['name']
-class MarketSerializer(serializers.ModelSerializer):
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['score','issuedate','observation','critic']
+
+class MarketSerializer(serializers.ModelSerializer):
+    #reviews = ReviewSerializer(many=True)
     class Meta:
         model = Market
         fields = ['year','price']
+
+    def create(self, validated_data):
+        market = Market.objects.create(**validated_data)
+        return market
 
 class WineSerializer(serializers.ModelSerializer):
     vintage = MarketSerializer(many=True)
@@ -21,15 +36,11 @@ class WineSerializer(serializers.ModelSerializer):
         wine = Wine.objects.create(**validated_data)
         return wine
 
-class CriticSerializer(serializers.ModelSerializer):
+class WineReviewSerializer(serializers.ModelSerializer):
+    wines = WineSerializer(many=True)
     class Meta:
-        model = Critic
-        fields = ['name']
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ['score','issuedate','observation','critic']
+        model = Producer
+        fields = ['name','wines']
 
 class ProducerWinesSerializer(serializers.ModelSerializer):
     wines = WineSerializer(many=True)

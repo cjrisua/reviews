@@ -1,8 +1,8 @@
+from django.shortcuts import get_object_or_404, render
 from .models import Producer,Wine, Critic, Market, Review
 from rest_framework import viewsets
-from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer
-
-# Create your views here.
+from django.http import HttpResponse
+from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer
 
 class ProducerViewSet(viewsets.ModelViewSet):
     """
@@ -38,3 +38,20 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """
     queryset = Review.objects.order_by('-score')
     serializer_class = ReviewSerializer
+
+class WineReviewViewSet(viewsets.ModelViewSet):
+    queryset = Producer.objects.all()
+    serializer_class = WineReviewSerializer
+
+# Create your views here.
+def wine_detail(request, producer, year ,winename):
+    wine = get_object_or_404(Market, producerslug=producer,
+                                     year=year,
+                                     wineslug = winename)
+    if wine.observations:
+        review = Review.objects.filter(marketitem_id=wine.id)
+
+    return render(request,
+                  'wine/producer/detail.html',
+                  {'wine': wine, 'review' : review})
+    #return HttpResponse("return this string")
