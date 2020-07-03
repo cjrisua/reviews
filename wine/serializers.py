@@ -44,11 +44,16 @@ class WineReviewSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         wines_data = validated_data.pop('wines')
-        producer = Producer.objects.create(**validated_data)
+        producer, created = Producer.objects.get_or_create(**validated_data)
+        #producer, created = Producer.objects.get_or_create(name=validated_data["name"])
+        #producer = Producer.objects.create(**validated_data)
+
         for wine_data in wines_data:
             vintage_data = wine_data.pop('vintage')[0]
-            wine = Wine.objects.create(producer=producer, **wine_data)
-            Market.objects.create(wine=wine, **vintage_data)
+            #wine = Wine.objects.create(producer=producer, **wine_data)
+            wine, created = Wine.objects.get_or_create(producer=producer, **wine_data)
+            market, created = Market.objects.get_or_create(wine=wine, **vintage_data)
+            #Market.objects.create(wine=wine, **vintage_data)
         return producer
 
 class ProducerWinesSerializer(serializers.ModelSerializer):

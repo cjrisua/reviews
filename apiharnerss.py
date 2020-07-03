@@ -4,11 +4,11 @@ from requests.auth import HTTPBasicAuth
 import pandas as pd
 import re
 
-URL = 'http://127.0.0.1:8000/'
+URL = 'http://127.0.0.1:8000'
 
 def Get(page):
     try:
-        response = requests.get(f"{URL}{page}")
+        response = requests.get(f"{URL}/{page}")
         response.raise_for_status()
         # access JSOn content
         jsonResponse = response.json()
@@ -22,11 +22,9 @@ def Get(page):
 
 def Post(page, **kargs):
     headers = {'content-type': 'application/json'}
-    data=json.dumps(kargs["payload"])
-    print(f"{data}")
-    #response = requests.post(str(f"{URL}/{page}/") , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(payload), headers=headers)
-    #jsonResponse = response.json()
-    #print(jsonResponse)
+    response = requests.post(f"{URL}/{page}" , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(kargs["payload"]), headers=headers)
+    jsonResponse = response.json()
+    print(jsonResponse)
 
 #read country file
 countrydf = pd.read_csv("country_code.csv")
@@ -50,6 +48,7 @@ for house,wines in df.groupby(["house"]):
                    }
         dataset["wines"].append(wineset)
     Post("api/wine/",payload = dataset)
+    break
 
 
 #Get("api/wine/")

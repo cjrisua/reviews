@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from jsonfield import JSONField
 
 class Producer(models.Model):
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=150)
 
     class Meta:
         
