@@ -1,5 +1,6 @@
 from .models import Producer, Wine, Critic, Market, Review
 from rest_framework import serializers
+from .analytics.wineentities import WineEntities
 
 class CriticSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,20 +46,15 @@ class WineReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         wines_data = validated_data.pop('wines')
         producer, created = Producer.objects.get_or_create(**validated_data)
-        #producer, created = Producer.objects.get_or_create(name=validated_data["name"])
-        #producer = Producer.objects.create(**validated_data)
-
         for wine_data in wines_data:
             vintage_data = wine_data.pop('vintage')[0]
-            #wine = Wine.objects.create(producer=producer, **wine_data)
+            enities = WineEntities(wine_data["name"])
             wine, created = Wine.objects.get_or_create(producer=producer, **wine_data)
             market, created = Market.objects.get_or_create(wine=wine, **vintage_data)
-            #Market.objects.create(wine=wine, **vintage_data)
         return producer
 
 class ProducerWinesSerializer(serializers.ModelSerializer):
     wines = WineSerializer(many=True)
-    
     class Meta:
         model = Producer
         fields = ['name','wines']
