@@ -48,7 +48,6 @@ for house,wines in df.groupby(["house"]):
                    }
         dataset["wines"].append(wineset)
     Post("api/wine/",payload = dataset)
-    break
 
 
 #Get("api/wine/")

@@ -39,6 +39,7 @@ class WineSerializer(serializers.ModelSerializer):
 
 class WineReviewSerializer(serializers.ModelSerializer):
     wines = WineSerializer(many=True)
+    enities = WineEntities()
     class Meta:
         model = Producer
         fields = ['name','wines']
@@ -48,7 +49,7 @@ class WineReviewSerializer(serializers.ModelSerializer):
         producer, created = Producer.objects.get_or_create(**validated_data)
         for wine_data in wines_data:
             vintage_data = wine_data.pop('vintage')[0]
-            enities = WineEntities(wine_data["name"])
+            self.enities.ReadEntities(wine_data["name"])
             wine, created = Wine.objects.get_or_create(producer=producer, **wine_data)
             market, created = Market.objects.get_or_create(wine=wine, **vintage_data)
         return producer

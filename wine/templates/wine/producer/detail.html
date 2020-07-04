@@ -1,16 +1,44 @@
 {% extends "cellar/base.html" %}
+
+{% block javascript %}
+  <script>
+    $( document ).ready(function() 
+    {
+        console.log( "ready!");
+        var wineid = "{{ wine.wine_id }}"
+        $.ajax(
+        {
+            
+            type:"GET",
+            url: "/analytics/displacy/",
+            data:{
+                    wine_id: wineid
+            },
+            success: function( data ) 
+            {
+                $('#wine-content-displacy').html(data);
+            }
+        })
+    });
+  </script>
+{% endblock %}
+
 {% block content %}
-    <h2>{{wine.wine.producer.name}}</h2>
-    <h3>Vintage: {{wine.year}}</h3>
-    <h4>{{wine.wine.name}}</h4>
-    <h4>Release Price: {{wine.price}}</h4>
-    {% if review.all %}
-        <span>Reviews</span>
-        {% for r in review.all %}
-            <li>{{r.critic.name}}</li>
-            <span>{{r.observation}}</span>
-        {% endfor %}
-    {% else %}
-        <span>No Reviews</span>
-    {% endif %}
+    <div id="wine-content-detail">
+        <p>Testing ID: "{{ wine.wine_id }}"<p/>
+        <h2>{{wine.wine.producer.name}}</h2>
+        <h3>Vintage: {{wine.year}}</h3>
+        <h4>{{wine.wine.name}}</h4>
+        <h4>Release Price: {{wine.price}}</h4>
+        {% if review.all %}
+            <span>Reviews</span>
+            {% for r in review.all %}
+                <li>{{r.critic.name}}</li>
+                <span>{{r.observation}}</span>
+            {% endfor %}
+        {% else %}
+            <span>No Reviews</span>
+        {% endif %}
+        <div id="wine-content-displacy"></div>
+    </div>
 {% endblock %}
