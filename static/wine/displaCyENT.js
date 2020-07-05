@@ -58,8 +58,15 @@ class displaCyENT {
             const fragments = text.slice(offset, start).split('\n');
  
             fragments.forEach((fragment, i) => {
-                this.container.appendChild(document.createTextNode(fragment));
-                if(fragments.length > 1 && i != fragments.length - 1) this.container.appendChild(document.createElement('br'));
+                //this.container.appendChild(document.createTextNode(fragment));
+                if(fragments.length > 1 && i != fragments.length - 1) 
+                    this.container.appendChild(document.createElement('br'));
+                else{
+                    const span = document.createElement('span');
+                    span.setAttribute('id','1')
+                    span.appendChild(document.createTextNode(fragment))
+                    this.container.appendChild(span);
+                }
             });
 
             if(ents.includes(label.toLowerCase())) {
