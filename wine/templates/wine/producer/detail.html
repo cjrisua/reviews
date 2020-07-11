@@ -4,6 +4,124 @@
   <script>
     $( document ).ready(function() 
     {
+        if (!window.x) {
+        x = {};
+        }
+        x.Selector = {};
+        x.Selector.getSelected = function() {
+            var t = '';
+            if (window.getSelection) {
+                console.log("window")
+                t = window.getSelection();
+            } else if (document.getSelection) {
+                console.log("document")
+                t = document.getSelection();
+            } else if (document.selection) {
+                console.log("document.range")
+                t = document.selection.createRange().text;
+            }
+            return t;
+        }
+        var getNextNode = function(node, skipChildren, endNode){
+            //if there are child nodes and we didn't come from a child node
+            if (endNode == node) {
+                return null;
+            }
+            if (node.firstChild && !skipChildren) {
+                return node.firstChild;
+            }
+            if (!node.parentNode){
+                return null;
+            }
+            return node.nextSibling 
+                    || getNextNode(node.parentNode, true, endNode); 
+        };
+        $('button.entity').on('click', function(){
+            $('button.entity').removeClass('selected');
+            $(this).addClass('selected');
+        });
+
+        $('button.train').on('click', function(){
+           alert("TODO AJAX to Train URL")
+        });
+
+        $(document).on('change mouseup mousedown keydown',"#wine-content-displacy", function(){
+            var selection = x.Selector.getSelected();
+
+            if(selection.anchorNode == selection.focusNode &&
+               selection.anchorOffset == selection.focusOffset)
+                return;
+            else if(selection.anchorNode.parentElement != null && selection.anchorNode.parentElement.parentElement != $(this)[0] ||
+                    selection.focusNode.parentElement != null && selection.focusNode.parentElement.parentElement != $(this)[0] )
+                return;
+
+            //Check select direction
+            let endindex = Array.from($(this)[0].childNodes).indexOf(selection.focusNode.parentElement)
+            let startindex = Array.from($(this)[0].childNodes).indexOf(selection.anchorNode.parentElement)
+            
+            let  startNode = startindex < endindex ? selection.anchorNode : selection.focusNode;
+            let  endNode = startindex < endindex ? selection.focusNode : selection.anchorNode;
+
+            let sliced = Array.from($(this)[0].childNodes).slice(startindex, (endindex+1))
+            var newtext = '';
+            let selectedbutton = Array.from($('.button.entity')).filter(bclass => bclass.className.includes('selected'));
+
+            sliced.forEach( (node,index) => {
+
+                newtext += node.innerHTML;
+
+                if( (index+1) == sliced.length)
+                {
+                    if(node.localName != 'mark')
+                    {
+                        if(selectedbutton.length == 0){
+                            alert("select an entity for: " + newtext)
+                            return;
+                        }
+                        const mark = document.createElement('mark');
+                        mark.setAttribute('data-entity', selectedbutton[0].innerHTML.toLowerCase());
+                        mark.appendChild(document.createTextNode(newtext.trim()));
+                        mark.appendChild(document.createTextNode(" "));
+                        node.replaceWith(mark);
+                    }
+                    else
+                    {
+                        let nextextarraysize = newtext.length;
+                        //node.remove()
+                        newtext.split(' ').forEach( (text,i) => { 
+                            if (text.length > 0) {
+                                const span = document.createElement('span');
+                                span.setAttribute('id','span_0')
+                                span.appendChild(document.createTextNode(text.trim()))
+                                span.appendChild(document.createTextNode(" "))
+                                node.parentNode.insertBefore(span,node)
+                            }
+                        });
+                        node.remove()
+                    }
+                }
+                else
+                    node.remove()
+            });
+            
+            let alteredwinename = $(this)[0].innerText.trim()
+            //store information
+
+            let ents = []
+            //get marks
+            Array.from($(this).find('mark')).forEach( entity => {
+                let start = $(".winename")[0].innerText.indexOf(entity.innerText.trim())
+                let end = start + entity.innerText.trim().length;
+                let ent = {"start": start, "end": end, "label": entity.dataset.entity.toUpperCase()};
+                ents.push(ent);
+                console.log("|"+$(".winename")[0].innerText.slice(start,end)+"|")
+            });
+
+            let spacystring = {"text" : alteredwinename , "ents":ents, "tile":"None"};
+            console.log(JSON.stringify([spacystring]));
+            selection.removeAllRanges()
+        });
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -29,8 +147,6 @@
         container: '#wine-content-displacy',csrftoken: csrftoken})
         displacy.parse(winename,)
         
-
-        
     });
   </script>
 {% endblock %}
@@ -40,7 +156,7 @@
         <p>Testing ID: "{{ wine.wine_id }}"<p/>
         <h2>{{wine.wine.producer.name}}</h2>
         <h3>Vintage: {{wine.year}}</h3>
-        <h4>{{wine.wine.name}}</h4>
+        <h4 class="winename">{{wine.wine.name}}</h4>
         <h4>Release Price: {{wine.price}}</h4>
         {% if review.all %}
             <span>Reviews</span>
@@ -51,6 +167,14 @@
         {% else %}
             <span>No Reviews</span>
         {% endif %}
+        <div id="msgid">
+            <button  class="button entity">Grape</button>
+            <button  class="button entity">Terrior</button>
+            <button  class="button entity">Location</button>
+        </div>
         <div id="wine-content-displacy"></div>
+        <div id="msgid">
+            <button  class="button train">Train</button>
+        </div>
     </div>
 {% endblock %}

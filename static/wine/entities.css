@@ -2,14 +2,34 @@
     line-height: 2;
 }
 
-[data-entity] {
-    padding: 0.25em 0.35em;
-     margin: 0px 0.25em;
-     line-height: 1;
-     display: inline-block;
-     border-radius: 0.25em;
-     border: 1px solid;
+
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    margin: 2px 1px;
+    cursor: pointer;
+    border-radius: 10%;
 }
+.button.entity {
+    background-color: #67bb9f; /* Green */
+}
+.button.train {
+    background-color: #99af4c; /* Green */
+}
+
+.button.entity.selected{
+    color:red;
+  }
+
+span::selection {
+    background: rgb(166, 226, 45)
+  }
 
 [data-entity]::after {
     box-sizing: border-box;
@@ -24,29 +44,28 @@
     margin: 0px 0px 0.1rem 0.5rem;
 }
 
-[data-entity][data-entity="person"] {
+[data-entity][data-entity="grape"] {
     background: rgba(166, 226, 45, 0.2);
     border-color: rgb(166, 226, 45);
 }
 
-[data-entity][data-entity="person"]::after {
+[data-entity][data-entity="grape"]::after {
     background: rgb(166, 226, 45);
 }
 
-[data-entity][data-entity="org"] {
+[data-entity][data-entity="location"] {
     background: rgba(67, 198, 252, 0.2);
     border-color: rgb(67, 198, 252);
 }
 
-[data-entity][data-entity="org"]::after {
+[data-entity][data-entity="location"]::after {
     background: rgb(67, 198, 252);
 }
 
-[data-entity][data-entity="date"] {
+[data-entity][data-entity="terrior"] {
     background: rgba(47, 187, 171, 0.2);
     border-color: rgb(47, 187, 171);
 }
-
-[data-entity][data-entity="date"]::after {
+[data-entity][data-entity="terrior"]::after {
     background: rgb(47, 187, 171);
 }

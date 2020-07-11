@@ -52,19 +52,21 @@ class displaCyENT {
         
         //console.log(spans.ents)
         //spans = [{"start":0,"end":18,"label":"GRAPE"}]
-        
+        let spanid = 1;
+
         spans.ents.forEach(({ label, start, end }) => {
             const entity = text.slice(start, end);
-            const fragments = text.slice(offset, start).split('\n');
+            const fragments = text.slice(offset, start).split(' ');
  
             fragments.forEach((fragment, i) => {
                 //this.container.appendChild(document.createTextNode(fragment));
                 if(fragments.length > 1 && i != fragments.length - 1) 
                     this.container.appendChild(document.createElement('br'));
-                else{
+                else if (fragments.length > 1) {
                     const span = document.createElement('span');
-                    span.setAttribute('id','1')
+                    span.setAttribute('id','span_' + spanid++)
                     span.appendChild(document.createTextNode(fragment))
+                    span.appendChild(document.createTextNode(" "))
                     this.container.appendChild(span);
                 }
             });
@@ -73,6 +75,7 @@ class displaCyENT {
                 const mark = document.createElement('mark');
                 mark.setAttribute('data-entity', label.toLowerCase());
                 mark.appendChild(document.createTextNode(entity));
+                mark.appendChild(document.createTextNode(" "));
                 this.container.appendChild(mark);
             }
 
@@ -83,7 +86,22 @@ class displaCyENT {
             offset = end;
         });
         
-        this.container.appendChild(document.createTextNode(text.slice(offset, text.length)));
+        //this.container.appendChild(document.createTextNode(text.slice(offset, text.length)));
+        const fragments = text.slice(offset, text.length).split(' ');
+        let fragmentarraysize = fragments.length
+        fragments.forEach((fragment, i) => {
+            //this.container.appendChild(document.createTextNode(fragment));
+            if (fragment.length > 0) {
+                const span = document.createElement('span');
+                span.setAttribute('id','span_' + spanid++)
+                //span.setAttribute('class', "noselect");
+                span.appendChild(document.createTextNode(fragment))
+                if((i+1) != fragmentarraysize)
+                    span.appendChild(document.createTextNode(" "))
+                this.container.appendChild(span);
+            }
+            //}
+        });
         
         console.log(`%c💥  HTML markup\n%c<div class="entities">${this.container.innerHTML}</div>`, 'font: bold 16px/2 arial, sans-serif', 'font: 13px/1.5 Consolas, "Andale Mono", Menlo, Monaco, Courier, monospace');
 
