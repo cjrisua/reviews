@@ -65,7 +65,8 @@
             let sliced = Array.from($(this)[0].childNodes).slice(startindex, (endindex+1))
             var newtext = '';
             let selectedbutton = Array.from($('.button.entity')).filter(bclass => bclass.className.includes('selected'));
-
+            //let status = 0;
+            //var newtext = "";
             sliced.forEach( (node,index) => {
 
                 newtext += node.innerHTML;
@@ -101,7 +102,10 @@
                     }
                 }
                 else
-                    node.remove()
+                {
+                    if(selectedbutton.length != 0)
+                        node.remove();
+                }
             });
             
             let alteredwinename = $(this)[0].innerText.trim()

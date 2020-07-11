@@ -60,9 +60,11 @@ class displaCyENT {
  
             fragments.forEach((fragment, i) => {
                 //this.container.appendChild(document.createTextNode(fragment));
-                if(fragments.length > 1 && i != fragments.length - 1) 
+                /*if(fragments.length > 1 && i != fragments.length - 1) 
                     this.container.appendChild(document.createElement('br'));
                 else if (fragments.length > 1) {
+                */
+                if (fragment.length > 0) {
                     const span = document.createElement('span');
                     span.setAttribute('id','span_' + spanid++)
                     span.appendChild(document.createTextNode(fragment))
