@@ -11,7 +11,7 @@ class displaCyENT {
 
         this.defaultText = options.defaultText || 'When Sebastian Thrun started working on self-driving cars at Google in 2007, few people outside of the company took him seriously.';
         this.defaultModel = options.defaultModel || 'en';
-        this.defaultEnts = options.defaultEnts || ['person', 'org', 'gpe', 'loc', 'product','grape'];
+        this.defaultEnts = options.defaultEnts || ['person', 'org', 'gpe','terrior' ,'location', 'product','grape'];
 
         this.onStart = options.onStart || false;
         this.onSuccess = options.onSuccess || false;
@@ -77,7 +77,8 @@ class displaCyENT {
                 const mark = document.createElement('mark');
                 mark.setAttribute('data-entity', label.toLowerCase());
                 mark.appendChild(document.createTextNode(entity));
-                mark.appendChild(document.createTextNode(" "));
+                if(entity[entity.length-1] != "-")
+                    mark.appendChild(document.createTextNode(" "));
                 this.container.appendChild(mark);
             }
 

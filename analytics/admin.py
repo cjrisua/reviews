@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import ParkerSomm
 
-# Register your models here.
+@admin.register(ParkerSomm)
+class ParkerSommAdmin(admin.ModelAdmin):
+    list_display = ('keywords','metadata','sourceid','sourcetype')

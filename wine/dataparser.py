@@ -7,7 +7,28 @@ from pathlib import Path
 import spacy
 from spacy.util import minibatch, compounding
 
+import requests, json
+from requests.exceptions import HTTPError
+
+
+URL = 'http://127.0.0.1:8000'
+
+def Get(page):
+    try:
+        response = requests.get(f"{URL}/{page}")
+        response.raise_for_status()
+        # access JSOn content
+        return response.json()
+        
+        return 
+    except HTTPError as http_err:
+        print(f'HTTP error occurred: {http_err}')
+    except Exception as err:
+        print(f'Other error occurred: {err}')
+
 # training data
+TRAIN_DATA = []
+"""
 TRAIN_DATA = [
     ("Pinot Noir Willamette Valley",{"entities":[()]}),
     ("Cabernet Franc St. Helena 29 Estate", {"entities" : [(0,14,"GRAPE")]}),
@@ -15,14 +36,31 @@ TRAIN_DATA = [
     ("Who is Shaka Khan?", {"entities": [(7, 17, "PERSON")]}),
     ("I like London and Berlin.", {"entities": [(7, 13, "LOC"), (18, 24, "LOC")]}),
 ]
+"""
 
+def getSpacyTrainStyle(data):
+    # ("Uber blew through $1 million a week", {"entities": [(0, 4, "ORG")]})
+    ents = {'entities': [(e['start'],e['end'],e['label']) for e in data['ents']]}
+    text = data['text']
+    return(text,ents)
+
+def InitTrainData():
+    data = []
+    r = Get("api/learn/")
+    while r["next"] != None:
+        data.append(r["results"])
+        r = Get(r["next"][22:])
+    return [getSpacyTrainStyle(json.loads(m['metadata'])) for d in data for m in d]
 
 @plac.annotations(
     model=("Model name. Defaults to blank 'en' model.", "option", "m", str),
     output_dir=("Optional output directory", "option", "o", Path),
     n_iter=("Number of training iterations", "option", "n", int),
 )
+
 def main(model=None, output_dir=None, n_iter=100):
+
+    TRAIN_DATA = InitTrainData()
     """Load the model, set up the pipeline and train the entity recognizer."""
     if model is not None:
         nlp = spacy.load(model)  # load existing spaCy model
@@ -55,8 +93,8 @@ def main(model=None, output_dir=None, n_iter=100):
 
         # reset and initialize the weights randomly – but only if we're
         # training a new model
-        if model is None:
-            nlp.begin_training()
+        #if model is None:
+        nlp.begin_training()
         for itn in range(n_iter):
             random.shuffle(TRAIN_DATA)
             losses = {}

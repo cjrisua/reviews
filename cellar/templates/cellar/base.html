@@ -1,21 +1,39 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Minikahda Wine Cellar</title>
     </head>
     <body>
-        <div id="content">
+        <div id="container">
             {% block content %}
             {% endblock %}
+            <footer>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Copyright © 2020</p>
+                    </div>
+                    <div class="col-md-6 text-md-right">
+                        <a href="#" class="text-dark">Terms of Use</a> 
+                        <span class="text-muted mx-2">|</span> 
+                        <a href="#" class="text-dark">Privacy Policy</a>
+                    </div>
+                </div>
+            </footer>
         </div>
-        <div id="sidebar">
+        <!--<div id="sidebar">
             <h2>My Cellar</h2>
             <p>This is my cellar.</p>
             <span id='span_a'>Hello Carlos</span>
         </div>
+        -->
         <script src="{% static 'wine/displaCyENT.js' %}"></script> 
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="{% static 'wine/entities.css' %}">       
+        <link rel="stylesheet" type="text/css" href="{% static 'wine/entities.css' %}">   
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/css/bootstrap.min.css' %}" >  
+        <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>      
         {% block javascript %}{% endblock %}
     </body>
 </html>

@@ -78,6 +78,7 @@ class Review(models.Model):
     class Meta:
         unique_together = ['critic','marketitem']
         ordering = ['score']
+    
 
 class InboundException(models.Model):
     indoundid = models.IntegerField(blank=False)

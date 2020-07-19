@@ -15,18 +15,24 @@ Including another URLconf
 """
 from django.urls import include, path
 from rest_framework import routers
-from wine import views
+from wine import views as wineviews
+from cellar import views as cellarviews
+from analytics import views as analyticsviews
 from django.contrib import admin
 
 
 router = routers.DefaultRouter()
-router.register(r'wine', views.WineReviewViewSet)
+router.register(r'wine', wineviews.WineReviewViewSet)
+router.register(r'cellar', cellarviews.CollectionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('cellar/', include('cellar.urls', namespace='cellar')),
+    #path('cellar/', include('cellar.urls', namespace='cellar')),
+    path('cellar/', cellarviews.CollectionListView.as_view(),name='cellar'),
     path('wine/', include('wine.urls', namespace='wine')),
     path('analytics/', include('analytics.urls', namespace='analytics')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/',  include(router.urls)),
+    path('api/learn/<int:pk>/',  analyticsviews.ParkerSommDetail.as_view(), name='analytics'),
+    path('api/learn/',  analyticsviews.ParkerSommList.as_view(), name='analytics'),
 ]

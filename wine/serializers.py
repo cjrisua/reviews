@@ -17,11 +17,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['score','issuedate','observation','critic']
 
+    def create(self, validated_data):
+        review = Review.objects.create(**validated_data)
+        return review
+
 class MarketSerializer(serializers.ModelSerializer):
-    #reviews = ReviewSerializer(many=True)
+    observations = ReviewSerializer(many=True)
+
     class Meta:
         model = Market
-        fields = ['year','price']
+        fields = ['id','year','price','observations']
 
     def create(self, validated_data):
         market = Market.objects.create(**validated_data)
@@ -29,6 +34,7 @@ class MarketSerializer(serializers.ModelSerializer):
 
 class WineSerializer(serializers.ModelSerializer):
     vintage = MarketSerializer(many=True)
+    
     class Meta:
         model = Wine
         fields = ['name','country','region','terroir','vintage']
@@ -42,7 +48,7 @@ class WineReviewSerializer(serializers.ModelSerializer):
     enities = WineEntities()
     class Meta:
         model = Producer
-        fields = ['name','wines']
+        fields = ['id','name','wines']
         
     def create(self, validated_data):
         wines_data = validated_data.pop('wines')
@@ -51,7 +57,14 @@ class WineReviewSerializer(serializers.ModelSerializer):
             vintage_data = wine_data.pop('vintage')[0]
             self.enities.ReadEntities(wine_data["name"])
             wine, created = Wine.objects.get_or_create(producer=producer, **wine_data)
+            
+            reviews = vintage_data.pop('observations')
+
             market, created = Market.objects.get_or_create(wine=wine, **vintage_data)
+
+            for review_data in reviews:
+                review, created = Review.objects.get_or_create(marketitem=market, **review_data)
+
         return producer
 
 class ProducerWinesSerializer(serializers.ModelSerializer):
