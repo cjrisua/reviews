@@ -1,6 +1,37 @@
-from .models import Producer, Wine, Critic, Market, Review
+from .models import BlendVarietal,  Producer, Wine, Critic, Market, Review, Terroir, Country, Varietal
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
+
+class VarietalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Varietal
+        fields = ['id','name','slug']
+        lookup_field ='slug'
+
+
+class BlendVarietalSerializer(serializers.ModelSerializer):
+    blend_varietal = VarietalSerializer(many=True)
+
+    class Meta:
+        model = BlendVarietal
+        fields = ['id','name','blend_varietal']
+        lookup_field ='id'
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['id','name','abbreviation','slug']
+        lookup_field ='slug'
+
+class TerroirSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Terroir
+        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard']
+        lookup_field = 'slug'
+
+    def create(self, validated_data):
+         terroir, created = Terroir.objects.get_or_create(**validated_data)
+         return terroir
 
 class CriticSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,7 +68,7 @@ class WineSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Wine
-        fields = ['name','country','region','terroir','vintage']
+        fields = ['name','terroir','vintage']
 
     def create(self, validated_data):
         wine = Wine.objects.create(**validated_data)

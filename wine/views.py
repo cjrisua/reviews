@@ -1,8 +1,23 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Producer,Wine, Critic, Market, Review
+from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer
+from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
+
+class VarietalViewSet(viewsets.ModelViewSet):
+    queryset = Varietal.objects.all()
+    serializer_class = VarietalSerializer
+    lookup_field = 'slug'
+
+class CountryViewSet(viewsets.ModelViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    lookup_field = 'slug'
+
+class TerroirViewSet(viewsets.ModelViewSet):
+    queryset = Terroir.objects.all()
+    serializer_class = TerroirSerializer
+    lookup_field = 'slug'
 
 class ProducerViewSet(viewsets.ModelViewSet):
     """
