@@ -27,6 +27,7 @@ router.register(r'cellar', cellarviews.CollectionViewSet)
 router.register(r'terroir', wineviews.TerroirViewSet)
 router.register(r'country', wineviews.CountryViewSet)
 router.register(r'varietal', wineviews.VarietalViewSet)
+router.register(r'blendvarietal', wineviews.BlendVarietalViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

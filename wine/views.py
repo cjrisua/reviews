@@ -1,8 +1,13 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal
+from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal, BlendVarietal
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
+from .serializers import BlendVarietalSerializer, ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
+
+class BlendVarietalViewSet(viewsets.ModelViewSet):
+    queryset = BlendVarietal.objects.all()
+    serializer_class = BlendVarietalSerializer
+    lookup_field = 'id'
 
 class VarietalViewSet(viewsets.ModelViewSet):
     queryset = Varietal.objects.all()

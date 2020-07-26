@@ -2,8 +2,9 @@ import requests, json
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import pandas as pd
+import socket
 
-URL = 'http://tokalon.fios-router.home:8000'
+URL = f'http://{socket.gethostname()}:8000'
 
 def FormatDate(input):
     rmatch = re.match(r'^Web\s+Only.+?([0-9]{4})',input)
@@ -45,11 +46,36 @@ countries =(
         ('CAN', 'Canada'),
         ('ISR','Israel'),
         ('ZAF', 'South Africa'),)
-countries = [{"name": name, "abbreviation": abbreviation} for abbreviation, name in countries]
-for country in countries:
-    response = Post("api/country/",payload = country)
 
-df = pd.read_csv("grapes.csv")
-grapes =[str(g).strip('\xa0').strip() for r in df['Common Name(s)'] for g in str(r).split('/')]
-for grape in grapes:
-    response = Post("api/varietal/",payload = {'name':grape, 'slug':grape})
+def LoadCountry():
+    countries = [{"name": name, "abbreviation": abbreviation} for abbreviation, name in countries]
+    for country in countries:
+        response = Post("api/country/",payload = country)
+
+def LoadVarietal():
+    df = pd.read_csv("grapes.csv")
+    grapes =[str(g).strip('\xa0').strip() for r in df['Common Name(s)'] for g in str(r).split('/')]
+    for grape in grapes:
+        response = Post("api/varietal/",payload = {'name':grape, 'slug':grape})
+
+def LoadBlendVarietal():
+    array = ['Cabernet Sauvignon', 'Red Bordeaux Blend', 'Sangiovese',
+       'Pinot Noir', 'Mourvèdre', 'Syrah', 'Chardonnay',
+       'Red Rhone Blend', 'Malbec', 'Cabernet Franc', 'Champagne Blend',
+       'Port Blend', 'Merlot', 'Red Blend', 'Sauvignon Blanc', 'Barbera',
+       'Nebbiolo', 'Sémillon-Sauvignon Blanc Blend', 'White Blend',
+       'Petite Sirah', 'Albariño', 'Tinto Fino', 'Tempranillo Blend',
+       'Grenache', 'Grenache Blend', 'Syrah Blend', 'Zinfandel',
+       'Tempranillo', 'Gewürztraminer']
+    
+    for blendname in array:
+        response = Post("api/blendvarietal/",payload = 
+            {"name": blendname ,
+             "varietal": [
+                
+                    1831
+                
+            ]})
+
+if __name__ == "__main__":
+    LoadBlendVarietal()

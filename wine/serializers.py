@@ -10,11 +10,11 @@ class VarietalSerializer(serializers.ModelSerializer):
 
 
 class BlendVarietalSerializer(serializers.ModelSerializer):
-    blend_varietal = VarietalSerializer(many=True)
+    #varietal = VarietalSerializer(many=True)
 
     class Meta:
         model = BlendVarietal
-        fields = ['id','name','blend_varietal']
+        fields = ['id','name','varietal']
         lookup_field ='id'
 
 class CountrySerializer(serializers.ModelSerializer):
