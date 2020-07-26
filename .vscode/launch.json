@@ -17,7 +17,7 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/manage.py",
-      "args": ["runserver", "--noreload", "tokalon.fios-router.home:8000"],
+      "args": ["runserver", "--noreload", "marchiori.fios-router.home:8000"],
       "django": true
     }
   ]

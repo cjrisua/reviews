@@ -8,8 +8,16 @@ admin.site.register(Critic)
 
 @admin.register(BlendVarietal)
 class BelndVarietalAdmin(admin.ModelAdmin):
-    list_display = ('id','name',)
-    search_fields = ('varietal',)
+    list_display = ('name','get_belndvarietal',)
+    search_fields = ('varietal','name')
+
+    def get_belndvarietal(self, obj):
+        grapes = [grape.name for grape in obj.varietal.all()]
+        if len(grapes) > 1:
+            return ", ".join(grapes[:-1]) + f" and { grapes[-1:][0]}"
+        else:    
+            return ", ".join(grapes)
+
 @admin.register(Varietal)
 class VarietalAdmin(admin.ModelAdmin):
     list_display = ('id','name','slug',)

@@ -3,6 +3,7 @@ from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import pandas as pd
 import socket
+from django.utils.text import slugify
 
 URL = f'http://{socket.gethostname()}:8000'
 
@@ -59,6 +60,7 @@ def LoadVarietal():
         response = Post("api/varietal/",payload = {'name':grape, 'slug':grape})
 
 def LoadBlendVarietal():
+
     array = ['Cabernet Sauvignon', 'Red Bordeaux Blend', 'Sangiovese',
        'Pinot Noir', 'Mourvèdre', 'Syrah', 'Chardonnay',
        'Red Rhone Blend', 'Malbec', 'Cabernet Franc', 'Champagne Blend',
@@ -68,12 +70,20 @@ def LoadBlendVarietal():
        'Grenache', 'Grenache Blend', 'Syrah Blend', 'Zinfandel',
        'Tempranillo', 'Gewürztraminer']
     
+    default_varietalid = Get(f"api/varietal/none/")['id']
+
     for blendname in array:
+        response = Get(f"api/varietal/{slugify(blendname)}/")
+        if response is not None:
+            varietalid = response['id']
+        else:
+            varietalid = default_varietalid
+
         response = Post("api/blendvarietal/",payload = 
             {"name": blendname ,
              "varietal": [
                 
-                    1831
+                    varietalid
                 
             ]})
 
