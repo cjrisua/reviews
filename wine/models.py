@@ -35,7 +35,8 @@ class Terroir(models.Model):
     isvineyard = models.BooleanField(default=False)
     slug = models.CharField(max_length=150, blank=False, null=False, default='')
     class Meta:
-        ordering = ('-name',)
+        unique_together = ['country', 'slug', 'parentterroir']
+        ordering = ('country','slug')
 
     def __str__(self):
         return self.name
@@ -46,15 +47,27 @@ class Terroir(models.Model):
 
 class Producer(models.Model):
     name = models.CharField(max_length=150)
+    slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')
 
     class Meta:
         ordering = ('-name',)
+        
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Producer, self).save(*args, **kwargs)
 
 class BlendVarietal(models.Model):
     name = models.CharField(max_length=150)
     varietal = models.ManyToManyField(Varietal)
+
+    class Meta:
+        ordering = ('-name',)
+
+    def __str__(self):
+        return self.name
 
 class Wine(models.Model):
     COUNTRY = models.TextChoices = (
@@ -76,8 +89,9 @@ class Wine(models.Model):
     )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     terroir = models.ForeignKey(Terroir, on_delete=models.PROTECT)
-    mastervarietal = models.ForeignKey(Varietal, on_delete=models.PROTECT)
+    varietal = models.ForeignKey(BlendVarietal, on_delete=models.PROTECT, blank=False)
     name = models.CharField(max_length=150)
+    wtype = models.CharField(max_length=15)
 
     def __str__(self):
         return self.name

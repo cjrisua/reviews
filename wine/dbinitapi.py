@@ -30,25 +30,24 @@ def Post(page, **kargs):
     return requests.post(f"{URL}/{page}" , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(kargs["payload"]), headers=headers)
     
 
-#Load Country
-countries =(
-        ('FRA','France'),
-        ('NZL','New Zealand'),
-        ('AUS','Australia'),
-        ('CHL','Chile'),
-        ('ARG','Argentina'),
-        ('USA','United States'),
-        ('PRT','Portugal'),
-        ('ESP','Spain'),
-        ('ITA','Italy'),
-        ('HUN','Hungary'),
-        ('DEU','Germany'),
-        ('AUT','Austria'),
-        ('CAN', 'Canada'),
-        ('ISR','Israel'),
-        ('ZAF', 'South Africa'),)
-
 def LoadCountry():
+    #Load Country
+    countries =(
+            ('FRA','France'),
+            ('NZL','New Zealand'),
+            ('AUS','Australia'),
+            ('CHL','Chile'),
+            ('ARG','Argentina'),
+            ('USA','United States'),
+            ('PRT','Portugal'),
+            ('ESP','Spain'),
+            ('ITA','Italy'),
+            ('HUN','Hungary'),
+            ('DEU','Germany'),
+            ('AUT','Austria'),
+            ('CAN', 'Canada'),
+            ('ISR','Israel'),
+            ('ZAF', 'South Africa'),)
     countries = [{"name": name, "abbreviation": abbreviation} for abbreviation, name in countries]
     for country in countries:
         response = Post("api/country/",payload = country)
@@ -70,7 +69,10 @@ def LoadBlendVarietal():
        'Grenache', 'Grenache Blend', 'Syrah Blend', 'Zinfandel',
        'Tempranillo', 'Gewürztraminer']
     
-    default_varietalid = Get(f"api/varietal/none/")['id']
+    response = Get(f"api/varietal/none/")
+    if response is None:
+        response = Post("api/varietal/",payload = {"name":"None","slug":"none"})
+    default_varietalid = response['id']
 
     for blendname in array:
         response = Get(f"api/varietal/{slugify(blendname)}/")
@@ -88,4 +90,6 @@ def LoadBlendVarietal():
             ]})
 
 if __name__ == "__main__":
+    LoadCountry()
+    LoadVarietal()
     LoadBlendVarietal()

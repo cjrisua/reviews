@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal, BlendVarietal
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import BlendVarietalSerializer, ProducerWinesSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
+from .serializers import BlendVarietalSerializer, ProducerSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
 
 class BlendVarietalViewSet(viewsets.ModelViewSet):
     queryset = BlendVarietal.objects.all()
@@ -17,7 +17,7 @@ class VarietalViewSet(viewsets.ModelViewSet):
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    lookup_field = 'slug'
+    lookup_field = ('abbreviation')
 
 class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.all()
@@ -29,7 +29,8 @@ class ProducerViewSet(viewsets.ModelViewSet):
     API endpoint that allows producers to be viewed or edited.
     """
     queryset = Producer.objects.order_by('-name')
-    serializer_class = ProducerWinesSerializer
+    serializer_class = ProducerSerializer
+    lookup_field = 'slug'
 
 class WineViewSet(viewsets.ModelViewSet):
     """

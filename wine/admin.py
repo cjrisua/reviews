@@ -33,9 +33,29 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(Terroir)
 class TerroirAdmin(admin.ModelAdmin):
-    list_display = ('name','parentterroir','isappellation','isvineyard',)
+    list_display = ('name','get_terroirs','isappellation','isvineyard',)
     list_filter = ( 'name',)
     search_fields = ('name',)
+
+    def __init__(self, model, admin_site):
+        self.__terroirs = []
+        super().__init__(model, admin_site)
+        
+    def parentterroirs(self, terroir):
+        if terroir is not None:
+            self.__terroirs.append(terroir.name)
+            if terroir.parentterroir is not None:
+                self.parentterroirs(terroir.parentterroir)
+
+    def get_terroirs(self, obj):
+        self.__terroirs = []
+        self.parentterroirs(obj.parentterroir)
+        if len(self.__terroirs) > 1:
+            return " > ".join(self.__terroirs[::-1])
+        elif len(self.__terroirs) == 1:
+            return self.__terroirs[0]
+        else:
+            return obj.name
 
 @admin.register(Review)
 class CollectionAdmin(admin.ModelAdmin):
@@ -43,6 +63,25 @@ class CollectionAdmin(admin.ModelAdmin):
 
 @admin.register(Wine)
 class WineAdmin(admin.ModelAdmin):
-     list_display = ('producer','name','terroir',)
-     list_filter = ( 'terroir', )
-     search_fields = ('producer', 'name',)
+    
+
+    list_display = ('producer','name','get_terroirs',)
+    list_filter = ( 'terroir', )
+    search_fields = ('producer', 'name',)
+
+    def __init__(self, model, admin_site):
+        self.__terroirs = []
+        super().__init__(model, admin_site)
+
+    def parentterroirs(self, terroir):
+        self.__terroirs.append(terroir.name)
+        if terroir.parentterroir is not None:
+            self.parentterroirs(terroir.parentterroir)
+
+    def get_terroirs(self, obj):
+        self.__terroirs = []
+        self.parentterroirs(obj.terroir)
+        if len(self.__terroirs) > 1:
+            return " > ".join(self.__terroirs[::-1])
+        else:
+            return self.__terroirs[0]

@@ -1,3 +1,17 @@
+
+#searchsubmit {
+    position: absolute;
+    top: 17px;
+    right: 17px;
+    border-top: 3px solid #222;
+    border: 2px solid #222;
+    background: #000;
+    color: #fff;
+    margin-left: -2.5rem;
+    border-radius: 0 3px 3px 0;
+    padding: 5px 6px;
+}
+
 .entities {
     line-height: 2;
 }

@@ -5,6 +5,9 @@ import pandas as pd
 import re
 import itertools
 from datetime import datetime
+from django.utils.text import slugify
+from array import *
+from analytics.utils.smartwine import WineFingerPrint
 
 URL = 'http://tokalon.fios-router.home:8000'
 
@@ -13,6 +16,18 @@ def FormatDate(input):
     if rmatch != None:
         return f'{rmatch[1]}-01-01'
     return "{:%Y-%m-%d}".format(datetime.strptime(input,'%d-%b-%y'))
+
+def GetAll(page):
+    data = []
+    r = Get(f"{page}?page=1")
+    count = r["count"]
+    itemsperset = len(r["results"])
+    while r["next"] != None:
+        data.extend(r["results"])
+        r = Get(r["next"][37:])
+    data.extend(r["results"])
+    return data
+
 def Get(page):
     try:
         response = requests.get(f"{URL}/{page}")
@@ -61,6 +76,73 @@ def LoadReviews():
             dataset["wines"].append(wineset)
         Post("api/wine/",payload = dataset)
 
+def isvinifera(name,string):
+
+    result = re.search (f'(^|[^a-z]){name}($|[^a-z])',string)
+    
+    return False if result is None else True
+def LoadWine(producerdata):
+    notmatch = 0
+    grapeinfo = GetVarietal()
+    #open review csv fiew 
+    df = pd.read_csv("winespectator.csv", encoding="utf-8")
+    payload = []
+    for house,wines in df.groupby(["house"]):
+        houseinfo = next(filter(lambda x : x['slug'] == slugify(house) , producerdata), None)
+        print(f"Producer {house} [{houseinfo['id']}]")
+        for index, wine in wines.iterrows():
+            #Find Grape Info...
+            slugifywine = slugify(wine.terroir + "-" + wine.observation)
+            grapematches = [grape for grape in grapeinfo if isvinifera(grape['slug'],slugifywine)]
+
+            if len(grapematches) == 0:
+                if wine.region == "Southern Rhône":
+                    print("Red Rhone Blend?")
+                elif wine.region == "Champagne":
+                    print(wine.region)
+                else:
+                    print("No Match found")
+            else:
+                names = set([name['slug'] for name in grapematches])
+                if len(names) == 1:
+                    print(names)
+                    notmatch = notmatch + 1
+                else:
+                    print(f"Blend of: {names}")
+    print(f"{notmatch} not matched")
+
+            
+def GetVarietal():
+    varietal = GetAll("api/varietal/")
+    blendname = GetAll("api/blendvarietal/")
+
+    vinifera_list = [{"id":v['id'], "type":"v" , "slug":v['slug']} for v in varietal]
+    vinifera_list.extend( [{"id": b['id'],"type":"b", "slug": slugify(b['name'])} for b in blendname])
+
+    return vinifera_list
+
+def LoadProducers():
+    #Get database 
+    data = []
+    r = Get("api/producer/?page=1")
+    count = r["count"]
+    itemsperset = len(r["results"])
+    
+    while r["next"] != None:
+        data.extend([{"id": p['id'], "slug" : p['slug']} for p in r["results"]])
+        r = Get(r["next"][37:])
+    data.extend([{"id": p['id'], "slug" : p['slug']} for p in r["results"]])
+    print(f"Database Producers: {data}")
+
+     #open review csv fiew 
+    df = pd.read_csv("winespectator.csv", encoding="utf-8")
+    slugdata = [slug['slug'] for slug in data]
+    localproducer_list = [{"name":p, "slug": slugify(p)} for p in df.house.unique() if slugify(p) not in slugdata]
+    for p in localproducer_list:
+        Post('api/producer/',payload=p )
+    
+    return data
+
 def LoadCellar():
     traindict = {}
     data = []
@@ -88,9 +170,14 @@ def LoadCellar():
             "status": "added"
         }
         Post("api/cellar/",payload = dataset)
-
+def LoadDataModel():
+   df = pd.read_csv("winespectator_with_type.csv", encoding="utf-8")
+   smartwine = WineFingerPrint(df)
         
 if __name__ == "__main__":
     #Populate Random Cellar
+    #resutls = LoadProducers()
+    #LoadWine(resutls)
     #LoadCellar()
-    LoadReviews()
+    #LoadReviews()
+    LoadDataModel()

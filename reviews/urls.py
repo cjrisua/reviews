@@ -22,12 +22,13 @@ from django.contrib import admin
 
 
 router = routers.DefaultRouter()
-router.register(r'wine', wineviews.WineReviewViewSet)
+router.register(r'wine', wineviews.WineViewSet)
 router.register(r'cellar', cellarviews.CollectionViewSet)
 router.register(r'terroir', wineviews.TerroirViewSet)
 router.register(r'country', wineviews.CountryViewSet)
 router.register(r'varietal', wineviews.VarietalViewSet)
 router.register(r'blendvarietal', wineviews.BlendVarietalViewSet)
+router.register(r'producer', wineviews.ProducerViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

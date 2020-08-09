@@ -26,7 +26,7 @@ class CountrySerializer(serializers.ModelSerializer):
 class TerroirSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terroir
-        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard']
+        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country']
         lookup_field = 'slug'
 
     def create(self, validated_data):
@@ -41,38 +41,44 @@ class CriticSerializer(serializers.ModelSerializer):
 class ProducerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producer
-        fields = ['name']
+        fields = ['id','name','slug']
+        
 
 class ReviewSerializer(serializers.ModelSerializer):
+    critic = CriticSerializer(many=True)
+    #marketitem = MarketSerializer(many=False)
+
     class Meta:
         model = Review
-        fields = ['score','issuedate','observation','critic']
+        fields = ['critic','issuedate','observation','score']
 
     def create(self, validated_data):
         review = Review.objects.create(**validated_data)
         return review
 
 class MarketSerializer(serializers.ModelSerializer):
-    observations = ReviewSerializer(many=True)
+    #observations = ReviewSerializer(many=True)
 
     class Meta:
         model = Market
-        fields = ['id','year','price','observations']
+        fields = ['id','year','price']
 
     def create(self, validated_data):
         market = Market.objects.create(**validated_data)
         return market
 
 class WineSerializer(serializers.ModelSerializer):
-    vintage = MarketSerializer(many=True)
+    producer = ProducerSerializer(many=False)
+    terroir = TerroirSerializer(many=False)
+    varietal = BlendVarietalSerializer(many=False)
     
     class Meta:
         model = Wine
-        fields = ['name','terroir','vintage']
+        fields = ['producer','varietal','terroir','name']
 
-    def create(self, validated_data):
-        wine = Wine.objects.create(**validated_data)
-        return wine
+    #def create(self, validated_data):
+    #    wine = Wine.objects.create(**validated_data)
+    #    return wine
 
 class WineReviewSerializer(serializers.ModelSerializer):
     wines = WineSerializer(many=True)
@@ -97,22 +103,3 @@ class WineReviewSerializer(serializers.ModelSerializer):
                 review, created = Review.objects.get_or_create(marketitem=market, **review_data)
 
         return producer
-
-class ProducerWinesSerializer(serializers.ModelSerializer):
-    wines = WineSerializer(many=True)
-    class Meta:
-        model = Producer
-        fields = ['name','wines']
-    
-    def create(self, validated_data):
-        wines_data = validated_data.pop('wines')
-        producer = Producer.objects.create(**validated_data)
-        for wine_data in wines_data:
-            vintage_data = wine_data.pop('vintage')[0]
-            wine = Wine.objects.create(producer=producer, **wine_data)
-            Market.objects.create(wine=wine, **vintage_data)
-        return producer
-
-    def update(self, instance, validated_data):
-        producer_mapping = {producer.id: producer for producer in instance}
-        return []
