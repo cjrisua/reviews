@@ -6,7 +6,7 @@ from django.utils.text import slugify
 
 class Varietal(models.Model):
     name = models.CharField(max_length=150)
-    slug = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150,unique=True)
     class Meta:
         ordering = ('-name',)
     def __str__(self):

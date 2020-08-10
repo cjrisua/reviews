@@ -90,6 +90,9 @@ def LoadBlendVarietal():
             ]})
 
 if __name__ == "__main__":
-    LoadCountry()
-    LoadVarietal()
-    LoadBlendVarietal()
+    print("Loading country")
+    #LoadCountry()
+    print("Loading varietal")
+    #LoadVarietal()
+    print("Loading belnding")
+    #LoadBlendVarietal()

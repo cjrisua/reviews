@@ -1,13 +1,24 @@
 from .models import BlendVarietal,  Producer, Wine, Critic, Market, Review, Terroir, Country, Varietal
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
+from .documents import WineDocument
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+
+class WineDocumentSerializer(DocumentSerializer):
+    class Meta:
+        document = WineDocument
+        fields = (
+            'id',
+            'name',
+            'review',
+            'producer',
+        )   
 
 class VarietalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Varietal
         fields = ['id','name','slug']
         lookup_field ='slug'
-
 
 class BlendVarietalSerializer(serializers.ModelSerializer):
     #varietal = VarietalSerializer(many=True)

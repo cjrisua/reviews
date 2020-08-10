@@ -1,10 +1,10 @@
 import pandas as pd
-import requests, json
+import requests, json, socket
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 from django.utils.text import slugify
 
-URL = 'http://tokalon.fios-router.home:8000'
+URL = f'http://{socket.gethostname()}:8000'
 
 class WBase():
      def __init__(self, country):

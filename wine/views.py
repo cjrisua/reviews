@@ -2,7 +2,76 @@ from django.shortcuts import get_object_or_404, render
 from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal, BlendVarietal
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import BlendVarietalSerializer, ProducerSerializer, WineSerializer, CriticSerializer, MarketSerializer, ReviewSerializer, WineReviewSerializer, TerroirSerializer, CountrySerializer, VarietalSerializer
+from .serializers import (  WineDocumentSerializer, BlendVarietalSerializer, 
+                            ProducerSerializer, WineSerializer, CriticSerializer, 
+                            MarketSerializer, ReviewSerializer, WineReviewSerializer, 
+                            TerroirSerializer, CountrySerializer, VarietalSerializer)
+from django_elasticsearch_dsl_drf.constants import (
+    LOOKUP_FILTER_RANGE,
+    LOOKUP_QUERY_IN,
+    LOOKUP_QUERY_GT,
+    LOOKUP_QUERY_GTE,
+    LOOKUP_QUERY_LT,
+    LOOKUP_QUERY_LTE,
+)
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    OrderingFilterBackend,
+    DefaultOrderingFilterBackend,
+    SearchFilterBackend,
+)
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from .documents import WineDocument
+
+class WineDocumentViewSet(DocumentViewSet):
+
+    document = WineDocument
+    serializer_class = WineDocumentSerializer
+
+    lookup_field = 'id'
+
+    filter_backends = [
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        DefaultOrderingFilterBackend,
+        SearchFilterBackend,
+    ]
+    # Define search fields
+    search_fields = (
+        'name',
+        'review',
+    )
+    # Filter fields
+    filter_fields = {
+        'id': {
+            'field': 'id',
+            'lookups': [
+                LOOKUP_FILTER_RANGE,
+                LOOKUP_QUERY_IN,
+                LOOKUP_QUERY_GT,
+                LOOKUP_QUERY_GTE,
+                LOOKUP_QUERY_LT,
+                LOOKUP_QUERY_LTE,
+            ],
+        },
+        'name': 'name.raw',
+        'review': 'review.raw',
+        'producer': {
+            'field': 'producer_id',
+            'lookups': [
+                LOOKUP_QUERY_IN,
+            ]
+        },
+    }
+    # Define ordering fields
+    ordering_fields = {
+        'id': 'id',
+        'name': 'name.raw',
+        'producer': 'producer_id',
+    }
+
+    # Specify default ordering
+    ordering = ('id',)   
 
 class BlendVarietalViewSet(viewsets.ModelViewSet):
     queryset = BlendVarietal.objects.all()

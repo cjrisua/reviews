@@ -20,7 +20,6 @@ from cellar import views as cellarviews
 from analytics import views as analyticsviews
 from django.contrib import admin
 
-
 router = routers.DefaultRouter()
 router.register(r'wine', wineviews.WineViewSet)
 router.register(r'cellar', cellarviews.CollectionViewSet)
@@ -40,4 +39,5 @@ urlpatterns = [
     path('api/',  include(router.urls)),
     path('api/learn/<int:pk>/',  analyticsviews.ParkerSommDetail.as_view(), name='analytics'),
     path('api/learn/',  analyticsviews.ParkerSommList.as_view(), name='analytics'),
+    path('wines/', include('wine.urls')),  
 ]

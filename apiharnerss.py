@@ -8,8 +8,9 @@ from datetime import datetime
 from django.utils.text import slugify
 from array import *
 from analytics.utils.smartwine import WineFingerPrint
+import socket, chardet
 
-URL = 'http://tokalon.fios-router.home:8000'
+URL = f'http://{socket.gethostname()}:8000'
 
 def FormatDate(input):
     rmatch = re.match(r'^Web\s+Only.+?([0-9]{4})',input)
@@ -24,7 +25,7 @@ def GetAll(page):
     itemsperset = len(r["results"])
     while r["next"] != None:
         data.extend(r["results"])
-        r = Get(r["next"][37:])
+        r = Get(r["next"][39:])
     data.extend(r["results"])
     return data
 
@@ -125,14 +126,14 @@ def LoadProducers():
     #Get database 
     data = []
     r = Get("api/producer/?page=1")
-    count = r["count"]
-    itemsperset = len(r["results"])
-    
-    while r["next"] != None:
+    if r is not None:
+        count = r["count"]
+        itemsperset = len(r["results"])
+        while r["next"] != None:
+            data.extend([{"id": p['id'], "slug" : p['slug']} for p in r["results"]])
+            r = Get(r["next"][37:])
         data.extend([{"id": p['id'], "slug" : p['slug']} for p in r["results"]])
-        r = Get(r["next"][37:])
-    data.extend([{"id": p['id'], "slug" : p['slug']} for p in r["results"]])
-    print(f"Database Producers: {data}")
+        print(f"Database Producers: {data}")
 
      #open review csv fiew 
     df = pd.read_csv("winespectator.csv", encoding="utf-8")
@@ -173,11 +174,31 @@ def LoadCellar():
 def LoadDataModel():
    df = pd.read_csv("winespectator_with_type.csv", encoding="utf-8")
    smartwine = WineFingerPrint(df)
+
+def GetBlendName(info,grapes):
+    tokenizeinfo = info
+
+def LoadWSWines():
+    
+    #get varieal
+    grapes = GetVarietal()
+    excel_file = pd.ExcelFile("winestoload.xlsx")
+    df_wines = excel_file.parse('wines')
+    df_utf8_data = excel_file.parse('original_data')
+    for producer, wines in df_wines.groupby(['house']):
+        data = [(i,w) for i,w in wines.iterrows()]
+        for d in data:
+            row = df_utf8_data[df_utf8_data.id == d[1].id]
+            response = Get(f"api/producer/{slugify(row.house.values[0])}/")
+            info = row.terroir.values[0] + "@" + row.observation.values[0] + "@" + row.region.values[0]
+            GetBlendName(info,grapes)
         
+
 if __name__ == "__main__":
     #Populate Random Cellar
     #resutls = LoadProducers()
     #LoadWine(resutls)
     #LoadCellar()
     #LoadReviews()
-    LoadDataModel()
+    #LoadDataModel()
+    LoadWSWines()
