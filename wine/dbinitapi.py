@@ -67,7 +67,7 @@ def LoadBlendVarietal():
        'Nebbiolo', 'Sémillon-Sauvignon Blanc Blend', 'White Blend',
        'Petite Sirah', 'Albariño', 'Tinto Fino', 'Tempranillo Blend',
        'Grenache', 'Grenache Blend', 'Syrah Blend', 'Zinfandel',
-       'Tempranillo', 'Gewürztraminer']
+       'Tempranillo', 'Gewürztraminer','Champagne','White Rhone Blend','Cava']
     
     response = Get(f"api/varietal/none/")
     if response is None:
@@ -95,4 +95,4 @@ if __name__ == "__main__":
     print("Loading varietal")
     #LoadVarietal()
     print("Loading belnding")
-    #LoadBlendVarietal()
+    LoadBlendVarietal()

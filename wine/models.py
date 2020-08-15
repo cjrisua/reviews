@@ -60,7 +60,7 @@ class Producer(models.Model):
         super(Producer, self).save(*args, **kwargs)
 
 class BlendVarietal(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
     varietal = models.ManyToManyField(Varietal)
 
     class Meta:

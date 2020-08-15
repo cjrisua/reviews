@@ -9,6 +9,7 @@ from django.utils.text import slugify
 from array import *
 from analytics.utils.smartwine import WineFingerPrint
 import socket, chardet
+from sklearn.feature_extraction.text import CountVectorizer
 
 URL = f'http://{socket.gethostname()}:8000'
 
@@ -25,7 +26,7 @@ def GetAll(page):
     itemsperset = len(r["results"])
     while r["next"] != None:
         data.extend(r["results"])
-        r = Get(r["next"][39:])
+        r = Get(re.match(URL+"/(.+?$)",r["next"]).groups(0)[0])
     data.extend(r["results"])
     return data
 
@@ -117,8 +118,8 @@ def GetVarietal():
     varietal = GetAll("api/varietal/")
     blendname = GetAll("api/blendvarietal/")
 
-    vinifera_list = [{"id":v['id'], "type":"v" , "slug":v['slug']} for v in varietal]
-    vinifera_list.extend( [{"id": b['id'],"type":"b", "slug": slugify(b['name'])} for b in blendname])
+    vinifera_list = [{"id":v['id'], "type":"v" , "slug": v['slug'], "name" : v['name']} for v in varietal]
+    vinifera_list.extend( [{"id": b['id'],"type":"b", "slug": slugify(b['name']), "name" : b['name']} for b in blendname])
 
     return vinifera_list
 
@@ -175,11 +176,62 @@ def LoadDataModel():
    df = pd.read_csv("winespectator_with_type.csv", encoding="utf-8")
    smartwine = WineFingerPrint(df)
 
+def AOCRuleBased(gtype,information):
+
+    if gtype.values[0] == "red":
+        if information.country.values[0].lower() == "france":
+            if information.terroir.values[0].lower().__contains__("Côtes du Rhône".lower()) or information.terroir.values[0].lower().__contains__("châteauneuf"):
+                return "Red Rhone Blend"
+            elif information.region.values[0].lower().__contains__("Northern Rhône".lower()):
+                return "Syrah"
+            elif information.region.values[0].lower().__contains__("Côte de Beaune".lower()) or \
+                 information.region.values[0].lower().__contains__("Côte de Nuits".lower()) or \
+                 information.region.values[0].lower().__contains__("Chalonnaise".lower()) or \
+                 information.region.values[0].lower().__contains__("Other Burgundy".lower()):
+                return "Pinot Noir"
+            else:
+                return "Unknown-Red-France"
+        elif information.country.values[0].lower() == "spain":
+            #Ribera del Duero
+            if information.terroir.values[0].lower().__contains__("Ribera del Duero"):
+                return "Tempranillo"
+            else:
+                return "Unknow-Red-Spain"
+        else:
+            return "Unknown-Red-Type"
+
+    elif gtype.values[0] == "white":
+         if information.country.values[0].lower() == "france":
+            if information.region.values[0].lower().__contains__("chablis") or \
+               information.region.values[0].lower().__contains__("Côte de Beaune".lower()) or \
+               information.region.values[0].lower().__contains__("Mâcon".lower()) or \
+               information.region.values[0].lower().__contains__("Chalonnaise".lower()) or \
+               information.region.values[0].lower().__contains__("Côte de Nuits".lower()) or \
+               information.region.values[0].lower().__contains__("Other Burgundy".lower()):
+                return "Chardonnay"
+            else:
+                return "Unknown-White-France"
+         else:
+             return "Unknow-White-Country"
+    else:
+        return "unknown-White-Type"
+
+    return "unknown"
+
 def GetBlendName(info,grapes):
-    tokenizeinfo = info
+    vocabulary = list(set([str(g['name']).lower() for g in grapes]))
+    cv = CountVectorizer(vocabulary=vocabulary, ngram_range=(1, 2))
+    #vectorizer.fit_transform(vocabulary)
+    #bag_of_words = vectorizer.transform([info])
+    bag_of_words = cv.fit_transform([info.lower()])
+
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in     cv.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
+    return [w for w in words_freq if w[1] > 0]
 
 def LoadWSWines():
-    
+    unmatched = {}
     #get varieal
     grapes = GetVarietal()
     excel_file = pd.ExcelFile("winestoload.xlsx")
@@ -190,9 +242,17 @@ def LoadWSWines():
         for d in data:
             row = df_utf8_data[df_utf8_data.id == d[1].id]
             response = Get(f"api/producer/{slugify(row.house.values[0])}/")
-            info = row.terroir.values[0] + "@" + row.observation.values[0] + "@" + row.region.values[0]
-            GetBlendName(info,grapes)
-        
+            info = row.terroir.values[0] + " " + row.observation.values[0] + " " + row.region.values[0]
+            g = GetBlendName(info,grapes)
+            if len(g) == 0:
+                AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
+                if row.region.values[0] in unmatched:
+                    unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
+                else:
+                    unmatched.update({row.region.values[0] : 1})
+            else:
+                print(g)
+    print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":
     #Populate Random Cellar

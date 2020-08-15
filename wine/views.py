@@ -119,7 +119,7 @@ class MarketViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows producers to be viewed or edited.
     """
-    queryset = Market.objects.order_by('-vintage')
+    queryset = Market.objects.order_by('-wine')
     serializer_class = MarketSerializer
 
 class ReviewViewSet(viewsets.ModelViewSet):
