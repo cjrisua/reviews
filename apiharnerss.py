@@ -10,6 +10,7 @@ from array import *
 from analytics.utils.smartwine import WineFingerPrint
 import socket, chardet
 from sklearn.feature_extraction.text import CountVectorizer
+from progress.bar import IncrementalBar
 
 URL = f'http://{socket.gethostname()}:8000'
 
@@ -177,46 +178,106 @@ def LoadDataModel():
    smartwine = WineFingerPrint(df)
 
 def AOCRuleBased(gtype,information):
+    rules = {'Spain': 
+                {'red':[{'Tempranillo' :['Rioja','Ribera del Duero']}]}
+            }
 
     if gtype.values[0] == "red":
         if information.country.values[0].lower() == "france":
-            if information.terroir.values[0].lower().__contains__("Côtes du Rhône".lower()) or information.terroir.values[0].lower().__contains__("châteauneuf"):
-                return "Red Rhone Blend"
+            if information.terroir.values[0].lower().__contains__("Côtes du Rhône".lower()) or \
+                information.terroir.values[0].lower().__contains__("châteauneuf") or \
+                information.region.values[0].lower().__contains__("Southern Rhône".lower()):
+                return [("Red Rhone Blend",1)]
             elif information.region.values[0].lower().__contains__("Northern Rhône".lower()):
-                return "Syrah"
+                return [("Syrah",1)]
             elif information.region.values[0].lower().__contains__("Côte de Beaune".lower()) or \
                  information.region.values[0].lower().__contains__("Côte de Nuits".lower()) or \
                  information.region.values[0].lower().__contains__("Chalonnaise".lower()) or \
+                 information.region.values[0].lower().__contains__("Mâcon".lower()) or \
                  information.region.values[0].lower().__contains__("Other Burgundy".lower()):
-                return "Pinot Noir"
-            else:
-                return "Unknown-Red-France"
+                return [("Pinot Noir",1)]
+            elif information.region.values[0].lower().__contains__("Graves".lower()):
+                return [("Left Bordeaux Blend",1)]
+            elif information.region.values[0].lower().__contains__("Bordeaux".lower()):
+                return [("Red Bordeaux Blend",1)]
         elif information.country.values[0].lower() == "spain":
             #Ribera del Duero
-            if information.terroir.values[0].lower().__contains__("Ribera del Duero"):
-                return "Tempranillo"
-            else:
-                return "Unknow-Red-Spain"
-        else:
-            return "Unknown-Red-Type"
+            if information.terroir.values[0].lower().__contains__("Rioja".lower()) or \
+               information.terroir.values[0].lower().__contains__("Ribera del Duero".lower()) or \
+               information.terroir.values[0].lower().__contains__("Toro".lower()) or \
+               information.terroir.values[0].lower().__contains__("Viño de la Tierra de Castilla y León".lower()) or \
+               information.terroir.values[0].lower().__contains__("Navarra".lower()) or \
+               information.terroir.values[0].lower().__contains__("La Mancha".lower()) or \
+               information.terroir.values[0].lower().__contains__("Viño de la Tierra de Castilla".lower()):
+               return [('tempranillo',1)]
+            elif information.terroir.values[0].lower().__contains__("Ribeira Sacra".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Bierzo".lower()):
+                return [('mencia',1)]
+            elif information.terroir.values[0].lower().__contains__("Priorat".lower()):
+                return [('garnacha red blend',1)]
+            elif information.terroir.values[0].lower().__contains__("Cariñena".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Terra Alta".lower()):
+                return [('garnacha',1)]
+            elif information.terroir.values[0].lower().__contains__("Montsant".lower()):
+                return [('red rhone blend',1)]
+            elif information.terroir.values[0].lower().__contains__("Pago de Otazu".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Jerez".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Penedès".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Conca de Barberà".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Jumilla".lower()):
+                  return [('red blend',1)]
 
     elif gtype.values[0] == "white":
          if information.country.values[0].lower() == "france":
-            if information.region.values[0].lower().__contains__("chablis") or \
+            if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
+               information.region.values[0].lower().__contains__("Barsac".lower()):
+                return [("Sémillon",1), ("Sauvignon Blanc",1)]
+            elif information.region.values[0].lower().__contains__("chablis") or \
                information.region.values[0].lower().__contains__("Côte de Beaune".lower()) or \
                information.region.values[0].lower().__contains__("Mâcon".lower()) or \
                information.region.values[0].lower().__contains__("Chalonnaise".lower()) or \
                information.region.values[0].lower().__contains__("Côte de Nuits".lower()) or \
                information.region.values[0].lower().__contains__("Other Burgundy".lower()):
-                return "Chardonnay"
-            else:
-                return "Unknown-White-France"
+                return [("Chardonnay",1)]
+            elif information.region.values[0].lower().__contains__("Alsace".lower()):
+                return [("Riesling Blend",1)]
+            elif information.terroir.values[0].lower().__contains__("Condrieu".lower()):
+                return [("Viognier",1)]
+            elif information.region.values[0].lower().__contains__("Graves".lower()) or \
+                 information.region.values[0].lower().__contains__("Bordeaux".lower()):
+                return [("White Bordeaux Blend",1)]
+            elif information.region.values[0].lower().__contains__("Rhône".lower()):
+                return [("White Rhone Blend",1)]
+         elif information.country.values[0].lower() == "spain":
+             if information.terroir.values[0].lower().__contains__("Manzanilla".lower()) or \
+                information.terroir.values[0].lower().__contains__("Jerez".lower()):
+                 return [('palomino',1)]
+             elif information.terroir.values[0].lower().__contains__("Alella".lower()) or \
+                  information.terroir.values[0].lower().__contains__("Jumilla".lower()):
+                  return [('white blend',1)]
+             elif information.terroir.values[0].lower().__contains__("Rioja".lower()):
+                  return [('macabeo',1)]
+             elif information.terroir.values[0].lower().__contains__("Rueda".lower()):
+                  return [('verdejo',1)]
+             elif information.terroir.values[0].lower().__contains__("Rias Baixas".lower()):
+                  return [('albariño',1)]
+             elif information.terroir.values[0].lower().__contains__("Brut".lower()) or \
+                  information.terroir.values[0].lower().__contains__("Cava".lower()):
+                  return [('Macabeo',1),('Xarello',1),('Parellada',1)]
+             elif  information.terroir.values[0].lower().__contains__("Terra Alta".lower()):
+                  return [('grenache blanc',1)]
+             elif information.terroir.values[0].lower().__contains__("Txakolina".lower()) or \
+                  information.terroir.values[0].lower().__contains__("Utiel-Requena".lower()):
+                  return [('rosé blanc',1)]
+             elif information.terroir.values[0].lower().__contains__("Txakolina".lower()) or \
+                  information.terroir.values[0].lower().__contains__("Ribeiro".lower()):
+                  return [('treixadura',1)]
          else:
-             return "Unknow-White-Country"
+             return None
     else:
-        return "unknown-White-Type"
+        return None
 
-    return "unknown"
+    return None
 
 def GetBlendName(info,grapes):
     vocabulary = list(set([str(g['name']).lower() for g in grapes]))
@@ -236,22 +297,30 @@ def LoadWSWines():
     grapes = GetVarietal()
     excel_file = pd.ExcelFile("winestoload.xlsx")
     df_wines = excel_file.parse('wines')
+    df_wines = df_wines[(df_wines.country == 'Spain') | (df_wines.country== 'Rapel')]
     df_utf8_data = excel_file.parse('original_data')
+
+    bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
+
     for producer, wines in df_wines.groupby(['house']):
         data = [(i,w) for i,w in wines.iterrows()]
         for d in data:
+            bar.next()
             row = df_utf8_data[df_utf8_data.id == d[1].id]
             response = Get(f"api/producer/{slugify(row.house.values[0])}/")
             info = row.terroir.values[0] + " " + row.observation.values[0] + " " + row.region.values[0]
             g = GetBlendName(info,grapes)
             if len(g) == 0:
-                AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
-                if row.region.values[0] in unmatched:
-                    unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
-                else:
-                    unmatched.update({row.region.values[0] : 1})
+                predictedgrape = AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
+                if predictedgrape is None:
+                    if row.region.values[0] in unmatched:
+                        unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
+                    else:
+                        unmatched.update({row.region.values[0] : 1})
             else:
-                print(g)
+                #print(g)
+                pass
+    bar.finish()
     print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":
