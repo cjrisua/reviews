@@ -174,7 +174,7 @@ def LoadCellar():
         }
         Post("api/cellar/",payload = dataset)
 def LoadDataModel():
-   df = pd.read_csv("winespectator_with_type.csv", encoding="utf-8")
+   df = pd.read_csv("/Volumes/Programming/winespectator_with_type.csv", encoding="utf-8")
    smartwine = WineFingerPrint(df)
 
 def AOCRuleBased(gtype,information):
@@ -213,7 +213,8 @@ def AOCRuleBased(gtype,information):
             elif information.terroir.values[0].lower().__contains__("Ribeira Sacra".lower()) or \
                  information.terroir.values[0].lower().__contains__("Bierzo".lower()):
                 return [('mencia',1)]
-            elif information.terroir.values[0].lower().__contains__("Priorat".lower()):
+            elif information.terroir.values[0].lower().__contains__("Priorat".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Campo de Borja".lower()):    
                 return [('garnacha red blend',1)]
             elif information.terroir.values[0].lower().__contains__("Cariñena".lower()) or \
                  information.terroir.values[0].lower().__contains__("Terra Alta".lower()):
@@ -224,10 +225,15 @@ def AOCRuleBased(gtype,information):
                  information.terroir.values[0].lower().__contains__("Jerez".lower()) or \
                  information.terroir.values[0].lower().__contains__("Penedès".lower()) or \
                  information.terroir.values[0].lower().__contains__("Conca de Barberà".lower()) or \
+                 information.terroir.values[0].lower().__contains__("El Hierro".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Monterrei ".lower()) or \
                  information.terroir.values[0].lower().__contains__("Jumilla".lower()):
                   return [('red blend',1)]
-
-    elif gtype.values[0] == "white":
+            elif information.terroir.values[0].lower().__contains__("Tintilla Viño de la Tierra de Cadiz".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Andalucía".lower()) or \
+                 information.terroir.values[0].lower().__contains__("Tintilla de Rota".lower()):
+                 return [('graciano',1)]
+    elif gtype.values[0].lower() == "white":
          if information.country.values[0].lower() == "france":
             if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
                information.region.values[0].lower().__contains__("Barsac".lower()):
@@ -253,6 +259,8 @@ def AOCRuleBased(gtype,information):
                 information.terroir.values[0].lower().__contains__("Jerez".lower()):
                  return [('palomino',1)]
              elif information.terroir.values[0].lower().__contains__("Alella".lower()) or \
+                  information.terroir.values[0].lower().__contains__("El Hierro".lower()) or \
+                  information.terroir.values[0].lower().__contains__("Monterrei ".lower()) or \
                   information.terroir.values[0].lower().__contains__("Jumilla".lower()):
                   return [('white blend',1)]
              elif information.terroir.values[0].lower().__contains__("Rioja".lower()):
@@ -272,6 +280,12 @@ def AOCRuleBased(gtype,information):
              elif information.terroir.values[0].lower().__contains__("Txakolina".lower()) or \
                   information.terroir.values[0].lower().__contains__("Ribeiro".lower()):
                   return [('treixadura',1)]
+             elif information.terroir.values[0].lower().__contains__("Xarel".lower()):
+                 return [('Xarello',1)]   
+             elif information.terroir.values[0].lower().__contains__("Valdeorras".lower()):
+                 return [('godello',1)]  
+             elif information.terroir.values[0].lower().__contains__("Conca de Barberà".lower()): 
+                 return [('chardonnay',1)]  
          else:
              return None
     else:
@@ -295,7 +309,7 @@ def LoadWSWines():
     unmatched = {}
     #get varieal
     grapes = GetVarietal()
-    excel_file = pd.ExcelFile("winestoload.xlsx")
+    excel_file = pd.ExcelFile("/Volumes/Programming/winestoload.xlsx")
     df_wines = excel_file.parse('wines')
     df_wines = df_wines[(df_wines.country == 'Spain') | (df_wines.country== 'Rapel')]
     df_utf8_data = excel_file.parse('original_data')
@@ -317,6 +331,7 @@ def LoadWSWines():
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
                     else:
                         unmatched.update({row.region.values[0] : 1})
+                    print(row.terroir.values[0])
             else:
                 #print(g)
                 pass

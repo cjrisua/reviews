@@ -89,7 +89,7 @@ class CountryViewSet(viewsets.ModelViewSet):
     lookup_field = ('abbreviation')
 
 class TerroirViewSet(viewsets.ModelViewSet):
-    queryset = Terroir.objects.all()
+    queryset = Terroir.objects.order_by('slug')
     serializer_class = TerroirSerializer
     lookup_field = 'slug'
 
