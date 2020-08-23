@@ -237,6 +237,10 @@ def AOCRuleBased(gtype,information):
             if information.terroir.values[0].lower().__contains__("Barolo".lower()) or\
                information.terroir.values[0].lower().__contains__("Barbaresco".lower()):
                 return [('nebbiolo',1)]
+        elif information.country.values[0].lower() == "portugal":
+            if re.search(r"((ruby|tawny|vintage)?(^|\s)port($|\s))",information.terroir.values[0].lower()) is not None or\
+               re.search(r"Douro",information.terroir.values[0].lower(), flags=re.IGNORECASE) is not None:
+               return [('port blend',1)]
     elif gtype.values[0].lower() == "white":
          if information.country.values[0].lower() == "france":
             if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
@@ -290,6 +294,10 @@ def AOCRuleBased(gtype,information):
                  return [('godello',1)]  
              elif information.terroir.values[0].lower().__contains__("Conca de Barberà".lower()): 
                  return [('chardonnay',1)]  
+         elif information.country.values[0].lower() == "portugal":
+            if re.search(r"((ruby|tawny|vintage)?(^|\s)port($|\s))",information.terroir.values[0].lower()) is not None or\
+               re.search(r"Douro",information.terroir.values[0].lower(), flags=re.IGNORECASE) is not None:
+               return [('white blend',1)]
          else:
              return None
     else:
@@ -315,7 +323,7 @@ def LoadWSWines():
     grapes = GetVarietal()
     excel_file = pd.ExcelFile("winestoload.xlsx")
     df_wines = excel_file.parse('wines')
-    #df_wines = df_wines[(df_wines.region == 'Piedmont')]
+    df_wines = df_wines[(df_wines.region == 'Portugal')]
     df_utf8_data = excel_file.parse('original_data')
 
     #bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
@@ -339,11 +347,11 @@ def LoadWSWines():
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
                     else:
                         unmatched.update({row.region.values[0] : 1})
-                    print(row.house.values[0]+ " " + row.terroir.values[0])
+                    print(row.house.values[0]+ "@" + row.terroir.values[0])
             else:
                 #print(g)
                 pass
-            print(g)
+            #print(g)
             wine = {
                 "producer": producer_dict,
                  "varietal": {"name": "","varietal": []},
