@@ -59,6 +59,33 @@ class Producer(models.Model):
         self.slug = slugify(self.name)
         super(Producer, self).save(*args, **kwargs)
 
+class MasterVarietal(models.Model):
+    name = models.CharField(max_length=150, unique=True)
+    slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')
+
+    class Meta:
+        ordering = ('-name',)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(MasterVarietal, self).save(*args, **kwargs)
+
+class VarietalBlend(models.Model):
+    mastervarietal = models.ForeignKey(MasterVarietal, on_delete=models.PROTECT)
+    varietal = models.ManyToManyField(Varietal)
+
+    def __str__(self):
+        varietalstr = None
+        varietallst = [f.name for f in self.varietal.all()]
+        if len(varietallst) > 1:
+            varietalstr = str(', '.join(varietallst[:-1])) + " and " + varietallst[-1:][0]
+        else:
+            varietalstr = varietallst[0]
+        return f"{self.mastervarietal.name} ({varietalstr})"
+
 class BlendVarietal(models.Model):
     name = models.CharField(max_length=150, unique=True)
     varietal = models.ManyToManyField(Varietal)
@@ -89,7 +116,7 @@ class Wine(models.Model):
     )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     terroir = models.ForeignKey(Terroir, on_delete=models.PROTECT)
-    varietal = models.ForeignKey(BlendVarietal, on_delete=models.PROTECT, blank=False)
+    varietal = models.ForeignKey(MasterVarietal, on_delete=models.PROTECT, blank=False)
     name = models.CharField(max_length=150)
     wtype = models.CharField(max_length=15)
 

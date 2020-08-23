@@ -93,6 +93,6 @@ if __name__ == "__main__":
     print("Loading country")
     #LoadCountry()
     print("Loading varietal")
-    #LoadVarietal()
+    LoadVarietal()
     print("Loading belnding")
-    LoadBlendVarietal()
+    #LoadBlendVarietal()

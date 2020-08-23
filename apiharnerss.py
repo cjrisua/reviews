@@ -174,7 +174,7 @@ def LoadCellar():
         }
         Post("api/cellar/",payload = dataset)
 def LoadDataModel():
-   df = pd.read_csv("/Volumes/Programming/winespectator_with_type.csv", encoding="utf-8")
+   df = pd.read_csv("winespectator_with_type.csv", encoding="utf-8")
    smartwine = WineFingerPrint(df)
 
 def AOCRuleBased(gtype,information):
@@ -233,6 +233,10 @@ def AOCRuleBased(gtype,information):
                  information.terroir.values[0].lower().__contains__("Andalucía".lower()) or \
                  information.terroir.values[0].lower().__contains__("Tintilla de Rota".lower()):
                  return [('graciano',1)]
+        elif information.country.values[0].lower() == "italy":
+            if information.terroir.values[0].lower().__contains__("Barolo".lower()) or\
+               information.terroir.values[0].lower().__contains__("Barbaresco".lower()):
+                return [('nebbiolo',1)]
     elif gtype.values[0].lower() == "white":
          if information.country.values[0].lower() == "france":
             if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
@@ -309,33 +313,42 @@ def LoadWSWines():
     unmatched = {}
     #get varieal
     grapes = GetVarietal()
-    excel_file = pd.ExcelFile("/Volumes/Programming/winestoload.xlsx")
+    excel_file = pd.ExcelFile("winestoload.xlsx")
     df_wines = excel_file.parse('wines')
-    df_wines = df_wines[(df_wines.country == 'Spain') | (df_wines.country== 'Rapel')]
+    #df_wines = df_wines[(df_wines.region == 'Piedmont')]
     df_utf8_data = excel_file.parse('original_data')
 
-    bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
+    #bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
 
     for producer, wines in df_wines.groupby(['house']):
         data = [(i,w) for i,w in wines.iterrows()]
         for d in data:
-            bar.next()
+            #bar.next()
             row = df_utf8_data[df_utf8_data.id == d[1].id]
-            response = Get(f"api/producer/{slugify(row.house.values[0])}/")
+            producer_dict = Get(f"api/producer/{slugify(row.house.values[0])}/")
+
+            if producer_dict is None:
+                continue
+
             info = row.terroir.values[0] + " " + row.observation.values[0] + " " + row.region.values[0]
             g = GetBlendName(info,grapes)
             if len(g) == 0:
-                predictedgrape = AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
-                if predictedgrape is None:
+                g = AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
+                if g is None:
                     if row.region.values[0] in unmatched:
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
                     else:
                         unmatched.update({row.region.values[0] : 1})
-                    print(row.terroir.values[0])
+                    print(row.house.values[0]+ " " + row.terroir.values[0])
             else:
                 #print(g)
                 pass
-    bar.finish()
+            print(g)
+            wine = {
+                "producer": producer_dict,
+                 "varietal": {"name": "","varietal": []},
+            }
+    #bar.finish()
     print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":

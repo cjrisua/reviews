@@ -1,4 +1,6 @@
-from .models import BlendVarietal,  Producer, Wine, Critic, Market, Review, Terroir, Country, Varietal
+from .models import (BlendVarietal,  Producer, Wine, Critic, 
+                    Market, Review, Terroir, Country, Varietal,
+                    BlendVarietal, MasterVarietal, VarietalBlend)
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents import WineDocument
@@ -13,6 +15,11 @@ class WineDocumentSerializer(DocumentSerializer):
             'review',
             'producer',
         )   
+class MasterVarietalSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = MasterVarietal
+            fields = ['id','name','slug']
+            lookup_field ='slug'
 
 class VarietalSerializer(serializers.ModelSerializer):
     class Meta:

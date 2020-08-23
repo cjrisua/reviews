@@ -5,7 +5,8 @@ from django.http import HttpResponse
 from .serializers import (  WineDocumentSerializer, BlendVarietalSerializer, 
                             ProducerSerializer, WineSerializer, CriticSerializer, 
                             MarketSerializer, ReviewSerializer, WineReviewSerializer, 
-                            TerroirSerializer, CountrySerializer, VarietalSerializer)
+                            TerroirSerializer, CountrySerializer, VarietalSerializer,
+                            MasterVarietalSerializer, VarietalBlend)
 from django_elasticsearch_dsl_drf.constants import (
     LOOKUP_FILTER_RANGE,
     LOOKUP_QUERY_IN,
