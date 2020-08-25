@@ -200,6 +200,8 @@ def AOCRuleBased(gtype,information):
                 return [("Left Bordeaux Blend",1)]
             elif information.region.values[0].lower().__contains__("Bordeaux".lower()):
                 return [("Red Bordeaux Blend",1)]
+            elif re.search(r"champagne",information.terroir.values[0].lower()) is not None:
+                return [("Champagne",1)]
         elif information.country.values[0].lower() == "spain":
             #Ribera del Duero
             if information.terroir.values[0].lower().__contains__("Rioja".lower()) or \
@@ -234,18 +236,34 @@ def AOCRuleBased(gtype,information):
                  information.terroir.values[0].lower().__contains__("Tintilla de Rota".lower()):
                  return [('graciano',1)]
         elif information.country.values[0].lower() == "italy":
-            if information.terroir.values[0].lower().__contains__("Barolo".lower()) or\
-               information.terroir.values[0].lower().__contains__("Barbaresco".lower()):
+            if re.search(r"(Barolo|Barbaresco|Valtellina|Gattinara)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
                 return [('nebbiolo',1)]
+            elif re.search(r"Etna",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("nerello mascalese",1)]
+            elif re.search(r"Toscana",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("SuperTuscan Blend",1)]
+            elif re.search(r"Taurasi",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("Aglianico",1)]
+            elif re.search(r"Cerasuolo",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("red blend",1)]
+            elif re.search(r"(^|\s)Gavi($|\s)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("cortese",1)]
+            elif re.search(r"(^|\s)Cirò($|\s)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("gaglioppo",1)]
         elif information.country.values[0].lower() == "portugal":
             if re.search(r"((ruby|tawny|vintage)?(^|\s)port($|\s))",information.terroir.values[0].lower()) is not None or\
                re.search(r"Douro",information.terroir.values[0].lower(), flags=re.IGNORECASE) is not None:
                return [('port blend',1)]
+        elif information.country.values[0].lower() == "United States":
+            if re.search(r"(Napa|Monte Bello)",information.terroir.values[0].lower()) is not None:
+                return [('red blend',1)]
     elif gtype.values[0].lower() == "white":
          if information.country.values[0].lower() == "france":
             if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
                information.region.values[0].lower().__contains__("Barsac".lower()):
                 return [("Sémillon",1), ("Sauvignon Blanc",1)]
+            elif re.search(r"champagne",information.terroir.values[0].lower()) is not None:
+                return [("Champagne",1)]
             elif information.region.values[0].lower().__contains__("chablis") or \
                information.region.values[0].lower().__contains__("Côte de Beaune".lower()) or \
                information.region.values[0].lower().__contains__("Mâcon".lower()) or \
@@ -262,6 +280,13 @@ def AOCRuleBased(gtype,information):
                 return [("White Bordeaux Blend",1)]
             elif information.region.values[0].lower().__contains__("Rhône".lower()):
                 return [("White Rhone Blend",1)]
+         elif information.country.values[0].lower() == "italy":
+            if re.search(r"Etna",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("Carricante",1)]
+            elif re.search(r"Greco",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("greco",1)]
+            elif re.search(r"(^|\s)Gavi($|\s)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("cortese",1)]
          elif information.country.values[0].lower() == "spain":
              if information.terroir.values[0].lower().__contains__("Manzanilla".lower()) or \
                 information.terroir.values[0].lower().__contains__("Jerez".lower()):
@@ -298,10 +323,10 @@ def AOCRuleBased(gtype,information):
             if re.search(r"((ruby|tawny|vintage)?(^|\s)port($|\s))",information.terroir.values[0].lower()) is not None or\
                re.search(r"Douro",information.terroir.values[0].lower(), flags=re.IGNORECASE) is not None:
                return [('white blend',1)]
-         else:
-             return None
-    else:
-        return None
+
+    if re.search(r"(^|\s)brut($|\s)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None or\
+       re.search(r"(^|\s)Blanc(s)?\sde\s(Blancs|Noirs)($|\s)",information.terroir.values[0].lower(),flags=re.IGNORECASE) is not None:
+                return [("Champagne",1)]
 
     return None
 
@@ -323,7 +348,7 @@ def LoadWSWines():
     grapes = GetVarietal()
     excel_file = pd.ExcelFile("winestoload.xlsx")
     df_wines = excel_file.parse('wines')
-    df_wines = df_wines[(df_wines.region == 'Portugal')]
+    #df_wines = df_wines[(df_wines.region == 'Portugal')]
     df_utf8_data = excel_file.parse('original_data')
 
     #bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
@@ -347,14 +372,14 @@ def LoadWSWines():
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
                     else:
                         unmatched.update({row.region.values[0] : 1})
-                    print(row.house.values[0]+ "@" + row.terroir.values[0])
+                    print(f"{row.house.values[0]}@{row.terroir.values[0]}@{row.country.values[0]}@{row.region.values[0]}")
             else:
                 #print(g)
                 pass
             #print(g)
             wine = {
-                "producer": producer_dict,
-                 "varietal": {"name": "","varietal": []},
+                "producer": producer_dict['id'],
+                "varietal": {"name": "","varietal": []},
             }
     #bar.finish()
     print(f"Items to work: {unmatched}")

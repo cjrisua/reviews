@@ -39,5 +39,5 @@ urlpatterns = [
     path('api/',  include(router.urls)),
     path('api/learn/<int:pk>/',  analyticsviews.ParkerSommDetail.as_view(), name='analytics'),
     path('api/learn/',  analyticsviews.ParkerSommList.as_view(), name='analytics'),
-    path('wines/', include('wine.urls')),  
+    #path('wines/', include('wine.urls')),  
 ]

@@ -40,7 +40,7 @@ class WineDocumentViewSet(DocumentViewSet):
     # Define search fields
     search_fields = (
         'name',
-        'review',
+        #'review',
     )
     # Filter fields
     filter_fields = {
@@ -56,7 +56,7 @@ class WineDocumentViewSet(DocumentViewSet):
             ],
         },
         'name': 'name.raw',
-        'review': 'review.raw',
+        #'review': 'review.raw',
         'producer': {
             'field': 'producer_id',
             'lookups': [
@@ -108,6 +108,7 @@ class WineViewSet(viewsets.ModelViewSet):
     """
     queryset = Wine.objects.order_by('-name')
     serializer_class = WineSerializer
+    lookup_field = 'id'
 
 class CriticViewSet(viewsets.ModelViewSet):
     """

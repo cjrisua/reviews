@@ -28,12 +28,12 @@ class WineDocument(Document):
             'raw': fields.TextField(analyzer='keyword'),
         }
     )
-    review = fields.TextField(
-        analyzer=html_strip,
-        fields={
-            'raw': fields.TextField(analyzer='keyword'),
-        }
-    )
+    #review = fields.TextField(
+    #    analyzer=html_strip,
+    #    fields={
+    #        'raw': fields.TextField(analyzer='keyword'),
+    #    }
+    #)
     producer = fields.IntegerField(attr='producer_id')
 
     class Django:

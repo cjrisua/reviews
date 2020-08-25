@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, re
 from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 import pandas as pd
@@ -24,6 +24,17 @@ def Get(page):
         print(f'HTTP error occurred: {http_err}')
     except Exception as err:
         print(f'Other error occurred: {err}')
+
+def GetAll(page):
+    data = []
+    r = Get(f"{page}?page=1")
+    count = r["count"]
+    itemsperset = len(r["results"])
+    while r["next"] != None:
+        data.extend(r["results"])
+        r = Get(re.match(URL+"/(.+?$)",r["next"]).groups(0)[0])
+    data.extend(r["results"])
+    return data
 
 def Post(page, **kargs):
     headers = {'content-type': 'application/json'}
@@ -55,7 +66,10 @@ def LoadCountry():
 def LoadVarietal():
     df = pd.read_csv("grapes.csv")
     grapes =[str(g).strip('\xa0').strip() for r in df['Common Name(s)'] for g in str(r).split('/')]
+    varietal = [grpslug['slug'] for grpslug in GetAll("api/varietal/")]
     for grape in grapes:
+        if slugify(grape) in varietal:
+            continue
         response = Post("api/varietal/",payload = {'name':grape, 'slug':grape})
 
 def LoadBlendVarietal():

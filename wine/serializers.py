@@ -12,7 +12,7 @@ class WineDocumentSerializer(DocumentSerializer):
         fields = (
             'id',
             'name',
-            'review',
+            #'review',
             'producer',
         )   
 class MasterVarietalSerializer(serializers.ModelSerializer):
@@ -86,9 +86,9 @@ class MarketSerializer(serializers.ModelSerializer):
         return market
 
 class WineSerializer(serializers.ModelSerializer):
-    producer = ProducerSerializer(many=False)
-    terroir = TerroirSerializer(many=False)
-    varietal = BlendVarietalSerializer(many=False)
+    #producer = ProducerSerializer(many=False)
+    #terroir = TerroirSerializer(many=False)
+    #varietal = MasterVarietalSerializer(many=False)
     
     class Meta:
         model = Wine
