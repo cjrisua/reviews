@@ -87,6 +87,8 @@ def isvinifera(name,string):
 def LoadWine(producerdata):
     notmatch = 0
     grapeinfo = GetVarietal()
+    grape_df =  pd.DataFrame(grapeinfo)
+
     #open review csv fiew 
     df = pd.read_csv("winespectator.csv", encoding="utf-8")
     payload = []
@@ -117,7 +119,7 @@ def LoadWine(producerdata):
             
 def GetVarietal():
     varietal = GetAll("api/varietal/")
-    blendname = GetAll("api/blendvarietal/")
+    blendname = GetAll("api/mastervarietal/")
 
     vinifera_list = [{"id":v['id'], "type":"v" , "slug": v['slug'], "name" : v['name']} for v in varietal]
     vinifera_list.extend( [{"id": b['id'],"type":"b", "slug": slugify(b['name']), "name" : b['name']} for b in blendname])
@@ -181,8 +183,7 @@ def AOCRuleBased(gtype,information):
     rules = {'Spain': 
                 {'red':[{'Tempranillo' :['Rioja','Ribera del Duero']}]}
             }
-
-    if gtype.values[0] == "red":
+    if gtype.lower() == "red":
         if information.country.values[0].lower() == "france":
             if information.terroir.values[0].lower().__contains__("Côtes du Rhône".lower()) or \
                 information.terroir.values[0].lower().__contains__("châteauneuf") or \
@@ -257,7 +258,7 @@ def AOCRuleBased(gtype,information):
         elif information.country.values[0].lower() == "United States":
             if re.search(r"(Napa|Monte Bello)",information.terroir.values[0].lower()) is not None:
                 return [('red blend',1)]
-    elif gtype.values[0].lower() == "white":
+    elif gtype.lower() == "white":
          if information.country.values[0].lower() == "france":
             if information.region.values[0].lower().__contains__("Sauternes".lower()) or \
                information.region.values[0].lower().__contains__("Barsac".lower()):
@@ -341,11 +342,27 @@ def GetBlendName(info,grapes):
     words_freq = [(word, sum_words[0, idx]) for word, idx in     cv.vocabulary_.items()]
     words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
     return [w for w in words_freq if w[1] > 0]
+def addBlend(winetype,varietals):
+
+    varietals = [int(i) for i in varietals]
+    print("search blend!")
+    master_varietal_response = Get("api/blendvarietal/?items=" + ','.join(str(v) for v in varietals))
+    if master_varietal_response['count'] == 0:
+        Post('api/blendvarietal/',payload={'mastervarietal': 1 if winetype == 'red' else 176, 'varietal' :varietals})
+    else:
+        if master_varietal_response['count'] > 1:
+            #Exact Match
+            match_enum = enumerate([True if result in varietals else False for result in master_varietal_response['results']for v in result])
+            exact_match = [i for i,m in match_enum if len(set(m)) == 0 and m[0]==True]
+        else:
+             return master_varietal_response['results'][0]['id']
+
 
 def LoadWSWines():
     unmatched = {}
     #get varieal
     grapes = GetVarietal()
+    grapes_df = pd.DataFrame(grapes)
     excel_file = pd.ExcelFile("winestoload.xlsx")
     df_wines = excel_file.parse('wines')
     #df_wines = df_wines[(df_wines.region == 'Portugal')]
@@ -357,6 +374,8 @@ def LoadWSWines():
         data = [(i,w) for i,w in wines.iterrows()]
         for d in data:
             #bar.next()
+            winetype = df_wines[df_wines.id == d[1].id].type.values[0]
+
             row = df_utf8_data[df_utf8_data.id == d[1].id]
             producer_dict = Get(f"api/producer/{slugify(row.house.values[0])}/")
 
@@ -365,8 +384,9 @@ def LoadWSWines():
 
             info = row.terroir.values[0] + " " + row.observation.values[0] + " " + row.region.values[0]
             g = GetBlendName(info,grapes)
+            
             if len(g) == 0:
-                g = AOCRuleBased(df_wines[df_wines.id == d[1].id].type, row)
+                g = AOCRuleBased(winetype, row)
                 if g is None:
                     if row.region.values[0] in unmatched:
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
@@ -376,10 +396,34 @@ def LoadWSWines():
             else:
                 #print(g)
                 pass
-            #print(g)
+            #print(f"{df_wines[df_wines.id == d[1].id].type.values[0]}@{g}")
+
+            varietal_info = None
+            
+            if g is None:
+                varietal_info = grapes_df[grapes_df['slug'] == 'none'].id.values[0]
+            else:
+                if len(g) > 1:
+                    results = grapes_df[(grapes_df['type'] == 'v') & (grapes_df['slug'].isin([slugify(grape[0]) for grape in g]))]
+                    if results.shape[0] > 0:
+                        varietal_info = [id for id in results.id.values]
+                        if winetype.lower() == "red" or winetype.lower() == "white":
+                            #Red Blend
+                            addBlend(winetype, [id for id in results.id.values])
+                        else:
+                            print(f"Invalid wine type: {winetype}")
+                            raise
+                    else:
+                        varietal_info = grapes_df[grapes_df['slug'] == 'none'].id.values[0]
+                else:
+                    results = grapes_df[(grapes_df['type'] == 't') & (grapes_df['slug'].isin([slugify(grape[0]) for grape in g]))]
+                    print("single varietal")
+                    
+            
+
             wine = {
                 "producer": producer_dict['id'],
-                "varietal": {"name": "","varietal": []},
+                "varietal": varietal_info,
             }
     #bar.finish()
     print(f"Items to work: {unmatched}")

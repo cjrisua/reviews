@@ -1,5 +1,5 @@
 from django.contrib import admin
-from wine.models import (BlendVarietal, Varietal, Wine, Producer, Market, 
+from wine.models import (Varietal, Wine, Producer, Market, 
                          Critic, Review, Terroir, Country, MasterVarietal,
                          VarietalBlend)
 
@@ -9,11 +9,11 @@ admin.site.register(Critic)
 admin.site.register(MasterVarietal)
 admin.site.register(VarietalBlend)
 
-
-@admin.register(BlendVarietal)
+'''
+@admin.register(VarietalBlend)
 class BelndVarietalAdmin(admin.ModelAdmin):
-    list_display = ('name','get_belndvarietal',)
-    search_fields = ('varietal','name')
+    list_display = ('get_belndvarietal',)
+    search_fields = ('varietal')
 
     def get_belndvarietal(self, obj):
         grapes = [grape.name for grape in obj.varietal.all()]
@@ -21,6 +21,7 @@ class BelndVarietalAdmin(admin.ModelAdmin):
             return ", ".join(grapes[:-1]) + f" and { grapes[-1:][0]}"
         else:    
             return ", ".join(grapes)
+'''
 
 @admin.register(Varietal)
 class VarietalAdmin(admin.ModelAdmin):

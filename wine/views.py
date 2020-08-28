@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404, render
-from .models import Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal, BlendVarietal
+from .models import MasterVarietal, VarietalBlend, Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import (  WineDocumentSerializer, BlendVarietalSerializer, 
+from .serializers import (  WineDocumentSerializer, 
                             ProducerSerializer, WineSerializer, CriticSerializer, 
                             MarketSerializer, ReviewSerializer, WineReviewSerializer, 
                             TerroirSerializer, CountrySerializer, VarietalSerializer,
-                            MasterVarietalSerializer, VarietalBlend)
+                            MasterVarietalSerializer, VarietalBlendSerializer)
 from django_elasticsearch_dsl_drf.constants import (
     LOOKUP_FILTER_RANGE,
     LOOKUP_QUERY_IN,
@@ -74,11 +74,6 @@ class WineDocumentViewSet(DocumentViewSet):
     # Specify default ordering
     ordering = ('id',)   
 
-class BlendVarietalViewSet(viewsets.ModelViewSet):
-    queryset = BlendVarietal.objects.all()
-    serializer_class = BlendVarietalSerializer
-    lookup_field = 'id'
-
 class VarietalViewSet(viewsets.ModelViewSet):
     queryset = Varietal.objects.all()
     serializer_class = VarietalSerializer
@@ -93,6 +88,32 @@ class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')
     serializer_class = TerroirSerializer
     lookup_field = 'slug'
+
+class MasterVarietalViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows producers to be viewed or edited.
+    """
+    queryset = MasterVarietal.objects.order_by('name')
+    serializer_class = MasterVarietalSerializer
+    lookup_field = 'slug'
+
+class VarietalBlendViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows producers to be viewed or edited.
+    """
+    queryset = VarietalBlend.objects.all()
+    serializer_class = VarietalBlendSerializer
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = VarietalBlend.objects.all()
+        varietal = self.request.query_params.get('items', None)
+        if varietal is not None:
+            queryset = queryset.filter(varietal__in=[eval(varietal)])
+        return queryset
 
 class ProducerViewSet(viewsets.ModelViewSet):
     """

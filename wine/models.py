@@ -85,17 +85,7 @@ class VarietalBlend(models.Model):
         else:
             varietalstr = varietallst[0]
         return f"{self.mastervarietal.name} ({varietalstr})"
-
-class BlendVarietal(models.Model):
-    name = models.CharField(max_length=150, unique=True)
-    varietal = models.ManyToManyField(Varietal)
-
-    class Meta:
-        ordering = ('-name',)
-
-    def __str__(self):
-        return self.name
-
+        
 class Wine(models.Model):
     COUNTRY = models.TextChoices = (
         ('FRA','France'),
@@ -116,7 +106,7 @@ class Wine(models.Model):
     )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     terroir = models.ForeignKey(Terroir, on_delete=models.PROTECT)
-    varietal = models.ForeignKey(MasterVarietal, on_delete=models.PROTECT, blank=False)
+    varietal = models.ForeignKey(VarietalBlend, on_delete=models.PROTECT, blank=False)
     name = models.CharField(max_length=150)
     wtype = models.CharField(max_length=15)
 
@@ -135,7 +125,7 @@ class Critic(models.Model):
 
 class Market(models.Model):
     wine =  models.ForeignKey(Wine, related_name='vintage',  on_delete=models.CASCADE, blank=False, default=None)
-    varietal = models.ForeignKey(BlendVarietal, on_delete=models.PROTECT)
+    varietal = models.ForeignKey(VarietalBlend, on_delete=models.PROTECT)
     observations = models.ManyToManyField(Critic, through='Review')
     producerslug = models.SlugField(max_length=200, null=True)
     wineslug = models.SlugField(max_length=200, null=True)

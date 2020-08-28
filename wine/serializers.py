@@ -1,6 +1,6 @@
-from .models import (BlendVarietal,  Producer, Wine, Critic, 
+from .models import (Producer, Wine, Critic, 
                     Market, Review, Terroir, Country, Varietal,
-                    BlendVarietal, MasterVarietal, VarietalBlend)
+                    MasterVarietal, VarietalBlend)
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents import WineDocument
@@ -27,12 +27,11 @@ class VarietalSerializer(serializers.ModelSerializer):
         fields = ['id','name','slug']
         lookup_field ='slug'
 
-class BlendVarietalSerializer(serializers.ModelSerializer):
-    #varietal = VarietalSerializer(many=True)
-
+class VarietalBlendSerializer(serializers.ModelSerializer):
+    #mastervarietal_id = serializers.PrimaryKeyRelatedField(source='mastervarietal', read_only=True)
     class Meta:
-        model = BlendVarietal
-        fields = ['id','name','varietal']
+        model = VarietalBlend
+        fields = ['id','mastervarietal','varietal']
         lookup_field ='id'
 
 class CountrySerializer(serializers.ModelSerializer):

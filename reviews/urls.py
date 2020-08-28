@@ -26,7 +26,8 @@ router.register(r'cellar', cellarviews.CollectionViewSet)
 router.register(r'terroir', wineviews.TerroirViewSet)
 router.register(r'country', wineviews.CountryViewSet)
 router.register(r'varietal', wineviews.VarietalViewSet)
-router.register(r'blendvarietal', wineviews.BlendVarietalViewSet)
+router.register(r'mastervarietal', wineviews.MasterVarietalViewSet)
+router.register(r'blendvarietal', wineviews.VarietalBlendViewSet)
 router.register(r'producer', wineviews.ProducerViewSet)
 
 urlpatterns = [

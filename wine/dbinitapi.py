@@ -73,7 +73,7 @@ def LoadVarietal():
         response = Post("api/varietal/",payload = {'name':grape, 'slug':grape})
 
 def LoadBlendVarietal():
-
+    '''
     array = ['Cabernet Sauvignon', 'Red Bordeaux Blend', 'Sangiovese',
        'Pinot Noir', 'Mourvèdre', 'Syrah', 'Chardonnay',
        'Red Rhone Blend', 'Malbec', 'Cabernet Franc', 'Champagne Blend',
@@ -82,31 +82,20 @@ def LoadBlendVarietal():
        'Petite Sirah', 'Albariño', 'Tinto Fino', 'Tempranillo Blend',
        'Grenache', 'Grenache Blend', 'Syrah Blend', 'Zinfandel',
        'Tempranillo', 'Gewürztraminer','Champagne','White Rhone Blend','Cava']
+    '''
+    db_varietal = [grpslug['slug'] for grpslug in GetAll("api/mastervarietal/")]
+    mastervarietals = []
+    with open("master_varietal.txt","r",encoding="utf-8") as f:
+        mastervarietals = [f.strip('\n') for f in f.readlines()]
+    for mblend in mastervarietals:
+        if slugify(mblend) in db_varietal:
+             continue
+        response = Post("api/mastervarietal/",payload = {"name":mblend,"slug":mblend})
     
-    response = Get(f"api/varietal/none/")
-    if response is None:
-        response = Post("api/varietal/",payload = {"name":"None","slug":"none"})
-    default_varietalid = response['id']
-
-    for blendname in array:
-        response = Get(f"api/varietal/{slugify(blendname)}/")
-        if response is not None:
-            varietalid = response['id']
-        else:
-            varietalid = default_varietalid
-
-        response = Post("api/blendvarietal/",payload = 
-            {"name": blendname ,
-             "varietal": [
-                
-                    varietalid
-                
-            ]})
-
 if __name__ == "__main__":
     print("Loading country")
     #LoadCountry()
     print("Loading varietal")
-    LoadVarietal()
+    #LoadVarietal()
     print("Loading belnding")
-    #LoadBlendVarietal()
+    LoadBlendVarietal()
