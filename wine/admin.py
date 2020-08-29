@@ -6,14 +6,18 @@ from wine.models import (Varietal, Wine, Producer, Market,
 admin.site.register(Producer)
 admin.site.register(Market)
 admin.site.register(Critic)
-admin.site.register(MasterVarietal)
-admin.site.register(VarietalBlend)
+#admin.site.register(MasterVarietal)
+#admin.site.register(VarietalBlend)
 
-'''
+@admin.register(MasterVarietal)
+class BelndVarietalAdmin(admin.ModelAdmin):
+    list_display = ('id','name','slug',)
+    search_fields = ('name',)
+
 @admin.register(VarietalBlend)
 class BelndVarietalAdmin(admin.ModelAdmin):
-    list_display = ('get_belndvarietal',)
-    search_fields = ('varietal')
+    list_display = ('id','mastervarietal','get_belndvarietal',)
+    search_fields = ('mastervarietal__name','varietal__name')
 
     def get_belndvarietal(self, obj):
         grapes = [grape.name for grape in obj.varietal.all()]
@@ -21,7 +25,6 @@ class BelndVarietalAdmin(admin.ModelAdmin):
             return ", ".join(grapes[:-1]) + f" and { grapes[-1:][0]}"
         else:    
             return ", ".join(grapes)
-'''
 
 @admin.register(Varietal)
 class VarietalAdmin(admin.ModelAdmin):

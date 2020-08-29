@@ -28,7 +28,7 @@ class Country(models.Model):
         super(Country, self).save(*args, **kwargs)
 
 class Terroir(models.Model):
-    country = models.ForeignKey(Country, blank='True', null=True, on_delete=models.CASCADE, default=-1)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_region')
     parentterroir = models.ForeignKey('self', blank='True', null=True, related_name='subterroir', on_delete=models.CASCADE, default=-1)
     name = models.CharField(max_length=150)
     isappellation = models.BooleanField(default=False)

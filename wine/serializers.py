@@ -41,9 +41,10 @@ class CountrySerializer(serializers.ModelSerializer):
         lookup_field ='slug'
 
 class TerroirSerializer(serializers.ModelSerializer):
+    country_name = serializers.StringRelatedField(source='country',read_only=True)
     class Meta:
         model = Terroir
-        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country']
+        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country']
         lookup_field = 'slug'
 
     def create(self, validated_data):

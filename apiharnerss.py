@@ -14,6 +14,8 @@ from progress.bar import IncrementalBar
 
 URL = f'http://{socket.gethostname()}:8000'
 
+
+
 def FormatDate(input):
     rmatch = re.match(r'^Web\s+Only.+?([0-9]{4})',input)
     if rmatch != None:
@@ -22,7 +24,7 @@ def FormatDate(input):
 
 def GetAll(page):
     data = []
-    r = Get(f"{page}?page=1")
+    r = Get(f"{page}")
     count = r["count"]
     itemsperset = len(r["results"])
     while r["next"] != None:
@@ -49,6 +51,9 @@ def Post(page, **kargs):
     response = requests.post(f"{URL}/{page}" , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(kargs["payload"]), headers=headers)
     #jsonResponse = response.json()
     #print(jsonResponse)
+    return response
+
+terroirs = GetAll("api/terroir/")
 
 def LoadReviews():
     #read country file
@@ -342,21 +347,36 @@ def GetBlendName(info,grapes):
     words_freq = [(word, sum_words[0, idx]) for word, idx in     cv.vocabulary_.items()]
     words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
     return [w for w in words_freq if w[1] > 0]
-def addBlend(winetype,varietals):
+
+def GetTerroir(winename, country, region):
+    country_regions = list(filter(lambda c: c['country_name'] == country, terroirs))
+    print(len(country_regions))
+def addBlend(winetypeid,varietals):
+
+    debug = [83,88]
+    if 307 in varietals and 277 in varietals and len(varietals) == 2:
+        print(debug)
 
     varietals = [int(i) for i in varietals]
+    varietals.sort()
     print("search blend!")
-    master_varietal_response = Get("api/blendvarietal/?items=" + ','.join(str(v) for v in varietals))
-    if master_varietal_response['count'] == 0:
-        Post('api/blendvarietal/',payload={'mastervarietal': 1 if winetype == 'red' else 176, 'varietal' :varietals})
+    master_varietal_response = GetAll("api/blendvarietal/?items=" + ','.join(str(v) for v in varietals))
+    if len(master_varietal_response) == 0:
+        response = Post('api/blendvarietal/',payload={'mastervarietal': winetypeid, 'varietal' :varietals})
+        return json.loads(response.content)['id']
     else:
-        if master_varietal_response['count'] > 1:
-            #Exact Match
-            match_enum = enumerate([True if result in varietals else False for result in master_varietal_response['results']for v in result])
-            exact_match = [i for i,m in match_enum if len(set(m)) == 0 and m[0]==True]
-        else:
-             return master_varietal_response['results'][0]['id']
+        if len(master_varietal_response) > 0:
+            #Try to Exact Match
+            #varietals.sort()
+            varietal_list = [varietal for varietal in [result['varietal'] for result in master_varietal_response] if len(varietal) == len(varietals)]
+            
+            for index, blend_varietal in enumerate(varietal_list):
+                blend_varietal.sort()
+                if blend_varietal == varietals:
+                    return master_varietal_response[index]['id']
 
+            response = Post('api/blendvarietal/',payload={'mastervarietal': winetypeid, 'varietal' :varietals})
+            return json.loads(response.content)['id']
 
 def LoadWSWines():
     unmatched = {}
@@ -368,7 +388,7 @@ def LoadWSWines():
     #df_wines = df_wines[(df_wines.region == 'Portugal')]
     df_utf8_data = excel_file.parse('original_data')
 
-    #bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
+    bar = IncrementalBar('Loading', max=df_wines.shape[0], suffix='%(percent)d%%')
 
     for producer, wines in df_wines.groupby(['house']):
         data = [(i,w) for i,w in wines.iterrows()]
@@ -392,7 +412,7 @@ def LoadWSWines():
                         unmatched[row.region.values[0]] = unmatched[row.region.values[0]] + 1
                     else:
                         unmatched.update({row.region.values[0] : 1})
-                    print(f"{row.house.values[0]}@{row.terroir.values[0]}@{row.country.values[0]}@{row.region.values[0]}")
+                    #print(f"{row.house.values[0]}@{row.terroir.values[0]}@{row.country.values[0]}@{row.region.values[0]}")
             else:
                 #print(g)
                 pass
@@ -409,23 +429,25 @@ def LoadWSWines():
                         varietal_info = [id for id in results.id.values]
                         if winetype.lower() == "red" or winetype.lower() == "white":
                             #Red Blend
-                            addBlend(winetype, [id for id in results.id.values])
+                            varietal_info = addBlend(int(grapes_df[grapes_df['slug'] == f'{winetype.lower()}-blend'].id.values[0]), [id for id in results.id.values])
                         else:
                             print(f"Invalid wine type: {winetype}")
                             raise
                     else:
                         varietal_info = grapes_df[grapes_df['slug'] == 'none'].id.values[0]
                 else:
-                    results = grapes_df[(grapes_df['type'] == 't') & (grapes_df['slug'].isin([slugify(grape[0]) for grape in g]))]
-                    print("single varietal")
+                    results = grapes_df[(grapes_df['type'] == 'b') & (grapes_df['slug'].isin([slugify(grape[0]) for grape in g]))]
+                    varietal_info = addBlend(int(results.id.values[0]),[grapes_df[grapes_df['slug'] ==slugify(g[0][0])].id.values[0]])
+                    #print(f"single varietal")
                     
-            
-
+            #xxxxx
+            GetTerroir(row.terroir.values[0], row.country.values[0], row.region.values[0])
             wine = {
                 "producer": producer_dict['id'],
                 "varietal": varietal_info,
             }
-    #bar.finish()
+            #print(wine)
+    bar.finish()
     print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":
