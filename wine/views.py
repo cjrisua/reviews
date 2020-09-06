@@ -1,5 +1,14 @@
 from django.shortcuts import get_object_or_404, render
-from .models import MasterVarietal, VarietalBlend, Producer,Wine, Critic, Market, Review, Terroir, Country, Varietal
+from .models import (
+    MasterVarietal, 
+    VarietalBlend, 
+    Producer,Wine, 
+    Critic, 
+    Market, 
+    Review, 
+    Terroir, 
+    Country, 
+    Varietal)
 from rest_framework import viewsets
 from django.http import HttpResponse
 from .serializers import (  WineDocumentSerializer, 
@@ -23,6 +32,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import WineDocument
+from django.utils.text import slugify
 
 class WineDocumentViewSet(DocumentViewSet):
 
@@ -88,6 +98,14 @@ class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')
     serializer_class = TerroirSerializer
     lookup_field = 'slug'
+
+    def get_queryset(self):
+        queryset = Terroir.objects.all()
+        country = self.request.query_params.get('country', None)
+        #print(country)
+        if country is not None:
+            queryset = queryset.filter(country__slug=slugify(country))
+        return queryset
 
 class MasterVarietalViewSet(viewsets.ModelViewSet):
     """

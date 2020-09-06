@@ -350,12 +350,16 @@ def GetBlendName(info,grapes):
 
 def GetTerroir(winename, country, region):
     country_regions = list(filter(lambda c: c['country_name'] == country, terroirs))
+    vocabulary = list(set([str(t['name']).lower() for t in country_regions]))
+    cv = CountVectorizer(vocabulary=vocabulary, ngram_range=(1, 4))
+    bag_of_words = cv.fit_transform([winename.lower() + " " + region.lower()])
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in     cv.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
+    return [w for w in words_freq if w[1] > 0]
+
     print(len(country_regions))
 def addBlend(winetypeid,varietals):
-
-    debug = [83,88]
-    if 307 in varietals and 277 in varietals and len(varietals) == 2:
-        print(debug)
 
     varietals = [int(i) for i in varietals]
     varietals.sort()
@@ -441,7 +445,8 @@ def LoadWSWines():
                     #print(f"single varietal")
                     
             #xxxxx
-            GetTerroir(row.terroir.values[0], row.country.values[0], row.region.values[0])
+            terroir_name = GetTerroir(row.terroir.values[0], row.country.values[0], row.region.values[0])
+            print(terroir_name)
             wine = {
                 "producer": producer_dict['id'],
                 "varietal": varietal_info,

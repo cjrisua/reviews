@@ -41,9 +41,9 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(Terroir)
 class TerroirAdmin(admin.ModelAdmin):
-    list_display = ('name','get_terroirs','isappellation','isvineyard',)
-    list_filter = ( 'name',)
-    search_fields = ('name',)
+    list_display = ('name','get_terroirs','isappellation','isvineyard','country')
+    list_filter = ( 'parentterroir','country',)
+    search_fields = ('parentterroir__name',)
 
     def __init__(self, model, admin_site):
         self.__terroirs = []
@@ -75,7 +75,7 @@ class WineAdmin(admin.ModelAdmin):
 
     list_display = ('producer','name','get_terroirs',)
     list_filter = ( 'terroir', )
-    search_fields = ('producer', 'name',)
+    search_fields = ('producer', 'name','get_terroirs',)
 
     def __init__(self, model, admin_site):
         self.__terroirs = []
