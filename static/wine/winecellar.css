@@ -1,9 +1,56 @@
-.body {
-    font-size: .575rem;
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fafafa;
   }
+
+/*
+.sticky-top{
+  top: 15px; 
+}*/
 /*
  * Sidebar
  */
+ .subregion-filter{
+    padding: 5px 14px;
+    border: 1px solid grey;
+    margin: 0px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+ }
+ .region-search div button{
+    float: left;
+    /*width: 50%;*/
+    background: #2196F3;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none; /* Prevent double borders */
+    cursor: pointer;
+    margin: 0px 1.5px;
+    padding: 0px 15px;
+ }
+ .region-search div button:hover {
+  background: #0b7dda;
+}
+.default-link{
+  color:#212529;
+}
+.click-region-name, .default-link {
+  color: inherit;
+}
+ .wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+ .canscroll {
+  width: 30em;
+  overflow-x: auto;
+  white-space: nowrap;
+ }
 
  .sidebar {
     position: fixed;

@@ -34,9 +34,22 @@ class Terroir(models.Model):
     isappellation = models.BooleanField(default=False)
     isvineyard = models.BooleanField(default=False)
     slug = models.CharField(max_length=150, blank=False, null=False, default='')
+    
     class Meta:
         unique_together = ['country', 'slug', 'parentterroir']
-        ordering = ('country','slug')
+        ordering = ('country','parentterroir__id','slug')
+
+    @staticmethod
+    def traverse_terroir(self, terroir, name):
+        if terroir.parentterroir is not None:
+            name = Terroir.traverse_terroir(self, terroir.parentterroir, f'{terroir.parentterroir.name} > {name}')
+        else:
+           self.__traversed_name = name
+    
+    @property
+    def region_traverse(self): 
+        region_names = Terroir.traverse_terroir(self, self.parentterroir,f'{self.parentterroir.name} > {self.name}')
+        return self.__traversed_name
 
     def __str__(self):
         return self.name
@@ -44,6 +57,11 @@ class Terroir(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super(Terroir, self).save(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        self.__traversed_name = None
+
+        super().__init__(*args, **kwargs)
 
 class Producer(models.Model):
     name = models.CharField(max_length=150)

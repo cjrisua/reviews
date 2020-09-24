@@ -1,4 +1,26 @@
 
+html {
+    font-size: 1rem;
+  }
+  
+  @include media-breakpoint-up(sm) {
+    html {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @include media-breakpoint-up(md) {
+    html {
+      font-size: 1.4rem;
+    }
+  }
+  
+  @include media-breakpoint-up(lg) {
+    html {
+      font-size: 1.6rem;
+    }
+  }
+
 #searchsubmit {
     position: absolute;
     top: 17px;
@@ -16,6 +38,15 @@
     line-height: 2;
 }
 
+.modal-body {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.region-scroll-list{
+    width: 100px;
+ }
+ 
 
 .button {
     background-color: #4CAF50; /* Green */

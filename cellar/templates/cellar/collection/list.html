@@ -3,8 +3,9 @@
 {% block javascript %}
 
 <script>
-  $( document ).ready(function() 
-  {
+
+  $( document ).ready(function() {
+    //$('.treeview').mdbTreeview();
     $('.wine-is-clickable').on('click', function(){
         console.log($(this)[0].dataset.href)
         let tablerow = $(this)[0];
@@ -45,7 +46,7 @@
   </script>
 {% endblock %}
 
-{% block content %}
+{% block content2 %}
 <div class="table-responsive">
     <table class="table table-hover">
       <thead>
@@ -79,4 +80,18 @@
       </tbody>
     </table>  
 </div>
+{% endblock %}
+{%block content %}
+<div class="treeview w-20 border">
+  <h6 class="pt-3 pl-3">Folders</h6>
+  <hr>
+  <ul class="mb-1 pl-3 pb-2">
+    <li><i class="fas fa-angle-right rotate"></i>
+      <span><i class="far fa-globe ic-w mx-1"></i>Countries</span>
+      <ul class="nested">
+        <li><i class="far fa-globe-americas ic-w mr-1"></i>United States</li>
+      </ul>
+    </li>
+  </ul>
+</div>  
 {% endblock %}

@@ -6,6 +6,7 @@ import socket
 from django.utils.text import slugify
 from progress.bar import IncrementalBar
 from functools import lru_cache
+import numpy
 
 URL = f'http://{socket.gethostname()}:8000'
 country_regions = []
@@ -72,7 +73,7 @@ def ProcessTerroir(terroirs, countryid):
     global country_regions
     parentid = None
     for terroir in enumerate(terroirs):
-        if terroir[1] == "Unknown" or terroir[1] == "None":
+        if terroir[1] == "Unknown" or terroir[1] == None:
             continue
 
         regionid = RegionLookup(terroir[1])
@@ -140,15 +141,22 @@ def LoadRegions():
     countries = [c for c in GetAll("api/country/")]
 
     df = pd.read_csv("terroir.csv", encoding='utf8')
+    previous_country = None
+    for country_key in df.groupby(['country','region']):
+    
+        country = "United States" if country_key[0][0] == "USA" else country_key[0][0]
+        if previous_country != country_key[0][0]:
+            country_regions = [r for r in GetAll(f"api/terroir/?country={slugify(country)}")]
+            previous_country = country_key[0][0]
 
-    for country_key in df.groupby(by='country'):
-        country = "United States" if country_key[0] == "USA" else country_key[0]
-        country_regions = [r for r in GetAll(f"api/terroir/?country={slugify(country)}")]
-
-        bar = IncrementalBar(f'Loading {country_key[0]} [{len(country_regions)}]', max=country_key[1].shape[0], suffix='%(percent)d%%')
+        bar = IncrementalBar(f'Loading {country_key[0][0]}-{country_key[0][1]} [{country_key[1].shape[0]}]', max=country_key[1].shape[0], suffix='%(percent)d%%')
         cache_regions = {}
         for row in country_key[1].sort_values(by=['country','region','subregion']).iterrows():
             bar.next()
+
+            if numpy.nan in [f for f in row[1]]:
+                continue
+
             region = row[1].region
             subregion = row[1].subregion
             appellation = row[1].appellation

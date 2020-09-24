@@ -24,6 +24,7 @@ router = routers.DefaultRouter()
 router.register(r'wine', wineviews.WineViewSet)
 router.register(r'cellar', cellarviews.CollectionViewSet)
 router.register(r'terroir', wineviews.TerroirViewSet)
+#router.register(r'terroir', wineviews.TerroirViewSet)
 router.register(r'country', wineviews.CountryViewSet)
 router.register(r'varietal', wineviews.VarietalViewSet)
 router.register(r'mastervarietal', wineviews.MasterVarietalViewSet)
@@ -32,8 +33,7 @@ router.register(r'producer', wineviews.ProducerViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('cellar/', include('cellar.urls', namespace='cellar')),
-    path('cellar/', cellarviews.CollectionListView.as_view(),name='cellar'),
+    path('cellar/', include('cellar.urls', namespace='cellar')),
     path('wine/', include('wine.urls', namespace='wine')),
     path('analytics/', include('analytics.urls', namespace='analytics')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),

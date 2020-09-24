@@ -5,6 +5,7 @@ from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents import WineDocument
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
+from rest_framework.response import Response
 
 class WineDocumentSerializer(DocumentSerializer):
     class Meta:
@@ -45,11 +46,23 @@ class TerroirSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terroir
         fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country']
-        lookup_field = 'slug'
+        #lookup_field = 'slug'
 
     def create(self, validated_data):
          terroir, created = Terroir.objects.get_or_create(**validated_data)
          return terroir
+    
+    def update(self, instance, validated_data):
+        print(self.context['request'].data)
+        print(validated_data)
+        #if self.context['request'].method == "PUT":
+        #   pass
+        #elif self.context['request'].method == "PATCH":
+        instance.isvineyard = validated_data.get('isvineyard', instance.isvineyard)
+        instance.isappellation = validated_data.get('isappellation', instance.isappellation)
+        instance.parentterroir = validated_data.get('parentterroir', instance.parentterroir)
+        instance.save()
+        return instance
 
 class CriticSerializer(serializers.ModelSerializer):
     class Meta:
