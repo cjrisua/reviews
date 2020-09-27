@@ -4,7 +4,9 @@ body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;
   }
-
+.fa-check-circle{
+  color: green;
+}
 /*
 .sticky-top{
   top: 15px; 

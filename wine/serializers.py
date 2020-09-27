@@ -58,10 +58,15 @@ class TerroirSerializer(serializers.ModelSerializer):
         #if self.context['request'].method == "PUT":
         #   pass
         #elif self.context['request'].method == "PATCH":
+        instance.name = validated_data.get('name', instance.name)
         instance.isvineyard = validated_data.get('isvineyard', instance.isvineyard)
         instance.isappellation = validated_data.get('isappellation', instance.isappellation)
         instance.parentterroir = validated_data.get('parentterroir', instance.parentterroir)
         instance.save()
+        return instance
+    
+    def delete(self, instance):
+        print("delete " + instance)
         return instance
 
 class CriticSerializer(serializers.ModelSerializer):

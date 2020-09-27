@@ -26,10 +26,10 @@
       <div class="pl-4 col-3 d-none"><h6><strong>Name</strong></h6></div>
       <div class="col-8"><h6><strong>Region</strong></h6></div>
   </div>
-  {% for region in regions %}
+  {% for region in regions|dictsort:"region_traverse" %}
   <div id="region-row" class="row">
       <div class="pl-4 col-3 d-none"><a id="{{region.id}}" href="#" class="default-link region-list-item">{{region.name}}</a></div>
-      <div class="col-8 region-traverse-name">{{region.region_traverse}}</div>
+      <div class="col-8 region-traverse-name"><a id="{{region.id}}" href="#" class="default-link region-list-item">{{region.region_traverse}}</a></div>
   </div>
   {% endfor %}
 </div>

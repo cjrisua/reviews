@@ -1,6 +1,5 @@
 
  {% load crispy_forms_tags %}
-
  <div class="row no-gutters justify-content-end">
     <div class="col-6 no-gutters">
         <div class="input-group region-search">
@@ -13,8 +12,11 @@
         </div>
     </div>
  </div>
+ <div id="topScroll" class="m-1">
+   <span id="banner-update"></span>
+</div>
 <div class="row">
-    <div class="col-12 mt-4">
+    <div class="col-12 mt-0">
        <h5><span id="region-path-info"><h3>Region</h3></span></h5>
     </div>
 </div>
@@ -25,27 +27,27 @@
                 <input type="hidden" id="parrentterroirid" name="pterroirid" value="{{parentterroirid}}">
                 <input type="hidden" id="terroirid" name="terroirid" value="{{terroirid}}">
                 {% csrf_token %}
-            <!-- {{ form |crispy }} -->
-            {{ form.name|as_crispy_field }}
-            {{ form.isappellation|as_crispy_field }}
-            {{ form.isvineyard|as_crispy_field }}
+                <!-- {{ form |crispy }} -->
+                {{ form.name|as_crispy_field }}
+                {{ form.isappellation|as_crispy_field }}
+                {{ form.isvineyard|as_crispy_field }}
+                {{ form.country|as_crispy_field }}
+                <div class="row no-gutters">
+                  <div class="col-10">
+                    {{ form.region|as_crispy_field }}
+                  </div>
+                  <div class="col-2 align-self-center mt-3">
+                    <span data-toggle="tooltip" data-html="true" data-placement="right" title="Explore <em>Sub-Regions</em>">
+                      <button type="button" class="btn btn-dark subregion-filter" data-toggle="modal" data-target="#subregionModal">
+                        <i class="fas fa-search-location fa-2x"></i>
+                      </button>
+                    </span>
+                  </div>
+                </div>
                 {% if form_init %}
-                    {{ form.country|as_crispy_field }}
-                    <div class="row no-gutters">
-                      <div class="col-10">
-                        {{ form.region|as_crispy_field }}
-                      </div>
-                      <div class="col-2 align-self-center mt-3">
-                        <span data-toggle="tooltip" data-html="true" data-placement="right" title="Explore <em>Sub-Regions</em>">
-                          <button type="button" class="btn btn-dark subregion-filter" data-toggle="modal" data-target="#subregionModal">
-                            <i class="fas fa-search-location fa-2x"></i>
-                          </button>
-                        </span>
-                      </div>
-                    </div>
                     <button id="event" type="submit" class="btn">Create</button>
                 {% else %}
-                    <button id="event" type="submit" class="btn">Update</button>
+                    <button type="submit" class="update-terroir btn">Update</button>
                     <span>
                     <button type="button" class="remove-terroir btn" data-toggle="modal" data-target="#exampleModalCenter">Remove</button>
                 {% endif %}
@@ -79,13 +81,13 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Confirm Removal</h5>
+          <h5 class="modal-title" id="exampleModalLongTitle"></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          Would you like to remove: <span class='modal-terroir-name'>?</span> Terroir?
+          <span class='modal-terroir-name'></span>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-grey" data-dismiss="modal">Close</button>

@@ -124,8 +124,8 @@
                     country: GetValue(serialized_dat,'country')
                 }
             ); 
-            alert("Update Successfully" + data)
-            /*
+            //alert("Update Successfully" + data)
+            
             $.ajax({
                     type: "POST",
                     url: $('head base').attr('href') + "api/terroir/",
@@ -143,7 +143,6 @@
                          console.log(errorThrown)
                     }
                 });
-            */
         });
         $('#id_country').on( 'change', function(event){
             slugifytext = slugify($('option:selected')[0].text);
@@ -190,8 +189,9 @@
         /* When user selects a region from the nav region bar
            then set form with region details
         */
-        $(document).on( 'click', '.click-region-name', function(event){
+        $(document).on( 'click', '.click-region-name', function(event, action){
             event.preventDefault();
+            console.log(action)
             let region_array =Array();
             let data = JSON.stringify({id: $(this)[0].parentNode.parentNode.parentNode.id})
             let name = $(this)[0].parentNode.parentNode.parentNode;
@@ -210,7 +210,7 @@
                 $("[name=child-terroirs")[0].remove()
 
             $.ajax({
-                    type: "POST",
+                    type: action == "action-remove" ? "DELETE": "POST",
                     url: $('head base').attr('href') + "cellar/terroir/detail/",
                     data: data,
                     contentType: "application/json; charset=utf-8", 
@@ -333,9 +333,39 @@
             }
             
         } );
+        //update-terroir
+        $(document).on('click','.update-terroir', function(event){
+            event.preventDefault();
+            data = JSON.stringify({ name: $("#id_name").val(),
+                                    isappellation: $("#id_isappellation").is(":checked"),
+                                    isvineyard: $('#id_isvineyard').is(":checked")});
+            id = $('[name=terroirid]')[0].attributes['value'].value;
+            console.log(id)
+            $.ajax({
+                    type: "PATCH",
+                    url: $('head base').attr('href') + "api/terroir/"+id+"/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    headers:{"X-CSRFToken": csrftoken},
+                    dataType: "json",
+                    success: successCallback
+                });
+                function successCallback(response) {
+                    $("#banner-update").html("<i class='far fa-check-circle pr-2' style='color:green;'>\
+                        </i><span>The region '"+ $("#id_name").val() +"'was changed successfully.</span>")
+                            .show().fadeOut(7500, function() {
+                        $(this).hide();
+                    });
+                }
+
+           
+           //$('#banner-update').delay(1000).fadeOut(500)
+           //$('#banner-update').innerHTML="";
+        });
         $(document).on('click','.remove-terroir', function(event){
             var terroirname = $('#id_name')[0].attributes['value'].value
-            $('.modal-terroir-name')[0].innerText = terroirname;
+            $('#exampleModalLongTitle')[0].innerText = "Confirm Removal";
+            $('.modal-terroir-name')[0].innerText = "Would you like to remove " +terroirname +"?"
         });
         $(document).on("click",".modal-yes", function(event){
             event.preventDefault();
@@ -343,7 +373,8 @@
             //alert('Remove API Terroir: ' +  $('[name=terroirid]')[0].attributes['value'].value + " Parent") 
             //$(this).modal('toggle');
             let regionlink = $( "#"+  $('[name=pterroirid]')[0].attributes['value'].value).find("a")[0]
-            $(regionlink).trigger( "click" );
+            console.log(regionlink)
+            $(regionlink).trigger( "click", "action-remove" );
             //alert('Call API2')
         });
         $(document).on("click",".region-list-item", function(event){
