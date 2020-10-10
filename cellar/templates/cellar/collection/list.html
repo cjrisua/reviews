@@ -2,96 +2,10 @@
 
 {% block javascript %}
 
-<script>
-
-  $( document ).ready(function() {
-    //$('.treeview').mdbTreeview();
-    $('.wine-is-clickable').on('click', function(){
-        console.log($(this)[0].dataset.href)
-        let tablerow = $(this)[0];
-
-        
-        let wineinfo = $($(tablerow)[0].parentNode.childNodes).filter(function(e){
-                            if( $(this)[0].dataset != null && 
-                                $(this)[0].dataset["target"] == $(tablerow)[0].dataset["target"])
-                              return true;
-                        });
-        //let hashidden = $(tablerow).filter(c => c.className.includes('hidden'));
-        if(wineinfo.length == 1){
-          $.ajax({
-                url: $(this)[0].dataset.href,
-                context: document.body,
-                success: successCallback
-          });
-        }
-        else
-        {
-          Array.from(wineinfo).forEach(function(e) {
-              if($(e).is(":visible"))
-                $(e).hide();
-              else
-                $(e).show()
-          })
-        }
-        function successCallback(response) {
-          const winedetail = $(tablerow).clone(true);
-          $(winedetail).find("#wine-info")[0].innerHTML = response;
-          $(winedetail).insertAfter($(tablerow));
-          $(tablerow).hide();
-          //$(tablerow).addClass('hidden');
-    }
-
-     });
-  });
-  </script>
 {% endblock %}
-
-{% block content2 %}
-<div class="table-responsive">
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Quantity</th>
-          <th>Average Socre</th>
-        </tr>
-      </thead>
-      <tbody>
-    {% for cellaritem in collection %}
-          {% ifchanged  cellaritem.collectible.wine.producer.name %} 
-          <tr data-toggle="collapse" data-target=".child{{cellaritem.collectible.wine.producer.id}}" class="clickable">
-            <th scope="row">1</th>
-            <!--<a href="{{ cellaritem.get_absolute_url }}">{{ cellaritem }}</a>-->
-            <!--<td>{{cellaritem}}</td>-->
-              <td>{{cellaritem.collectible.wine.producer.name}}</td>
-              <td>1</td>
-              <td>99</td>
-            </tr>
-          {% endifchanged %}
-         
-          
-          <tr class="collapse child{{cellaritem.collectible.wine.producer.id}} wine-is-clickable" 
-          data-href = '{{ cellaritem.get_absolute_url }}' data-target="{{cellaritem.collectible.id}}">
-            <td></td>
-            <td id='wine-info' colspan="3">{{cellaritem.collectible.wine.name}} {{cellaritem.collectible.year}}</td>
-          </tr>
-      {% endfor %}
-      </tbody>
-    </table>  
-</div>
+{% block sidenavcontent %}
+  <h3>Sidebar</h3>
 {% endblock %}
 {%block content %}
-<div class="treeview w-20 border">
-  <h6 class="pt-3 pl-3">Folders</h6>
-  <hr>
-  <ul class="mb-1 pl-3 pb-2">
-    <li><i class="fas fa-angle-right rotate"></i>
-      <span><i class="far fa-globe ic-w mx-1"></i>Countries</span>
-      <ul class="nested">
-        <li><i class="far fa-globe-americas ic-w mr-1"></i>United States</li>
-      </ul>
-    </li>
-  </ul>
-</div>  
+ <h3>Welcome</h3>
 {% endblock %}

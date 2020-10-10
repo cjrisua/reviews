@@ -1,0 +1,51 @@
+{% extends "cellar/base.html" %}
+{% load crispy_forms_tags %}
+
+{%block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="row no-gutters">
+            <div class="col-10">
+                {{form.producer|as_crispy_field}}
+            </div>
+            <div class="col-2">
+                <div class="pl-0 mt-3">
+                    <button type="button" class="btn btn-dark subregion-filter" data-toggle="modal" data-target="#producerModal" data-whatever="@mdo">
+                        <i class="fas fa-user-plus" style="color:#f5f7f4;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {{form.signupdate|as_crispy_field}}
+        {{form.status|as_crispy_field}}
+        <button type="submit" class="btn">Save</button>
+    </form>
+    <div class="modal fade" id="producerModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalLabel">Add Producer</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              {% include "allocation/producer-create.html" with form=producerform %}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+              <button id="submitProducer" type="button" class="btn btn-dark">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+      $(document).on( 'click', '#submitProducer', function(event){
+        $('#producerForm').submit();
+      });
+    });
+</script>
+{% endblock %}

@@ -15,9 +15,9 @@ body {
  * Sidebar
  */
  .subregion-filter{
-    padding: 5px 14px;
+    padding: 8px 14px;
     border: 1px solid grey;
-    margin: 0px 15px;
+    margin: 15px 15px;
     cursor: pointer;
     border-radius: 5px;
  }

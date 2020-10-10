@@ -9,8 +9,33 @@ COLLECTION_CHOICES = (
         ('pending', 'Pending Delivery'),
         ('drunk', 'Drunk'),
         ('curated','Curated'),
-        ('removed', 'Removed')
+        ('removed', 'Removed'),
     )
+ALLOCATION_CHOICES = (
+    ('waiting', 'Waiting'),
+    ('active', 'Active'),
+    ('atfault','At Fault'),
+)
+class ActiveAllocationManager(models.Manager):
+    def get_queryset(self):
+        return super(ActiveAllocationManager,self).get_queryset().filter(status='active')
+
+class Allocation(models.Model):
+    producer = models.ForeignKey(Producer,  on_delete=models.CASCADE, related_name="producer", unique=True)
+    signupdate = models.DateField()
+    addeddate = models.DateField(default='1900-01-01',blank=True)
+    mailingmonths = models.CharField(max_length=50, default='',  blank=True)
+    lastpurchasedate = models.DateField(default='1900-01-01',blank=True)
+    status = models.CharField(max_length=15, choices = ALLOCATION_CHOICES, blank=True, default='waiting')
+    inactivitypenalty = models.BooleanField(default=True,blank=True)
+    #active = ActiveAllocationManager()
+
+    def __str__(self):
+        return self.producer.name
+
+    def get_absolute_url(self):
+        print("???")
+        return reverse('cellar:allocation',)
 
 class Cellar(models.Model):
     name = models.CharField(max_length=50, default="My Cellar")

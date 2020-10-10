@@ -19,5 +19,5 @@ class TerroirForm(forms.ModelForm):
         labels = {
             'name' : _('Terroir Name'),
             'isappellation' : _('Appelation?'),
-            'isvineyard' : _('Vineyard?'),
+            'isvineyard' : _('Vineyard?')
         }

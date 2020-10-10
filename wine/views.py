@@ -44,18 +44,21 @@ def terrori_detail(request, **kwargs):
     subterroirs = Terroir.objects.filter(parentterroir__id=json.loads(request.body)['id'], isvineyard=True)
     #subterroirs_serializer = TerroirSerializer(instance=subterroirs)
     serializer = TerroirSerializer(instance=data)
-    #print(f"result = {serializer.data}")
+    #print("???? " + request.method)
     if request.method == 'POST':
          form = TerroirForm(serializer.data)
     else:
+        if request.method == 'DELETE':
+            print(f"delete: {json.loads(request.body)}")
         form = TerroirForm(serializer.data)
     
-    print(subterroirs.count())
+    print(serializer.data)
     return render(request, 'wine/region/detail.html', 
-        { 'form': form , 
-          'parentterroirid' : dict(serializer.data)['parentterroir'],
-          'childterroirs' : subterroirs,
-          'terroirid' : dict(serializer.data)['id']
+        {  'form': form , 
+           'parentterroirid' : dict(serializer.data)['parentterroir'],
+           'childterroirs' : subterroirs,
+           'terroirid' : dict(serializer.data)['id'],
+           'traverse' : dict(serializer.data)['traverse'] if "traverse" in dict(serializer.data) is not None else None
         })
 
 class WineDocumentViewSet(DocumentViewSet):

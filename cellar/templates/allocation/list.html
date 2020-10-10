@@ -1,0 +1,41 @@
+{% extends "cellar/base.html" %}
+{%block content %}
+ <h3>Allocations</h3>
+    {% for allocation in allocations%}
+        {% if forloop.first %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Producer</th>
+                <th scope="col">Sign up on</th>
+                <th scope="col">Status</th>
+                <th scope="col">Join mailing on</th>
+                <th scope="col">Last purchase</th>
+            </tr>
+            </thead>
+            <tbody>
+        {% endif %}
+        <tr>
+            <th scope="row">{{forloop.counter}} </th>
+            <td><a href="{% url 'cellar:allocation_update' allocation.id %}" class="default-link">{{allocation.producer}}</a></td>
+            <td>{{allocation.signupdate}}</td>
+            <td>{{allocation.status|title}} </td>
+            {% if allocation.status|lower == 'waiting' %}
+                <td> - </td>
+                <td> - </td>
+            {% else %}
+                <td>{{allocation.addeddate}} </td>
+                <td>{{allocation.lastpurchasedate}} </td>
+            {% endif %}
+          </tr>
+        {% if forloop.last %}
+            </tbody>
+        </table>
+        {% endif %}
+           
+    {%empty%}
+        There are no allocations yet.
+    {% endfor %}
+    <p><a href="{% url "cellar:allocation_create" %}">Add</a></p>
+{% endblock %}

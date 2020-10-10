@@ -162,6 +162,7 @@
         });
         $(document).on( 'click', '.click-vineyard-name', function(event){
             event.preventDefault();
+            console.log('click-vineyard-name')
             //alert("call API" + $(this).attr('href'));
             let terroir_path = $('#region-path-info')[0].innerHTML;
             let data = JSON.stringify({id:$(this).attr('href')})
@@ -178,6 +179,11 @@
                         console.log($(response).find("#region-form"))
                         $(document).find("#region-form").replaceWith($(response).find("#region-form")[0])
                         $('#region-path-info').html(terroir_path)
+                        //console.log($("#parrentterroirid").val())
+                        //console.log($("#traverse").val().substring(0, $("#traverse").val().lastIndexOf(">")))
+                        $("#id_region").empty()
+                        $("#id_region").append("<option value='"+$("#parrentterroirid").val()+"'>"+$("#traverse").val().substring(0, $("#traverse").val().lastIndexOf(">"))+"</option>"); // + "["+start+"]")
+
                     },
                     error: function (textStatus, errorThrown) {
                         alert(textStatus)
@@ -191,11 +197,12 @@
         */
         $(document).on( 'click', '.click-region-name', function(event, action){
             event.preventDefault();
-            console.log(action)
-            let region_array =Array();
+            console.log('click-region-name: action is ' + action)
+            console.log("traverse" + $("#traverse")[0])
+            let region_array = Array();
             let data = JSON.stringify({id: $(this)[0].parentNode.parentNode.parentNode.id})
             let name = $(this)[0].parentNode.parentNode.parentNode;
-        
+            console.log('Data: '  + data)
             function GetParentName(nodename){
                 if ($(nodename)[0].parentNode.parentNode.parentNode.parentNode.parentNode.id != ""){   
                     region_array.push($(nodename)[0].innerText)
@@ -222,6 +229,16 @@
                         divholder.append($(response).find('#region-form')[0])
                         GetParentName($(name).find('.click-region-name')[0])
                         $('#region-path-info').html(region_array.reverse().join(" > "))
+                        
+                        console.log("??" + $("#traverse").val())
+                        //GetRegions(64173)
+                        dropdowntext = $("#traverse").val()
+                        if($("#traverse").val() == "None")
+                            GetRegions($("#terroirid").val())
+
+                        $("#id_region").empty()
+                        $("#id_region").append("<option value='"+$("#terroirid").val()+"' selected>"+dropdowntext+"</option>"); // + "["+start+"]")
+
                         vineyards = $(response).filter('[name=child-terroirs]')  
                         if( $(vineyards)[0] != undefined)                
                             divholder.append($(vineyards)[0])

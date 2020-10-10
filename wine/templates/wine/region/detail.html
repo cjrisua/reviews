@@ -24,8 +24,10 @@
     <div class="col-10">
         <form action={% url 'terroir-list' %} id="region-form" >
             <div class="form-group">
-                <input type="hidden" id="parrentterroirid" name="pterroirid" value="{{parentterroirid}}">
-                <input type="hidden" id="terroirid" name="terroirid" value="{{terroirid}}">
+                <input type="hidden" id="parrentterroirid" name="pterroirid" value="{{parentterroirid}}"/>
+                <input type="hidden" id="terroirid" name="terroirid" value="{{terroirid}}"/>
+                <input type="hidden" id="traverse" name="traverse" value="{{traverse}}"/>
+                
                 {% csrf_token %}
                 <!-- {{ form |crispy }} -->
                 {{ form.name|as_crispy_field }}
@@ -55,7 +57,7 @@
         </form>
     </div>
 </div>
-{%if childterroirs|length > 1%}
+{%if childterroirs|length > 0%}
 <div name="child-terroirs" class="table-wrapper-scroll-y my-custom-scrollbar">
     <table class="table table-bordered table-striped mb-0">
         <thead>
