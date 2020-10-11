@@ -2,21 +2,21 @@ from django import forms
 from .models import Allocation
 from wine.models import Producer
 from django.utils.translation import gettext_lazy as _
-from django.forms.widgets import TextInput
+from django.forms.widgets import TextInput, HiddenInput
 
-class AllocationForm(forms.ModelForm):
+class AllocationModelForm(forms.ModelForm):
      class Meta:
         model = Allocation
-        fields = ('producer','signupdate','status')
+        fields = ('producer','signupdate','status','addeddate','mailingmonths','inactivitypenalty','lastpurchasedate')
         widgets = {
-            'producer': TextInput(attrs={'cols': 80, 'rows': 20}),
+            'producer' : HiddenInput(),
         }
         labels = {
-            'producer' : _('Producer name'),
             'signupdate' : _('Mailing list sign up date'),
         }
+class AllocationForm(AllocationModelForm, forms.Form):        
+        producer_name = forms.CharField(widget=TextInput(attrs={'cols': 80, 'rows': 20}))
         
-
 class ProducerForm(forms.ModelForm):
     class Meta:
         model = Producer

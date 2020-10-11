@@ -40,14 +40,18 @@ class AllocationCreateView(CreateView):
         return render(request, 'allocation/create.html', context)
 
      def post(self, request, *args, **kwargs):
-        form = AllocationForm(request.POST)
+        print(request.POST)
+        #request.POST['producer'] = request.POST['producer_id'] 
+        new_request = request.POST.copy()
+        #new_request['producer'] =  request.POST['producer_id'] 
+        form = AllocationForm(new_request)
         if form.is_valid():
             allocation = form.save()
             allocation.save()
             return HttpResponseRedirect(reverse_lazy('cellar:allocation'))
         else:
              print("Invalid", form.errors)
-        return render(request, 'allocation/detail.html', {'form': form})
+        return render(request, 'allocation/create.html', {'form': form,'producerform': ProducerForm() })
 
 class AllocationListView(ListView):
     template_name = 'allocation/list.html'

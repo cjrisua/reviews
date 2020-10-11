@@ -7,8 +7,8 @@ register = template.Library()
 def producer_dict():
     producers = Producer.objects.all()
     results = [ {
-                 "id":p.id,
-                 "name":p.name
+                 "key":p.id,
+                 "value":p.name
                  } 
                  for p in producers]
     return results
