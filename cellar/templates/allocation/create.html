@@ -1,6 +1,6 @@
 {% extends "cellar/base.html" %}
 {% load crispy_forms_tags %}
-
+{% load cellar_tags %}
 {%block content %}
     <form action="" method="post">
         {% csrf_token %}
@@ -43,6 +43,19 @@
 {% block javascript %}
 <script>
     $(document).ready(function(){
+      
+      {% autoescape off %}
+      var producersList = {% producer_dict %}
+      {% endautoescape %}
+
+      var availableTags = []
+      var data = producersList.forEach((element) => {
+        availableTags.push(element['name'])
+      });
+
+      $( "#id_producer" ).autocomplete({
+        source: availableTags
+      });
       $(document).on( 'click', '#submitProducer', function(event){
         $('#producerForm').submit();
       });
