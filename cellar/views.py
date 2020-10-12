@@ -5,9 +5,10 @@ from rest_framework import viewsets
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, UpdateView
-from .forms import AllocationForm, ProducerForm
+from .forms import AllocationForm, ProducerForm,AllocationModelForm, AllocationUpdateForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
 
 class ProducerCreateView(CreateView):
     #template_name = 'allocation/producer-create.html'
@@ -26,9 +27,9 @@ class ProducerCreateView(CreateView):
 class AllocationUpdateView(UpdateView):
     model = Allocation
     template_name = 'allocation/detail.html'
-    #fields = '__all__'
-    form_class = AllocationForm
-    
+    form_class = AllocationUpdateForm
+    success_url = reverse_lazy('cellar:allocation')
+
 class AllocationCreateView(CreateView):
      #template_name = 'allocation/detail.html'
      #form_class = AllocationForm

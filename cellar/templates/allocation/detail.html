@@ -3,6 +3,7 @@
 {%block content %}
 <form action="" method="post">
     {% csrf_token %}
+    <h3>{{form.producer_name}}</h3>
     {{form|crispy}}
     <button type="submit" class="btn">Update</button>
 </form>
