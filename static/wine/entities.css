@@ -20,7 +20,9 @@ html {
       font-size: 1.6rem;
     }
   }
-
+.ui-menu-item{
+  font-family:  'Poppins', sans-serif;
+}
 #searchsubmit {
     position: absolute;
     top: 17px;

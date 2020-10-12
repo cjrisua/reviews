@@ -34,7 +34,6 @@ class Allocation(models.Model):
         return self.producer.name
 
     def get_absolute_url(self):
-        print("???")
         return reverse('cellar:allocation',)
 
 class Cellar(models.Model):

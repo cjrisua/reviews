@@ -15,6 +15,7 @@ class AllocationModelForm(forms.ModelForm):
         labels = {
             'signupdate' : _('Mailing list sign up date'),
         }
+
 class AllocationForm(AllocationModelForm, forms.Form):        
         producer_name = forms.CharField(widget=TextInput(attrs={'cols': 80, 'rows': 20}))
 
@@ -25,16 +26,28 @@ class AllocationUpdateForm(AllocationModelForm, forms.Form):
             self.post = kwargs
         
         def is_valid(self):
+            valid = super(AllocationUpdateForm,self).is_valid()
+            #print(valid)
             return True
 
         def form_valid(self, form, *args, **kwargs):
             print("form_valid")
-            
+        
+        def clean(self):
+            print("clean")
+
         def save(self, commit=True, *args, **kwargs):
             allocation = super(AllocationUpdateForm, self).save(commit=False)
+            defaults = {
+                "signupdate" : self.post['data']['signupdate'],
+                "addeddate"  : self.post['data']['addeddate'],
+                "mailingmonths" : self.post['data']['mailingmonths'],
+                "lastpurchasedate" : self.post['data']['lastpurchasedate'],
+                "status" : self.post['data']['status'] ,
+            }
             updated, created = Allocation.objects.update_or_create(
                 producer=self.instance.producer,
-                defaults={'addeddate': self.post['data']['addeddate']},
+                defaults=defaults,
                 )
             return updated
 

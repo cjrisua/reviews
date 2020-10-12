@@ -1,0 +1,42 @@
+{% load cellar_tags %}
+<script>
+    $(document).ready(function(){
+      
+      function AllocationAdvanceOptions(status)
+      {
+        $("#div_id_addeddate").toggle(status);
+        $("#div_id_mailingmonths").toggle(status);
+        $("#div_id_inactivitypenalty").toggle(status);
+        $("#div_id_lastpurchasedate").toggle(status);
+      }
+
+      if ($("#id_status option:selected").text() != "Active")
+        AllocationAdvanceOptions(false)
+
+      {% autoescape off %}
+      var availableTags = {% producer_dict %}
+      {% endautoescape %}
+
+      $(document).on("change", "#id_status", function(event){
+        if($("#id_status option:selected").text() == "Active")
+          AllocationAdvanceOptions(true)
+        else
+          AllocationAdvanceOptions(false)
+      });
+
+      $( "#id_producer_name" ).autocomplete({
+        source: availableTags,
+        select: function (event, ui) {
+          //$("#id_producer").removeData()
+          //$("#id_producer").val(ui.item.key)
+          $("#id_producer").attr('value', ui.item.key)
+          //$("#id_producer").val(ui.item.value)
+          console.log($("#id_producer"))
+        }
+      });
+
+      $(document).on( 'click', '#submitProducer', function(event){
+        $('#producerForm').submit();
+      });
+    });
+</script>
