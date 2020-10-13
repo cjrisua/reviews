@@ -11,12 +11,12 @@ p {
 }
 
 a {
-    color:#12c064;
+    color:#595b5a;
     text-decoration:none;
 }
 
 a:hover {
-    color:#00a74f;
+    color:#4c504e;
 }
 
 h1, h2, h3, h4, h5 , h6 { font-family: 'Muli', sans-serif; font-weight:normal; }
@@ -38,9 +38,9 @@ ol {
 #header {
     padding:10px 100px;
     font-size:14px;
-    background:#12c064;
+    background:#595b5a;
     color:#fff;
-    border-bottom:4px solid #1cdf78;
+    border-bottom:4px solid #808783;
     overflow:auto;
 }
 
@@ -64,7 +64,7 @@ ol {
 }
 
 #header ul.menu li.selected a, #header ul.menu li.selected a:hover {
-    color:#1b6d32;
+    color:#fff;
     font-weight:bold;
 }
 
@@ -111,7 +111,7 @@ input, textarea {
 }
 input[type=submit], a.button {
     font-weight:bold;
-    background:#12c064;
+    background:#595b5a;
     color:#fff;
     padding:10px 20px;
     font-size:14px;
