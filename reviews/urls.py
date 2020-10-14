@@ -19,6 +19,8 @@ from wine import views as wineviews
 from cellar import views as cellarviews
 from analytics import views as analyticsviews
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 router.register(r'wine', wineviews.WineViewSet)
@@ -43,3 +45,7 @@ urlpatterns = [
     path('api/learn/',  analyticsviews.ParkerSommList.as_view(), name='analytics'),
     #path('wines/', include('wine.urls')),  
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
