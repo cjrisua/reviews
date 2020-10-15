@@ -1,11 +1,27 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
-
+div{
+  height: 100%;
+}
 body {
     font-family: 'Poppins', sans-serif;
     background: #fafafa;
+    height: 100%;
   }
 .fa-check-circle{
   color: green;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
 }
 /*
 .sticky-top{

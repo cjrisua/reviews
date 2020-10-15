@@ -9,6 +9,13 @@ from .forms import AllocationForm, ProducerForm,AllocationModelForm, AllocationU
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def dashboard(request):
+    return render(request,
+                  'cellar/dashboard.html',
+                  {'section': 'dashboard'})
 
 class ProducerCreateView(CreateView):
     #template_name = 'allocation/producer-create.html'
@@ -61,6 +68,7 @@ class AllocationListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['section'] = 'allocation'
         return context
 
 class CollectionViewSet(viewsets.ModelViewSet):

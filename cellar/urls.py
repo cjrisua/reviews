@@ -3,7 +3,7 @@ from . import views
 from wine import views as wineviews
 app_name = 'cellar'
 urlpatterns = [
-    path('', views.CollectionListView.as_view(), name='cellar'),
+    path('', views.dashboard, name='dashboard'),
     path('allocation/', views.AllocationListView.as_view(), name='allocation'),
     path('allocation/add/', views.AllocationCreateView.as_view(), name='allocation_create'),
     path('allocation/producer/add/', views.ProducerCreateView.as_view(), name='allocation_producer_create'),

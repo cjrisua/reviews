@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Minikahda Wine Cellar</title>
+        <link rel="stylesheet" id="fontawesome-css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css?ver=5.4.2" type="text/css" media="all">
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/css/bootstrap.min.css' %}">
+        <!-- Material Design for Bootstrap -->
+        <link rel="stylesheet" type="text/css" href="{% static 'vendor/css/mdb.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'wine/entities.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'wine/winecellar.css' %}">
+        <!--<link href="{% static "wine/base.css" %}" rel="stylesheet">-->
+        <script src="https://kit.fontawesome.com/4b6b3dad85.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3">
+        <div class="container-fluid">
+          <a href="#" class="navbar-brand mr-3">VinoMío</a>
+          <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                <a href="{% url "cellar:dashboard" %}" class="nav-item nav-link{% if section == "dashboard" %} active{% endif %}">Cellar</a>
+                <a href="{% url "cellar:allocation" %}" class="nav-item nav-link{% if section == "allocation" %} active{% endif %}">Allocations</a>
+                <a href="#" class="nav-item nav-link">About</a>
+                <a href="#" class="nav-item nav-link">Contact</a>
+                {% endif %}
+            </div>
+            <div class="navbar-nav ml-auto">
+              {% if request.user.is_authenticated %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Hello {{ request.user.first_name }} 
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="#">Profile</a>
+                  <a class="dropdown-item" href="#">Cellar Management</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{% url "account:logout" %}">Sign Out</a>
+                </div>
+              </li>
+              <a href="{% url "account:logout" %}" class="nav-item nav-link"><i class="far fa-user"></i></a> 
+              {% else %}
+              <a href="#" class="nav-item nav-link">Register</a>
+              <a href="{% url "account:login" %}" class="nav-item nav-link">
+                <i class="far fa-user"></i>
+              </a>
+              {% endif %}
+          </div>
+          </div>
+        </div>
+      </nav>
+      <div class="container-fluid">
+        <div class="row flex-xl-nowrap">         
+          <div class="col-md-3 col-xl-4 bd-sidebar">
+                  {% block sidenavcontent %}
+                  {% endblock %}
+              </nav>
+          </div>
+          <main class="col-md-8 col-xl-7 py-md-3 pl-md-5 bd-content">
+              {% block content %}
+              {% endblock %}
+          </main>
+        </div>
+        <footer class="footer">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6">
+                  <p>Copyright &copy; 2020 VinoMío Wine Management</p>
+              </div>
+              <div class="col-md-6 text-md-right">
+                  <a href="#" class="text-dark">Terms of Use</a> 
+                  <span class="text-muted mx-2">|</span> 
+                  <a href="#" class="text-dark">Privacy Policy</a>
+              </div>
+          </div>
+          </div>
+      </footer>
+      </div>
+      <script src="{% static 'wine/displaCyENT.js' %}"></script>
+      <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+      <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+      <script src="{% static 'vendor/js/bootstrap.min.js' %}"></script>  
+      <!-- Material Design for Bootstrap -->  
+      <script src="{% static 'vendor/mdb/js/mdb.min.js' %}"></script>    
+      {% block javascript %}{% endblock %}
+    </body>
+</html>
