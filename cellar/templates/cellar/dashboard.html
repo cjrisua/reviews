@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dashboard?{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block sidenavcontent %}
 <form role="search" class="bd-search d-flex align-items-center">
@@ -29,85 +29,155 @@
 <nav class="collapse bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
     <a class="bd-toc-link" href="/docs/4.5/getting-started/introduction/">
-      Getting started
+      My Cellar
     </a>
-
     <ul class="nav bd-sidenav">
-      <li class="active bd-sidenav-active">
-        <a href="/docs/4.5/getting-started/introduction/">
-          Introduction
+      <li class="">
+        <a href="#">
+          Bottles in Cellar&nbsp;&nbsp;&nbsp;&nbsp;400
         </a>
       </li>
-      <li>
-        <a href="/docs/4.5/getting-started/download/">
-          Download
+      <li class="">
+        <a href="#">
+          Pending Delivery&nbsp;&nbsp;&nbsp;&nbsp;400
         </a>
       </li>
-      <li>
-        <a href="/docs/4.5/getting-started/contents/">
-          Contents
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/browsers-devices/">
-          Browsers &amp; devices
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/javascript/">
-          JavaScript
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/theming/">
-          Theming
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/build-tools/">
-          Build tools
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/webpack/">
-          Webpack
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/getting-started/accessibility/">
-          Accessibility
+      <li class="">
+        <a href="#">
+          Bottles Consumer&nbsp;&nbsp;&nbsp;&nbsp;1400
         </a>
       </li>
     </ul>
   </div>
   <div class="bd-toc-item">
     <a class="bd-toc-link" href="/docs/4.5/layout/overview/">
-      Layout
+      Up Coming Allocations
     </a>
 
-    <ul class="nav bd-sidenav">
-      <li>
-        <a href="/docs/4.5/layout/overview/">
-          Overview
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/layout/grid/">
-          Grid
-        </a>
-      </li>
-      <li>
-        <a href="/docs/4.5/layout/utilities-for-layout/">
-          Utilities for layout
-        </a>
-      </li>
+    <li class="active bd-sidenav-active">
+      <a href="#">
+        Shafer Sep 25th 2021
+      </a>
+    </li>
+    <li class="">
+      <a href="#">
+        Favia November Sep 25th 2021
+      </a>
+    </li>
     </ul>
   </div>
 </nav>
 {% endblock %}
 
 {% block content %}
-<h1>Dashboard</h1>
+<!--<h1>Dashboard</h1>
 <p>Welcome to your dashboard. You can <a href="{% url "account:edit" %}">edit your profile</a> or <a
-    href="{% url "account:password_change" %}">change your password</a>.</p>
+    href="{% url "account:password_change" %}">change your password</a>.</p>-->
+      
+    <div class="container-fluid" style="background-color: white;">
+      <div class="row">
+        <div class="col-4 portrait">
+          <img src="/media/Comte_Lafon_Montrachet.jpg" class="img-responsive" alt="...">
+        </div>
+        <div class="col portrait">
+          <div id="carouselContent" class="carousel slide" data-ride="carousel" style="height:65%; background-color: white;">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselContent" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselContent" data-slide-to="1"></li>
+              <li data-target="#carouselContent" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox" >
+                <div class="carousel-item active text-center p-4">
+                  <p>victor Perez-Tort</p>
+                  <p>🍷🍷 wow excelente vino con 24 meses de barrica nueva Roble Francés excelente fruta y estructura para continuar una guarda de 15 años saludables #tintadelpais #wine #winelover #winetasting #wineloverscommunity #winetime #winesmartpr #winestagram #wineporn #wineaddict #vino #vinofino #tempranillo #wineinfluencer #winetastingpuertorico #riberadelduero #riberadelduerowine #pinnafidelis</p>
+                </div>
+                <div class="carousel-item text-center p-4">
+                    
+                    <p>lorem ipsum (imagine longer text)</p>
+                </div>
+            </div>
+          <!--
+            <a class="carousel-control-prev" href="#carouselContent" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselContent" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>-->
+            </a>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid" style="background-color: white;">
+      <div class="row">
+        <div class="col-4 portrait">
+          <img src="/media/Comte_Lafon_Montrachet.jpg" class="img-responsive" alt="...">
+        </div>
+        <div class="col portrait">
+          <div id="carouselContent" class="carousel slide" data-ride="carousel" style="height:65%; background-color: white;">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselContent" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselContent" data-slide-to="1"></li>
+              <li data-target="#carouselContent" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox" >
+                <div class="carousel-item active text-center p-4">
+                  <p>victor Perez-Tort</p>
+                  <p>🍷🍷 wow excelente vino con 24 meses de barrica nueva Roble Francés excelente fruta y estructura para continuar una guarda de 15 años saludables #tintadelpais #wine #winelover #winetasting #wineloverscommunity #winetime #winesmartpr #winestagram #wineporn #wineaddict #vino #vinofino #tempranillo #wineinfluencer #winetastingpuertorico #riberadelduero #riberadelduerowine #pinnafidelis</p>
+                </div>
+                <div class="carousel-item text-center p-4">
+                    
+                    <p>lorem ipsum (imagine longer text)</p>
+                </div>
+            </div>
+          <!--
+            <a class="carousel-control-prev" href="#carouselContent" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselContent" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>-->
+            </a>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid" style="background-color: white;">
+      <div class="row">
+        <div class="col-4 portrait">
+          <img src="/media/Comte_Lafon_Montrachet.jpg" class="img-responsive" alt="...">
+        </div>
+        <div class="col portrait">
+          <div id="carouselContent" class="carousel slide" data-ride="carousel" style="height:65%; background-color: white;">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselContent" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselContent" data-slide-to="1"></li>
+              <li data-target="#carouselContent" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox" >
+                <div class="carousel-item active text-center p-4">
+                  <p>victor Perez-Tort</p>
+                  <p>🍷🍷 wow excelente vino con 24 meses de barrica nueva Roble Francés excelente fruta y estructura para continuar una guarda de 15 años saludables #tintadelpais #wine #winelover #winetasting #wineloverscommunity #winetime #winesmartpr #winestagram #wineporn #wineaddict #vino #vinofino #tempranillo #wineinfluencer #winetastingpuertorico #riberadelduero #riberadelduerowine #pinnafidelis</p>
+                </div>
+                <div class="carousel-item text-center p-4">
+                    
+                    <p>lorem ipsum (imagine longer text)</p>
+                </div>
+            </div>
+          <!--
+            <a class="carousel-control-prev" href="#carouselContent" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselContent" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>-->
+            </a>
+        </div>
+        </div>
+      </div>
+    </div>
+      
 {% endblock %}
