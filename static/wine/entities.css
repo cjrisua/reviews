@@ -1,3 +1,97 @@
+* { box-sizing: border-box; }
+.card-text{
+  line-height: 14pt;
+}
+.carousel-cell {
+  width: 28%;
+  border-radius: 5%;
+  background: white;
+  border-style: solid;
+  margin-right: auto;
+  padding-left: 50px;
+  border-color:white;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  /* flex-box, center image in cell */
+  /*display: -webkit-box;
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  -webkit-align-items: center;
+          align-items: center;*/
+}
+.carousel-cell.is-selected {
+  border-color:lightslategrey;
+  width: 28%;
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+.carousel-cell img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  /* dim unselected */
+  /*opacity: 0.7;
+  -webkit-transform: scale(0.85);
+          transform: scale(0.85);
+  -webkit-filter: blur(5px);
+          filter: blur(5px);
+  -webkit-transition: opacity 0.3s, -webkit-transform 0.3s, transform 0.3s, -webkit-filter 0.3s, filter 0.3s;
+          transition: opacity 0.3s, transform 0.3s, filter 0.3s;
+  */
+}
+
+/* brighten selected image */
+.carousel-cell.is-selected img {
+  /*opacity: 1;
+  -webkit-transform: scale(1);
+          transform: scale(1);
+  -webkit-filter: none;
+          filter: none;*/
+}
+
+@media screen and ( min-width: 768px ) {
+  .carousel-cell {
+    height: 189px;
+  }
+}
+
+@media screen and ( min-width: 960px ) {
+  .carousel-cell {
+    width: 28%;
+  }
+}
+
+
+.gallery {
+  background: #EEE;
+}
+
+.gallery-cell {
+  width: 28%;
+  height: 200px;
+  margin-right: 10px;
+  background: #8C8;
+  counter-increment: gallery-cell;
+}
+
+.gallery-cell.is-selected {
+  background: #ED2;
+}
+
+/* cell number */
+.gallery-cell:before {
+  display: block;
+  text-align: center;
+  content: counter(gallery-cell);
+  line-height: 200px;
+  font-size: 80px;
+  color: white;
+}
+
+
 .algolia-autocomplete {
   display: block !important;
   flex: 1;
@@ -19,7 +113,7 @@ img {
 /* Medium media */
 @media (min-width: 544px) {
   .portrait{
-    height: 450px;
+    height: 150px;
   }
 }
 .sidenav {
