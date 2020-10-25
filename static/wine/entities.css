@@ -1,4 +1,14 @@
 * { box-sizing: border-box; }
+
+.crop-text {
+  
+  overflow : hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  width: 770px;
+}
+
 .card-text{
   line-height: 14pt;
 }
@@ -156,7 +166,7 @@ img {
 .bd-sidebar {
   border-bottom: 1px solid rgba(0, 0, 0, .1);
   border-right: 1px solid rgba(0, 0, 0, .1);
-  
+  background-color: #93a9bd5c;
   position: sticky;
   top: 4rem;
   /*z-index: 1000;*/
@@ -178,10 +188,16 @@ img {
     max-width: 500px;
   }
 }
+@media (min-width: 1200px){
+  .bd-sidebar{
+    flex: 0 1 400px;
+  }
+}
+
 .bd-search {
     position: relative;
     padding: 1rem 15px;
-    margin-right: -15px;
+    /*margin-right: -15px;*/
     /*margin-left: -15px;*/
     border-bottom: 1px solid rgba(0,0,0,.05);
 }
