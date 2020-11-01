@@ -34,6 +34,12 @@
 <!--<h1>Dashboard</h1>
 <p>Welcome to your dashboard. You can <a href="{% url "account:edit" %}">edit your profile</a> or <a
     href="{% url "account:password_change" %}">change your password</a>.</p>-->
+    <!--<div class="search-box"> -->
+      <div id="main-search" class="input-group mb-3">
+        <input id="main-search-input" type="text" class="form-control vinomio-search" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon2">
+        <span id="search-img"><i class="fas fa-search"></i></span>
+      </div>
+    <!--</div>-->
     <h3>Hot reviews</h3>
     <div class="container-fluid" >
         <div class="card" style="width: 50rem;">
@@ -70,6 +76,19 @@
  <script>
    $( document ).ready(function() {
 
+    $('#main-search-input')
+       .on('focusout',function() {
+          $('.search-results').remove()
+          //improvements 
+       })
+       .on('click', function(){ 
+          $('#main-search').append('<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">'+
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Wine..</span></li>'+
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Region..</span></li>'+
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Tasting Note..</span></li>'+
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Producer..</span></li>' +
+          '</ul><div></div>');
+        });
     $('.crop-text').toArray().forEach( function(e){
         clientHeight = $(e)[0].clientHeight;
         ct = $(e).first().css("-webkit-line-clamp","4")
