@@ -34,8 +34,27 @@ from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import WineDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
-from .forms import TerroirForm
+from .forms import TerroirForm,WineRegisterForm
 import json
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def register(request):
+    if request.method == 'POST':
+        wine_form = WineRegisterForm(request.POST)
+        if wine_form.is_valid():
+            new_wine = wine_form.save(commit=False)
+            new_wine.save()
+             #return render(request,
+             #             'wine/register_done.html',
+             #             {'new_user': new_user})
+    else:
+        wine_form = WineRegisterForm()
+    
+    return render(request,
+                  'wine/register.html',
+                  {'wine_form': wine_form,
+                   })
 
 def terrori_detail(request, **kwargs):
     print(json.loads(request.body))

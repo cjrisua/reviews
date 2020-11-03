@@ -457,9 +457,9 @@ def LoadWSWines():
 
 if __name__ == "__main__":
     #Populate Random Cellar
-    #resutls = LoadProducers()
+    resutls = LoadProducers()
     #LoadWine(resutls)
     #LoadCellar()
     #LoadReviews()
     #LoadDataModel()
-    LoadWSWines()
+    #LoadWSWines()

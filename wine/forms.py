@@ -1,5 +1,5 @@
 from django import forms
-from .models import Terroir
+from .models import Terroir, Wine
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 
@@ -21,3 +21,8 @@ class TerroirForm(forms.ModelForm):
             'isappellation' : _('Appelation?'),
             'isvineyard' : _('Vineyard?')
         }
+
+class WineRegisterForm(forms.ModelForm):
+    class Meta:
+        model = Wine
+        fields = ('producer','terroir','varietal','name','wtype',)
