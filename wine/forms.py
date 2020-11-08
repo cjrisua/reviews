@@ -26,3 +26,8 @@ class WineRegisterForm(forms.ModelForm):
     class Meta:
         model = Wine
         fields = ('producer','terroir','varietal','name','wtype',)
+        labels = {
+            'wtype' : _('Wine Type'),
+            'isappellation' : _('Appelation?'),
+            'isvineyard' : _('Vineyard?')
+        }

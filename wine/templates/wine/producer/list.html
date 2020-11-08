@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Producer Name</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for model in inventory_object %}
+        <tr>
+          <td>{{ model.name }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% include "../pagination.html" with inventory_object=inventory_object %}
+
+{% endblock %}

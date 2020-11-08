@@ -34,9 +34,69 @@ from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import WineDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
+from django.views import View
 from .forms import TerroirForm,WineRegisterForm
 import json
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+from django.apps import apps
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
+def inventory(request,section):
+
+    Model = apps.get_model('wine', section)
+    inventory_object = Model.objects.all()
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(inventory_object, 20)
+
+    try:
+        inventory_object = paginator.page(page)
+    except PageNotAnInteger:
+        inventory_object = paginator.page(1)
+    except EmptyPage:
+        inventory_object = paginator.page(paginator.num_pages)
+
+
+    return render(request, f'wine/{section}/list.html', 
+        {'inventory_object': inventory_object,
+         
+        })
+
+class Dashboard(View):
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        vinomio_data = [{
+                    'name' : 'Producers',
+                    'count':  Producer.objects.count(),
+                    'section': 'producer',
+                },
+                {   
+                    'name' : 'Wine Regions',
+                    'count':  Terroir.objects.count(),
+                    'section': 'terroir',
+                },
+                {
+                    'name' :  'Wines',
+                    'count' : Wine.objects.count(),
+                    'section': 'wine',
+                },
+                {
+                    'name' : 'Active Users',
+                    'count' : '3',
+                    'section': 'user',
+                }
+        ]
+        
+        return render(request,
+                  'wine/dashboard.html',
+                  {
+                   'section': 'wine-dashboard',
+                   'inventory' : vinomio_data
+                  })
 
 @login_required
 def register(request):
@@ -45,6 +105,7 @@ def register(request):
         if wine_form.is_valid():
             new_wine = wine_form.save(commit=False)
             new_wine.save()
+            #return HttpResponseRedirect('')
              #return render(request,
              #             'wine/register_done.html',
              #             {'new_user': new_user})
@@ -61,23 +122,19 @@ def terrori_detail(request, **kwargs):
     
     data = Terroir.objects.get(pk=json.loads(request.body)['id'])
     subterroirs = Terroir.objects.filter(parentterroir__id=json.loads(request.body)['id'], isvineyard=True)
-    #subterroirs_serializer = TerroirSerializer(instance=subterroirs)
     serializer = TerroirSerializer(instance=data)
-    #print("???? " + request.method)
     if request.method == 'POST':
          form = TerroirForm(serializer.data)
     else:
         if request.method == 'DELETE':
             print(f"delete: {json.loads(request.body)}")
         form = TerroirForm(serializer.data)
-    
-    print(serializer.data)
     return render(request, 'wine/region/detail.html', 
         {  'form': form , 
            'parentterroirid' : dict(serializer.data)['parentterroir'],
            'childterroirs' : subterroirs,
            'terroirid' : dict(serializer.data)['id'],
-           'traverse' : dict(serializer.data)['traverse'] if "traverse" in dict(serializer.data) is not None else None
+           #'traverse' : dict(serializer.data)['traverse'] if "traverse" in dict(serializer.data) is not None else None
         })
 
 class WineDocumentViewSet(DocumentViewSet):
@@ -149,6 +206,7 @@ class TerroirViewSet(viewsets.ModelViewSet):
         super().__init__(*args, **kwargs)
 
     def get_queryset(self):
+        #print("???")
         queryset = Terroir.objects.all()
         country = self.request.query_params.get('country', None)
         name = self.request.query_params.get('name', None)

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% load wine_tags %}
+
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Country</th>
+        <th>Full Terroir</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+        {% for model in inventory_object %}
+
+        {% if model.isappellation %}
+          <tr>
+            <td>{{ model.name }}</td>
+            <td>{{ model.country }}</td>
+            <td>{{ model.id|region_traverse }}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% include "../pagination.html" with inventory_object=inventory_object %}
+
+{% endblock %}

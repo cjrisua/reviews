@@ -1,6 +1,10 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
 
+.sidebar-list-group li{
+  border: 0 none;
+  border-bottom: 1px solid rgba(0,0,0,.125) !important;
+}
 
 div.container-fluid{
   /*height: 100%;*/
@@ -58,6 +62,15 @@ footer > .container {
  .region-search div button:hover {
   background: #0b7dda;
 }
+
+.nopadding {
+  /*padding: 0 !important;*/
+  /*margin: 0 !important;*/
+  
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
 .default-link{
   color:#212529;
 }

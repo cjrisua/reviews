@@ -1,0 +1,15 @@
+<div class="pagination">
+    <span class="step-links">
+        {% if inventory_object.has_previous %}          
+            <a href="?page={{ inventory_object.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            {{inventory_object}}
+        </span>
+
+        {% if inventory_object.has_next %}
+            <a href="?page={{ inventory_object.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div

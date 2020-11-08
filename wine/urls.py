@@ -15,5 +15,7 @@ router.register(
 urlpatterns = [
     #path('<slug:producer>/<str:year>/<slug:winename>/', views.wine_detail, name='wine_detail'),
     path('register/', views.register, name='wine_register'),
+    path('dashboard/', views.Dashboard.as_view(), name='wine_dashboard'),
+    path(r'inventory/<section>/', views.inventory, name='inventory'),
     path('',include(router.urls)),
 ]

@@ -52,7 +52,7 @@ class Terroir(models.Model):
         return self.__traversed_name
 
     def __str__(self):
-        return self.name
+        return self.name 
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -122,11 +122,36 @@ class Wine(models.Model):
         ('ISR','Israel'),
         ('ZAF', 'South Africa'),
     )
+    SPARKLING_WINE = 'SW'
+    LIGHTBODIED_WHITE_WINE = 'LBW'
+    FULLBODIED_WHITE_WINE = 'FBW'
+    AROMATIC_WHITE_WINE = 'AWW'
+    ROSE_WINE = 'RW'
+    LIGHTBODIED_RED_WINE = 'LBR'
+    MEDIUMBODIED_RED_WINE = 'MBR'
+    FULLBODIED_RED_WINE = 'FBR'
+    DESSERT_WINE = 'DW'
+    NONE = 'NONE'
+
+    WINETYPE = models.TextChoices = (
+        (SPARKLING_WINE, 'Sparkling Wine'),
+        (LIGHTBODIED_WHITE_WINE, 'Light-Bodied White Wine'),
+        (FULLBODIED_WHITE_WINE, 'Full-Bodied White Wine'),
+        (AROMATIC_WHITE_WINE,'Aromatic White Wine'),
+        (ROSE_WINE,'Rosé Wine'),
+        (LIGHTBODIED_RED_WINE,'Light-Bodied Red Wine'),
+        (MEDIUMBODIED_RED_WINE,'Medium-Bodied Red Wine'),
+        (DESSERT_WINE,'Full-Bodied Red Wine'),
+        (DESSERT_WINE,'Dessert Wine')
+    )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
     terroir = models.ForeignKey(Terroir, on_delete=models.PROTECT)
     varietal = models.ForeignKey(VarietalBlend, on_delete=models.PROTECT, blank=False)
     name = models.CharField(max_length=150)
-    wtype = models.CharField(max_length=15)
+    wtype =  models.CharField(
+        max_length=4,
+        choices=WINETYPE,
+    )
 
     def __str__(self):
         return self.name

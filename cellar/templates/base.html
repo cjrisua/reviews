@@ -38,6 +38,7 @@
                 {% if request.user.is_authenticated %}
                 <a href="{% url "cellar:dashboard" %}" class="nav-item nav-link{% if section == "dashboard" %} active{% endif %}">Cellar</a>
                 <a href="{% url "cellar:allocation" %}" class="nav-item nav-link{% if section == "allocation" %} active{% endif %}">Allocations</a>
+                <a href="{% url "wine:wine_dashboard" %}" class="nav-item nav-link{% if section == "wine-dashboard" %} active{% endif %}">Wine</a>
                 <a href="#" class="nav-item nav-link">About</a>
                 <a href="#" class="nav-item nav-link">Contact</a>
                 {% endif %}
