@@ -34,6 +34,7 @@ from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import WineDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
 from django.views import View
 from .forms import TerroirForm,WineRegisterForm
 import json
@@ -43,8 +44,9 @@ from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.apps import apps
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.messages.views import SuccessMessageMixin
 
-
+@login_required
 def inventory(request,section):
 
     Model = apps.get_model('wine', section)
@@ -60,10 +62,9 @@ def inventory(request,section):
     except EmptyPage:
         inventory_object = paginator.page(paginator.num_pages)
 
-
     return render(request, f'wine/{section}/list.html', 
-        {'inventory_object': inventory_object,
-         
+        {   'section' : section,
+            'inventory_object': inventory_object,
         })
 
 class Dashboard(View):
@@ -90,7 +91,7 @@ class Dashboard(View):
                     'section': 'user',
                 }
         ]
-        
+        print(f"args: {args}")
         return render(request,
                   'wine/dashboard.html',
                   {
@@ -117,8 +118,14 @@ def register(request):
                   {'wine_form': wine_form,
                    })
 
+class TerroriCreateView(SuccessMessageMixin, CreateView):
+    template_name = 'wine/terroir/create.html'
+    form_class = TerroirForm
+
+
 def terrori_detail(request, **kwargs):
-    print(json.loads(request.body))
+    #print("???")
+    #print(json.loads(request.body))
     
     data = Terroir.objects.get(pk=json.loads(request.body)['id'])
     subterroirs = Terroir.objects.filter(parentterroir__id=json.loads(request.body)['id'], isvineyard=True)

@@ -8,9 +8,24 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration { display: none; }
 
+#inventory-body{
+  padding-top: 40px;
+}
 
-
-
+.list-group-item.selected{
+  background-color: lightgray;
+  color: #888;
+  border-radius: 0;
+  border-color: #000;
+}
+.list-group-item a:hover{
+  text-decoration: none;
+}
+.list-group-item.selected a:hover{
+  color: rgb(102, 95, 95);
+  font-weight: 400;
+  text-decoration: none;
+}
 .search-result-detail{
   border-top: 1px solid #888;
   padding-top: 15px;

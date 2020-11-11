@@ -15,7 +15,7 @@ class TerroirForm(forms.ModelForm):
     region = TerroirField()
     class Meta:
         model = Terroir
-        exclude = ['parentterroir','slug']
+        exclude = ['slug']
         labels = {
             'name' : _('Terroir Name'),
             'isappellation' : _('Appelation?'),

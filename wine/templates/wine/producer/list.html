@@ -1,21 +1,26 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Registered {{section|title}} {% endblock %}
 {% block content %}
-
-<table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Producer Name</th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for model in inventory_object %}
+{% for model in inventory_object %}
+  {% if forloop.first %}
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Producer Name</th>
+          </tr>
+        </thead>
+        <tbody>
+    {% endif %}
         <tr>
           <td>{{ model.name }}</td>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-{% include "../pagination.html" with inventory_object=inventory_object %}
-
+    {% if forloop.last %}
+        </tbody>
+      </table>
+      {% include "../pagination.html" with inventory_object=inventory_object %}
+    {% endif %}
+{%empty%}
+  There are no {{section|title}}s yet.  
+{% endfor %}
 {% endblock %}

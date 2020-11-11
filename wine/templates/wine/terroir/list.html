@@ -1,8 +1,12 @@
 {% extends "base.html" %}
-{% block content %}
 {% load wine_tags %}
+{% load crispy_forms_tags %}
+{% block title %}Registered {{section|title}} {% endblock %}
 
-<table class="table table-bordered">
+{% block content %}
+{% for model in inventory_object %}
+  {% if forloop.first %}
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>Name</th>
@@ -12,19 +16,20 @@
       </tr>
     </thead>
     <tbody>
-        {% for model in inventory_object %}
-
-        {% if model.isappellation %}
-          <tr>
-            <td>{{ model.name }}</td>
-            <td>{{ model.country }}</td>
-            <td>{{ model.id|region_traverse }}</td>
-          </tr>
-        {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-
-{% include "../pagination.html" with inventory_object=inventory_object %}
-
+    {% endif %}
+    {% if model.isappellation %}
+      <tr>
+        <td>{{ model.name }}</td>
+        <td>{{ model.country }}</td>
+        <td>{{ model.id|region_traverse }}</td>
+      </tr>
+    {% endif %}
+    {% if forloop.last %}
+        </tbody>
+      </table>
+      {% include "../pagination.html" with inventory_object=inventory_object %}
+    {% endif %}
+{%empty%}
+  There are no {{section|title}}s yet.  
+{% endfor %}
 {% endblock %}
