@@ -38,7 +38,7 @@ class VarietalBlendSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ['id','name','abbreviation','slug']
+        fields = ['id','name','abbreviation','slug','productionrank']
         lookup_field ='slug'
 
 class TerroirSerializer(serializers.ModelSerializer):

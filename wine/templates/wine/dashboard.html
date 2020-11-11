@@ -2,15 +2,16 @@
 {% load crispy_forms_tags %}
 {% block title %}VinoMio Inventory {% endblock %}
 {%block sidenavcontent %}
-
 {% if messages %}
-<ul class="messages">
     {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+        </div>
     {% endfor %}
-</ul>
 {% endif %}
-
 <div class="card ml-2 mt-5 border-light" style="width:95%;">
     <div class="card-header">
         Vinomío Inventory
@@ -36,6 +37,7 @@
 {% endblock %}
 
 {% block content %}
+    
     <div id="inventory-body" ></div>
 {% endblock %}
 

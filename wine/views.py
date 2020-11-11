@@ -36,7 +36,7 @@ from django.utils.text import slugify
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from django.views import View
-from .forms import TerroirForm,WineRegisterForm
+from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm
 import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -45,11 +45,17 @@ from django.core.paginator import Paginator
 from django.apps import apps
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.contrib.auth.models import User
+from rest_framework import filters
+
 
 @login_required
 def inventory(request,section):
 
     Model = apps.get_model('wine', section)
+    print(f"Model {Model}")
     inventory_object = Model.objects.all()
 
     page = request.GET.get('page', 1)
@@ -62,9 +68,12 @@ def inventory(request,section):
     except EmptyPage:
         inventory_object = paginator.page(paginator.num_pages)
 
+    #print(inventory_object)
+    #print([field for field in Model._meta.fields])
     return render(request, f'wine/{section}/list.html', 
         {   'section' : section,
             'inventory_object': inventory_object,
+            'columns' : [field.name for field in Model._meta.fields if field.name != 'id']
         })
 
 class Dashboard(View):
@@ -86,12 +95,12 @@ class Dashboard(View):
                     'section': 'wine',
                 },
                 {
-                    'name' : 'Active Users',
-                    'count' : '3',
-                    'section': 'user',
+                    'name' : 'Varietal',
+                    'count' : VarietalBlend.objects.count(),
+                    'section' : 'varietalblend',
                 }
         ]
-        print(f"args: {args}")
+       
         return render(request,
                   'wine/dashboard.html',
                   {
@@ -106,22 +115,41 @@ def register(request):
         if wine_form.is_valid():
             new_wine = wine_form.save(commit=False)
             new_wine.save()
-            #return HttpResponseRedirect('')
-             #return render(request,
-             #             'wine/register_done.html',
-             #             {'new_user': new_user})
+            messages.success(request, f"{new_wine.name} was created successfully")
+            print(reverse_lazy('wine:wine_dashboard'))
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+            #return render(request,
+            #              'wine/dashboard.html',
+            #              {})
     else:
         wine_form = WineRegisterForm()
     
     return render(request,
                   'wine/register.html',
                   {'wine_form': wine_form,
-                   })
+
+                  })
+class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
+    #template_name = 'wine/varietalblend/create.html'
+    #form_class = VarietalBlendForm
+    #success_message = "%(name)s was created successfully"
+
+    def get(self, request, *args, **kwargs):
+        context = {'form': VarietalBlendForm()}
+        return render(request, 'wine/varietalblend/create.html', context)
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 class TerroriCreateView(SuccessMessageMixin, CreateView):
     template_name = 'wine/terroir/create.html'
     form_class = TerroirForm
+    success_message = "%(name)s was created successfully"
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 def terrori_detail(request, **kwargs):
     #print("???")
@@ -235,6 +263,8 @@ class MasterVarietalViewSet(viewsets.ModelViewSet):
     queryset = MasterVarietal.objects.order_by('name')
     serializer_class = MasterVarietalSerializer
     lookup_field = 'slug'
+    search_fields = ['name']
+    filter_backends = (filters.SearchFilter,)
 
 class VarietalBlendViewSet(viewsets.ModelViewSet):
     """
@@ -242,6 +272,8 @@ class VarietalBlendViewSet(viewsets.ModelViewSet):
     """
     queryset = VarietalBlend.objects.all()
     serializer_class = VarietalBlendSerializer
+    search_fields = ['mastervarietal']
+    filter_backends = (filters.SearchFilter,)
 
     def get_queryset(self):
         """

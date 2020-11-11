@@ -34,7 +34,7 @@ class VarietalAdmin(admin.ModelAdmin):
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
-    list_display = ('id','abbreviation','name',)
+    list_display = ('id','abbreviation','name','productionrank')
     list_filter = ( 'name',)
     search_fields = ('name',)
 

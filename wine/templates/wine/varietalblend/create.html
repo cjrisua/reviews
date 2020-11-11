@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% block title %}Registered {{section|title}} {% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{form.name|as_crispy_field}}
+    <div class="vm-autocomplete"></div>
+    {{form.varietal|as_crispy_field}}
+    <button type="submit" id="submitProducer"  class="btn btn-dark">SUBMIT</button>
+</form>
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+        $("#id_name").attr("placeholder", "Search for Master Varietal...")
+        $("#id_name").attr("aria-label", "Search for Master Varietal...");
+        $("#id_name").addClass("mdb-autocomplete")
+
+        $("#id_varietal").attr("placeholder", "Search for Varietal...")
+        $("#id_varietal").attr("aria-label", "Search for Varietal...");
+
+        $("#id_name").autocomplete({
+            minLength: 0,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/mastervarietal/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.label = item.name;
+                            object.value = item.value;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log("event:" + event)
+            }
+        });
+        /*
+            $.ajax({
+                url: 'getSearch.php',
+                type: 'post',
+                data: {search:search, type:1},
+                dataType: 'json',
+                success:function(response){
+                
+                    var len = response.length;
+                    $("#searchResult").empty();
+                    for( var i = 0; i<len; i++){
+                        var id = response[i]['id'];
+                        var name = response[i]['name'];
+
+                        $("#searchResult").append("<li value='"+id+"'>"+name+"</li>");
+
+                    }
+
+                    // binding click event to li
+                    $("#searchResult li").bind("click",function(){
+                        setText(this);
+                    });
+
+                }
+            });
+            */
+    });
+</script>   
+{% endblock %}

@@ -9,18 +9,13 @@
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>Country</th>
-        <th>Full Terroir</th>
-        
+        <th>Master Varietal Name</th>
       </tr>
     </thead>
     <tbody>
     {% endif %}
       <tr>
-        <td>{{ model.name }}</td>
-        <td>{{ model.country }}</td>
-        <td>{{ model.id|region_traverse }}</td>
+        <td>{{ model }}</td>
       </tr>
     {% if forloop.last %}
         </tbody>

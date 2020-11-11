@@ -18,9 +18,10 @@ class Varietal(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=150)
     abbreviation = models.CharField(max_length=3, blank=False, null=False, default='',unique=True) 
+    productionrank = models.DecimalField(default=0, decimal_places=2,max_digits=5 )
     slug = models.CharField(max_length=150, blank=False, null=False, default='')
     class Meta:
-        ordering = ('-name',)
+        ordering = ('-productionrank','-name',)
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):

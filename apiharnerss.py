@@ -53,8 +53,14 @@ def Post(page, **kargs):
     #print(jsonResponse)
     return response
 
-terroirs = GetAll("api/terroir/")
+def LoadCountries():
+    df = pd.read_csv("country_code.csv")
+    filter = df[df.WWPR == "Y"]
+    data = [{ "name": c.Country, "abbreviation": c.Alpha3, "slug": slugify(c.Country),'productionrank': c.Rank} for r,c in filter.iterrows()]
+    for d in data:
+        Post("api/country/",payload = d)
 
+terroirs = GetAll("api/terroir/")
 def LoadReviews():
     #read country file
     countrydf = pd.read_csv("country_code.csv")
@@ -456,8 +462,9 @@ def LoadWSWines():
     print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":
+    LoadCountries()
     #Populate Random Cellar
-    resutls = LoadProducers()
+    #resutls = LoadProducers()
     #LoadWine(resutls)
     #LoadCellar()
     #LoadReviews()
