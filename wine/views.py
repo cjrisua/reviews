@@ -134,10 +134,33 @@ class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     #form_class = VarietalBlendForm
     #success_message = "%(name)s was created successfully"
 
+    #def __str__(self):
+    #    return self.title
+
+    #def get_absolute_url(self):
+    #    return reverse('books:detail', args=[self.id])
     def get(self, request, *args, **kwargs):
         context = {'form': VarietalBlendForm()}
         return render(request, 'wine/varietalblend/create.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        request.POST.get('office_id', None)
+        form = VarietalBlendForm(request.POST)
+        if form.is_valid():
+            book = form.save()
+            book.save()
+            return HttpResponseRedirect(reverse_lazy('books:detail', args=[book.id]))
+        else:
+             messages.add_message(request, messages.ERROR, 'Something went wrong!')
+        return render(request, 'wine/varietalblend/create.html', {'form': form})
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
@@ -226,6 +249,8 @@ class VarietalViewSet(viewsets.ModelViewSet):
     queryset = Varietal.objects.all()
     serializer_class = VarietalSerializer
     lookup_field = 'slug'
+    search_fields = ['name']
+    filter_backends = (filters.SearchFilter,)
 
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()

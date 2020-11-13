@@ -4,23 +4,44 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<form action="" method="post">
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form id="form-varietalblend" action="" method="post">
     {% csrf_token %}
     {{form.name|as_crispy_field}}
-    <div class="vm-autocomplete"></div>
+    <div class="float-right">
+       <span class="text-muted"><small>Add</small><a class="inventory-link ml-1 add-varietal"><i class="fas fa-plus-circle"></i></a></span>
+   </div>
     {{form.varietal|as_crispy_field}}
-    <button type="submit" id="submitProducer"  class="btn btn-dark">SUBMIT</button>
+    {{form.varietalId|as_crispy_field}}
+    <label for="id_blend" class=" requiredField">
+        Blending Information<span class="asteriskField">*</span>
+    </label>
+    <div id="blend-info" class="container blending-container border mb-3" style="border-radius: 3px; background-color: white; height: 150px;">
+          
+    </div>
+    <button type="submit" id="submitVarietalBlend"  class="btn btn-dark">SUBMIT</button>
 </form>
 {% endblock %}
 {% block javascript %}
 <script>
     $(document).ready(function(){
-        $("#id_name").attr("placeholder", "Search for Master Varietal...")
-        $("#id_name").attr("aria-label", "Search for Master Varietal...");
-        $("#id_name").addClass("mdb-autocomplete")
+        //$("#id_name").attr("placeholder", "Master Varietal...")
+        //$("#id_name").attr("aria-label", "Search for Master Varietal...");
+        //$("#id_name").addClass("mdb-autocomplete")
 
-        $("#id_varietal").attr("placeholder", "Search for Varietal...")
-        $("#id_varietal").attr("aria-label", "Search for Varietal...");
+        //$("#id_varietal").attr("placeholder", "Search for Varietal...")
+        //$("#id_varietal").attr("aria-label", "Search for Varietal...");
 
         $("#id_name").autocomplete({
             minLength: 0,
@@ -43,8 +64,62 @@
                 });
             },
             select: function (event, ui) {
-                console.log("event:" + event)
+                console.log("event:" + ui.item.value)
             }
+        });
+        $("#id_varietal").autocomplete({
+            minLength: 0,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/varietal/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                $("#id_varietalId").text(ui.item.id)
+            }
+        });
+
+        $('.add-varietal').click(function(event){
+            console.log($("#id_varietalId").text())
+            
+            if($("div#blend-info").find("div#"+ $("#id_varietalId").text()).length > 0){
+                alert("Varietal already blended!")
+            }else{
+                newitem = '<div id="'+ $("#id_varietalId")[0].innerText+'" class="remove-tag"><span class="keep-together"> <a id="' +$("#id_varietalId")[0].innerText+ '" class="remove-filter" href="#">x</a> <a  class="remove-filter">'+$("#id_varietal").val()+'</a></span></div>'
+                $("#blend-info").append(newitem)
+            }
+        });
+        $(document).on('click','.remove-filter',function(event){
+            event.preventDefault();
+            $(this).parent().parent().remove()
+        });
+        $('#form-varietalblend').submit(function(){
+            $("#id_varietalId")[0].innerText = "";
+            varietal_ids = "";
+            console.log($("div#blend-info div"))
+            $("div#blend-info div").toArray().forEach(function(element){
+                console.log(element)
+                varietal_ids += element.id +",";
+                alert(varietal_ids)
+                $("#id_varietalId")[0].innerText = varietal_ids.slice(0, -1)
+            })
+            //$('#your-input').val($('#editor').html())
         });
         /*
             $.ajax({
