@@ -144,12 +144,11 @@ class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
         return render(request, 'wine/varietalblend/create.html', context)
     
     def post(self, request, *args, **kwargs):
-        request.POST.get('office_id', None)
+        valueid = request.POST.get('varietalId', None)
         form = VarietalBlendForm(request.POST)
         if form.is_valid():
-            book = form.save()
-            book.save()
-            return HttpResponseRedirect(reverse_lazy('books:detail', args=[book.id]))
+            form.save()            
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
         else:
              messages.add_message(request, messages.ERROR, 'Something went wrong!')
         return render(request, 'wine/varietalblend/create.html', {'form': form})
