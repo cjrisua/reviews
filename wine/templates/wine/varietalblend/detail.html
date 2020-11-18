@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% block title %}Registered {{section|title}} {% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form method="post">  
+    {% csrf_token %}  
+    {{ form|crispy}}  
+    <input type="submit" class="btn btn-dark" value="Save">  
+</form>  
+{% endblock %}

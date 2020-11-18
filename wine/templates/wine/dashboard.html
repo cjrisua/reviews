@@ -2,47 +2,15 @@
 {% load crispy_forms_tags %}
 {% block title %}VinoMio Inventory {% endblock %}
 {%block sidenavcontent %}
-{% if messages %}
-    {% for message in messages %}
-    <div class="alert {{ message.tags }} alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-<div class="card ml-2 mt-5 border-light" style="width:95%;">
-    <div class="card-header">
-        Vinomío Inventory
-    </div>
-    <ul class="list-group sidebar-list-group">
-        {% for item in inventory %}
-            <li class="list-group-item justify-content-between align-items-center nopadding {% if section == item.name %}bg-dark{% endif %}"> 
-                <div class="row no-gutters">
-                    <div class="col-8">
-                        <a id="inventory-link" href="{% url 'wine:inventory' section=item.section %}" name={{item.section}} class="default-link nopadding">{{item.name}}</a>
-                    </div>
-                    <div class="col">
-                        <span class="badge badge-primary badge-pill">{{ item.count }}</span>
-                    </div>
-                    <div class="col">
-                        <a href="{% url 'wine:inventory' section=item.section %}add/">Add</a>
-                    </div>
-                </div>
-            </li>
-        {% endfor %}
-    </ul> 
-</div>  
+    {% include "./main_sidebar.html" with inventory=inventory %}
 {% endblock %}
 
 {% block content %}
-    
     <div id="inventory-body" ></div>
 {% endblock %}
 
 {% block  javascript %}
- <script>
+ <!--<script>
    $( document ).ready(function() {
        $(document).on( 'click','#inventory-link', function(){
             event.preventDefault();
@@ -64,5 +32,5 @@
                 });
        });
    });
-</script>
+</script>-->
 {% endblock %}

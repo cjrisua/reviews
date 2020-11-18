@@ -3,6 +3,10 @@
 {% load crispy_forms_tags %}
 {% block title %}Registered {{section|title}} {% endblock %}
 
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=section %}
+{% endblock %}
+
 {% block content %}
 {% for model in inventory_object %}
   {% if forloop.first %}

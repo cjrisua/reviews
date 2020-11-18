@@ -90,13 +90,13 @@
                 });
             },
             select: function (event, ui) {
-                console.log(ui.item)
+                //console.log(ui.item)
                 $("#id_varietalId").text(ui.item.id)
             }
         });
 
         $('.add-varietal').click(function(event){
-            console.log($("#id_varietalId").text())
+            //console.log($("#id_varietalId").text())
             
             if($("div#blend-info").find("div#"+ $("#id_varietalId").text()).length > 0){
                 alert("Varietal already blended!")
@@ -114,9 +114,9 @@
             varietal_ids = "";
             console.log($("div#blend-info div"))
             $("div#blend-info div").toArray().forEach(function(element){
-                console.log(element)
+               // console.log(element)
                 varietal_ids += element.id +",";
-                alert(varietal_ids)
+                //alert(varietal_ids)
                 $("#id_varietalId")[0].innerText = varietal_ids.slice(0, -1)
                 $("#id_varietalId").val(varietal_ids.slice(0, -1))
             })

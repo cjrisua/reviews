@@ -20,6 +20,7 @@ urlpatterns = [
     path(r'inventory/<section>/', views.inventory, name='inventory'),
     path(r'inventory/terroir/add/', views.TerroriCreateView.as_view(success_url=reverse_lazy('wine:wine_dashboard')), name='inventory_terroir_add'),
     path(r'inventory/varietalblend/add/', views.VarietalBlendCreateView.as_view(success_url=reverse_lazy('wine:wine_dashboard')), name='inventory_varietalblend_add'),
+    path(r'inventory/varietalblend/<int:pk>/', views.VarietalBlendUpdateView.as_view(), name='inventory_varietalblend_update'),
     path(r'inventory/wine/add/', views.register, name='inventory_wine_add'),
     path('',include(router.urls)),
 ]

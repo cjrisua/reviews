@@ -34,7 +34,7 @@ from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents import WineDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views import View
 from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm
 import json
@@ -50,16 +50,22 @@ from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from rest_framework import filters
 
+sidebar_inventory=[
+    {'id':'producer','name':'Producers'},
+    {'id':'terroir','name':'Wine Regions'},
+    {'id':'wine','name':'Wines'},
+    {'id':'varietalblend','name':'Varietal'}
+]
 
 @login_required
 def inventory(request,section):
-
+    print(f"->{section}")
     Model = apps.get_model('wine', section)
     print(f"Model {Model}")
     inventory_object = Model.objects.all()
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(inventory_object, 20)
+    paginator = Paginator(inventory_object, 11)
 
     try:
         inventory_object = paginator.page(page)
@@ -68,34 +74,39 @@ def inventory(request,section):
     except EmptyPage:
         inventory_object = paginator.page(paginator.num_pages)
 
-    #print(inventory_object)
+    print(inventory_object)
     #print([field for field in Model._meta.fields])
     return render(request, f'wine/{section}/list.html', 
         {   'section' : section,
             'inventory_object': inventory_object,
-            'columns' : [field.name for field in Model._meta.fields if field.name != 'id']
+            'columns' : [field.name for field in Model._meta.fields if field.name != 'id'],
+            'inventory' : [{'name' : [s['name'] for s in sidebar_inventory if s.get('id') == section][0],
+                    'count':  Model.objects.count(),
+                    'section': section,
+                    'search' : 'ON'
+                    }]
         })
 
 class Dashboard(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         vinomio_data = [{
-                    'name' : 'Producers',
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'producer'][0],
                     'count':  Producer.objects.count(),
                     'section': 'producer',
                 },
                 {   
-                    'name' : 'Wine Regions',
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'terroir'][0],
                     'count':  Terroir.objects.count(),
                     'section': 'terroir',
                 },
                 {
-                    'name' :  'Wines',
+                    'name' :  [s['name'] for s in sidebar_inventory if s.get('id') == 'wine'][0],
                     'count' : Wine.objects.count(),
                     'section': 'wine',
                 },
                 {
-                    'name' : 'Varietal',
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'varietalblend'][0],
                     'count' : VarietalBlend.objects.count(),
                     'section' : 'varietalblend',
                 }
@@ -129,6 +140,12 @@ def register(request):
                   {'wine_form': wine_form,
 
                   })
+class VarietalBlendUpdateView(SuccessMessageMixin, UpdateView):
+    model = VarietalBlend
+    fields = ('mastervarietal','varietal')
+    template_name = 'wine/varietalblend/detail.html'
+    success_url ="/"
+
 class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     #template_name = 'wine/varietalblend/create.html'
     #form_class = VarietalBlendForm

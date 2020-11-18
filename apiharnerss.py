@@ -60,7 +60,7 @@ def LoadCountries():
     for d in data:
         Post("api/country/",payload = d)
 
-terroirs = GetAll("api/terroir/")
+#terroirs = GetAll("api/terroir/")
 def LoadReviews():
     #read country file
     countrydf = pd.read_csv("country_code.csv")
@@ -95,7 +95,8 @@ def isvinifera(name,string):
     result = re.search (f'(^|[^a-z]){name}($|[^a-z])',string)
     
     return False if result is None else True
-def LoadWine(producerdata):
+def LoadWine():
+    producerdata = []
     notmatch = 0
     grapeinfo = GetVarietal()
     grape_df =  pd.DataFrame(grapeinfo)
@@ -104,7 +105,12 @@ def LoadWine(producerdata):
     df = pd.read_csv("winespectator.csv", encoding="utf-8")
     payload = []
     for house,wines in df.groupby(["house"]):
+
         houseinfo = next(filter(lambda x : x['slug'] == slugify(house) , producerdata), None)
+        if houseinfo is None:
+             houseinfo = Get(f'api/producer/{slugify(house)}/')
+             producerdata.append(houseinfo)
+            
         print(f"Producer {house} [{houseinfo['id']}]")
         for index, wine in wines.iterrows():
             #Find Grape Info...
@@ -462,11 +468,11 @@ def LoadWSWines():
     print(f"Items to work: {unmatched}")
 
 if __name__ == "__main__":
-    LoadCountries()
+    #LoadCountries()
     #Populate Random Cellar
     #resutls = LoadProducers()
-    #LoadWine(resutls)
+    #LoadWine()
     #LoadCellar()
     #LoadReviews()
-    #LoadDataModel()
+    LoadDataModel()
     #LoadWSWines()

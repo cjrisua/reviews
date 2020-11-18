@@ -15,7 +15,7 @@
     <tbody>
     {% endif %}
       <tr>
-        <td>{{ model }}</td>
+        <td><a href="{% url 'wine:inventory_varietalblend_update' model.id %}">{{ model }}</a></td>
       </tr>
     {% if forloop.last %}
         </tbody>

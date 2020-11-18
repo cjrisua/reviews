@@ -9,7 +9,7 @@
         </span>
 
         {% if inventory_object.has_next %}
-            <a href="?page={{ inventory_object.next_page_number }}">next</a>
+            <a href="/wine/inventory/{{section}}/?page={{ inventory_object.next_page_number }}">next</a>
         {% endif %}
     </span>
 </div

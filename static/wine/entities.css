@@ -381,7 +381,7 @@ img {
   border-right: 1px solid rgba(0, 0, 0, .1);
   background-color: #93a9bd5c;
   position: sticky;
-  top: 4rem;
+  top: 0rem;
   /*z-index: 1000;*/
   /*height: calc(100vh - 4rem);*/
   /*@include media-breakpoint-up(md) {
