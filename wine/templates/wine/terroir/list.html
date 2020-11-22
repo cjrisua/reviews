@@ -35,3 +35,36 @@
   There are no {{section|title}}s yet.  
 {% endfor %}
 {% endblock %}
+
+{% block  javascript %}
+<script>
+   $( document ).ready(function() {
+     var minlength = 3;
+     var searchRequest = null;
+     $("#searchItem").on('keyup',function(){
+      var that = this,
+          value = $(this).val();
+          if (value.length >= minlength ) {
+            if (searchRequest != null) 
+                searchRequest.abort();
+            searchRequest = $.ajax({
+                type: "GET",
+                url: "/api/terroir/",
+                data: {
+                    'search' : value
+                },
+                dataType: "text",
+                success: function(msg){
+                    //we need to check if the value is the same
+                    if (value==$(that).val()) {
+                    //Receiving the result of search here
+                    console.log(msg)
+                    }
+                }
+            });
+          }
+     });
+  });
+</script>
+ 
+{% endblock %}

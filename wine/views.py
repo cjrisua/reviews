@@ -117,6 +117,31 @@ class Dashboard(View):
                    'inventory' : vinomio_data
                   })
 
+class WineRegisterView(SuccessMessageMixin, CreateView):
+
+
+    #@method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        wine_form = WineRegisterForm()
+        wine_form.fields['winetype'].choices =Wine.WINETYPE
+        return render(request,'wine/register.html', {'wine_form': wine_form,})
+
+    def post(self, request, *args, **kwargs):
+        wine_form = WineRegisterForm(request.POST)
+        if wine_form.is_valid():
+            new_wine = wine_form.save(commit=False)
+            new_wine.save()
+            messages.success(request, f"{new_wine.name} was created successfully")
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        else:
+            return render(request,'wine/register.html', {'wine_form': wine_form,})
+
+    def get_initial(self, *args, **kwargs):
+        print(">>>")
+        initial = super(WineRegisterView, self).get_initial(**kwargs)
+        initial['name'] = 'My Title'
+        return initial
+'''
 @login_required
 def register(request):
     if request.method == 'POST':
@@ -138,6 +163,7 @@ def register(request):
                   {'wine_form': wine_form,
 
                   })
+'''
 class ProducerCreateView(SuccessMessageMixin, CreateView):
     def get(self, request, *args, **kwargs):
         context = {'form': ProducerForm()}
@@ -267,20 +293,20 @@ class CountryViewSet(viewsets.ModelViewSet):
 
 class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')
+    filter_backends = [filters.SearchFilter]
     serializer_class = TerroirSerializer
-    #lookup_field = 'slug'
+    search_fields = ['name','parentterroir__name']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def get_queryset(self):
-        #print("???")
+    #    print("???")
         queryset = Terroir.objects.all()
         country = self.request.query_params.get('country', None)
         name = self.request.query_params.get('name', None)
         parentterroir = self.request.query_params.get('parentterroir', None)
         recursive = self.request.query_params.get('recursive', None)
-
         if country is not None:
             queryset = queryset.filter(country__slug=slugify(country))
         if name is not None:
@@ -326,6 +352,8 @@ class ProducerViewSet(viewsets.ModelViewSet):
     queryset = Producer.objects.order_by('-name')
     serializer_class = ProducerSerializer
     lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['name']
 
 class WineViewSet(viewsets.ModelViewSet):
     """

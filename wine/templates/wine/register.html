@@ -7,6 +7,48 @@
   <form method="post">
     {{ wine_form|crispy }}
     {% csrf_token %}
-    <p><input type="submit" value="Add my wine"></p>
+    <p><input type="submit" value="Submit"></p>
   </form>
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+      callAPI = function(request, response){
+          console.log()
+          $.ajax({
+              url: $(this)[0].options.api_router,
+              type: 'get',
+              dataType: "json",
+              data: {
+                  search: request.term
+              },
+              success: function( data ) {
+                  response( $.map( data.results, function( item ) {
+                      var object = new Object();
+                      object.label = item.name;
+                      object.value = item.value;
+                      return object
+                  }));
+              }
+          });
+      }
+
+      $("#id_producer").autocomplete({
+            api_router: "/api/producer/",
+            minLength: 0,
+            source: callAPI,
+            select: function (event, ui) {
+                console.log("event:" + ui.item.value)
+            }
+        });
+      $("#id_terroir").autocomplete({
+            api_router: "/api/terroir/",
+            minLength: 0,
+            source: callAPI,
+            select: function (event, ui) {
+                console.log("event:" + ui.item.value)
+            }
+        });
+    });
+</script>
 {% endblock %}

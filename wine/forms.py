@@ -60,15 +60,39 @@ class TerroirForm(forms.ModelForm):
             'isvineyard' : _('Vineyard?')
         }
 
-class WineRegisterForm(forms.ModelForm):
-    class Meta:
-        model = Wine
-        fields = ('producer','terroir','varietal','name','wtype',)
-        labels = {
-            'wtype' : _('Wine Type'),
-            'isappellation' : _('Appelation?'),
-            'isvineyard' : _('Vineyard?')
-        }
+#class WineRegisterForm(forms.ModelForm):
+#    class Meta:
+#        model = Wine
+#        fields = ('producer','terroir','varietal','name','wtype',)
+#        labels = {
+#            'wtype' : _('Wine Type'),
+#            'isappellation' : _('Appelation?'),
+#            'isvineyard' : _('Vineyard?')
+#        }
+class WineRegisterForm(forms.Form):
+
+    producer = forms.CharField(label='Producer Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Producer name',
+                                                          'aria-label': 'Producer name'},
+                                                         )) 
+    terroir = forms.CharField(label='Terroir Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Terroir name',
+                                                          'aria-label': 'Terroir name'},
+                                                         )) 
+    varietal = forms.CharField(label='Primary Varietal Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name'},
+                                                         ))  
+    name = forms.CharField(label='Wine Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name'},
+                                                         ))         
+    winetype = forms.ChoiceField(label='Wine Style')
+
+    def __init__(self, *args, **kwargs):
+        super(WineRegisterForm, self).__init__(*args, **kwargs)
+
+        
 class ProducerForm(forms.ModelForm):
     class Meta:
         model = Producer

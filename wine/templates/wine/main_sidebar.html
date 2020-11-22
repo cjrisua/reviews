@@ -11,33 +11,34 @@
         </div>
     {% endfor %}
 {% endif %}
+<div class=mt-5>
 {% with inventory|first as item %}
     {% if item.search == "ON" %}
-    <div class="form-group">
-        <label for="exampleFormControlInput1">Email address</label>
-        <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
-        </div>
+    <div class="pl-2 pr-2 form-group">
+        <input type="search" class="form-control" id="searchItem" placeholder="Search for {{item.section}}">
+    </div>
     {% endif %}
 {% endwith %}
-<div class="card ml-2 mt-5 border-light" style="width:95%;">
-    <div class="card-header">
-        Vinomío Inventory
+    <div class="card ml-2 border-light" style="width:95%;">
+        <div class="card-header">
+            Vinomío Inventory
+        </div>
+        <ul class="list-group sidebar-list-group">
+            {% for item in inventory %}
+                <li class="list-group-item justify-content-between align-items-center nopadding {% if section == item.name %}bg-dark{% endif %}"> 
+                    <div class="row no-gutters">
+                        <div class="col-7">
+                            <a id="inventory-link" href="{% url 'wine:inventory' section=item.section %}" name={{item.section}} class="default-link nopadding">{{item.name}}</a>
+                        </div>
+                        <div class="col-3 text-right">
+                            <span class="badge badge-primary badge-pill">{{ item.count|intcomma }}</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <a href="{% url 'wine:inventory' section=item.section %}add/">Add</a>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul> 
     </div>
-    <ul class="list-group sidebar-list-group">
-        {% for item in inventory %}
-            <li class="list-group-item justify-content-between align-items-center nopadding {% if section == item.name %}bg-dark{% endif %}"> 
-                <div class="row no-gutters">
-                    <div class="col-7">
-                        <a id="inventory-link" href="{% url 'wine:inventory' section=item.section %}" name={{item.section}} class="default-link nopadding">{{item.name}}</a>
-                    </div>
-                    <div class="col-3 text-right">
-                        <span class="badge badge-primary badge-pill">{{ item.count|intcomma }}</span>
-                    </div>
-                    <div class="col-2 text-right">
-                        <a href="{% url 'wine:inventory' section=item.section %}add/">Add</a>
-                    </div>
-                </div>
-            </li>
-        {% endfor %}
-    </ul> 
 </div>
