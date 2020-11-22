@@ -18,6 +18,7 @@ urlpatterns = [
     path('register/', views.register, name='wine_register'),
     path('dashboard/', views.Dashboard.as_view(), name='wine_dashboard'),
     path(r'inventory/<section>/', views.inventory, name='inventory'),
+     path(r'inventory/producer/add/', views.ProducerCreateView.as_view(success_url=reverse_lazy('wine:wine_dashboard')), name='inventory_producer_add'),
     path(r'inventory/terroir/add/', views.TerroriCreateView.as_view(success_url=reverse_lazy('wine:wine_dashboard')), name='inventory_terroir_add'),
     path(r'inventory/varietalblend/add/', views.VarietalBlendCreateView.as_view(success_url=reverse_lazy('wine:wine_dashboard')), name='inventory_varietalblend_add'),
     path(r'inventory/varietalblend/<int:pk>/', views.VarietalBlendUpdateView.as_view(), name='inventory_varietalblend_update'),

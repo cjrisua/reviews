@@ -1,5 +1,5 @@
 from django import forms
-from .models import Terroir, Wine, VarietalBlend, MasterVarietal,Varietal
+from .models import Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.utils.text import slugify
@@ -69,3 +69,7 @@ class WineRegisterForm(forms.ModelForm):
             'isappellation' : _('Appelation?'),
             'isvineyard' : _('Vineyard?')
         }
+class ProducerForm(forms.ModelForm):
+    class Meta:
+        model = Producer
+        fields = ('name',)

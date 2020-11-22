@@ -156,6 +156,24 @@ class Wine(models.Model):
 
     def __str__(self):
         return self.name
+    @property
+    def wine_indexing(self):
+
+        """Wine for indexing.
+        Used in Elasticsearch indexing.
+        """
+        print('adding wine_indexing...')
+        if self.name is not None:
+            return f"{self.producer.name} {self.name}"
+    @property
+    def vintages_indexing(self):
+
+        """Wine for indexing.
+        Used in Elasticsearch indexing.
+        """
+        print(f'adding vintages_indexing...pk {self.id}')
+        if self.name is not None:
+            return [v.year for v in Market.objects.filter(wine__id=self.id)]
 
     class Meta:
         unique_together = ['producer', 'name']
@@ -188,6 +206,27 @@ class Market(models.Model):
         self.producerslug = slugify(self.wine.producer.name)
         self.wineslug = slugify(self.wine.name)
         super(Market, self).save(*args, **kwargs)
+    @property
+    def wine_indexing(self):
+        """Wine for indexing.
+        Used in Elasticsearch indexing.
+        """
+        if self.wine is not None:
+            return self.__str__()
+    @property
+    def varietal_indexing(self):
+        """Wine for indexing.
+        Used in Elasticsearch indexing.
+        """
+        if self.varietal is not None:
+            return [  {"name":v.name, "pk": v.id} for v in self.varietal.varietal.all()]
+    @property
+    def reviews_indexing(self):
+        """Wine for indexing.
+        Used in Elasticsearch indexing.
+        """
+        if self.observations is not None:
+            return self.observations.name
 
 class Review(models.Model):
     critic = models.ForeignKey(Critic, on_delete=models.CASCADE)

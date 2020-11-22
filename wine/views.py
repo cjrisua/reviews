@@ -28,15 +28,15 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
     OrderingFilterBackend,
     DefaultOrderingFilterBackend,
-    SearchFilterBackend,
+    CompoundSearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-from .documents import WineDocument
+from .documents.wine import WineDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views import View
-from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm
+from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm, ProducerForm
 import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -74,8 +74,6 @@ def inventory(request,section):
     except EmptyPage:
         inventory_object = paginator.page(paginator.num_pages)
 
-    print(inventory_object)
-    #print([field for field in Model._meta.fields])
     return render(request, f'wine/{section}/list.html', 
         {   'section' : section,
             'inventory_object': inventory_object,
@@ -140,6 +138,20 @@ def register(request):
                   {'wine_form': wine_form,
 
                   })
+class ProducerCreateView(SuccessMessageMixin, CreateView):
+    def get(self, request, *args, **kwargs):
+        context = {'form': ProducerForm()}
+        return render(request, 'wine/producer/create.html', context)
+    def post(self, request, *args, **kwargs):
+        form = ProducerForm(request.POST)
+        if form.is_valid():
+            producer = form.save(commit=False)
+            producer.save()            
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        else:
+             messages.add_message(request, messages.ERROR, 'Something went wrong!')
+        return render(request, 'wine/varietalblend/create.html', {'form': form})
+
 class VarietalBlendUpdateView(SuccessMessageMixin, UpdateView):
     model = VarietalBlend
     fields = ('mastervarietal','varietal')
@@ -216,50 +228,30 @@ class WineDocumentViewSet(DocumentViewSet):
     document = WineDocument
     serializer_class = WineDocumentSerializer
 
-    lookup_field = 'id'
+    lookup_field = 'winename'
 
     filter_backends = [
         FilteringFilterBackend,
         OrderingFilterBackend,
         DefaultOrderingFilterBackend,
-        SearchFilterBackend,
+        CompoundSearchFilterBackend,
     ]
     # Define search fields
     search_fields = (
-        'name',
-        #'review',
+        'winename',
     )
     # Filter fields
     filter_fields = {
-        'id': {
-            'field': 'id',
-            'lookups': [
-                LOOKUP_FILTER_RANGE,
-                LOOKUP_QUERY_IN,
-                LOOKUP_QUERY_GT,
-                LOOKUP_QUERY_GTE,
-                LOOKUP_QUERY_LT,
-                LOOKUP_QUERY_LTE,
-            ],
-        },
-        'name': 'name.raw',
-        #'review': 'review.raw',
-        'producer': {
-            'field': 'producer_id',
-            'lookups': [
-                LOOKUP_QUERY_IN,
-            ]
-        },
+        'winename' : 'wine_indexing.keyword'
+        
     }
     # Define ordering fields
     ordering_fields = {
-        'id': 'id',
-        'name': 'name.raw',
-        'producer': 'producer_id',
+        'winename': 'winename',
     }
 
     # Specify default ordering
-    ordering = ('id',)   
+    #ordering = ('varietal',)   
 
 class VarietalViewSet(viewsets.ModelViewSet):
     queryset = Varietal.objects.all()
