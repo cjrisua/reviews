@@ -25,6 +25,7 @@
               success: function( data ) {
                   response( $.map( data.results, function( item ) {
                       var object = new Object();
+                      object.id = item.id;
                       object.label = item.name;
                       object.value = item.value;
                       return object
@@ -33,20 +34,35 @@
           });
       }
 
-      $("#id_producer").autocomplete({
+      $("#id_producername").autocomplete({
             api_router: "/api/producer/",
             minLength: 0,
             source: callAPI,
             select: function (event, ui) {
-                console.log("event:" + ui.item.value)
+              $("#id_producer").text(ui.item.id)
+              $("#id_producer")[0].innerText = ui.item.id
+              $("#id_producer").val(ui.item.id)
+              console.log(ui.item.id)
             }
         });
-      $("#id_terroir").autocomplete({
+      $("#id_terroirname").autocomplete({
             api_router: "/api/terroir/",
             minLength: 0,
             source: callAPI,
             select: function (event, ui) {
-                console.log("event:" + ui.item.value)
+              $("#id_terroir").text(ui.item.id)
+              $("#id_terroir")[0].innerText = ui.item.id
+              $("#id_terroir").val(ui.item.id)
+            }
+        });
+      $("#id_varietalname").autocomplete({
+            api_router: "/api/mastervarietal/",
+            minLength: 0,
+            source: callAPI,
+            select: function (event, ui) {
+              $("#id_varietal").text(ui.item.id)
+              $("#id_varietal")[0].innerText = ui.item.id
+              $("#id_varietal").val(ui.item.id)
             }
         });
     });

@@ -71,15 +71,15 @@ class TerroirForm(forms.ModelForm):
 #        }
 class WineRegisterForm(forms.Form):
 
-    producer = forms.CharField(label='Producer Name',
+    producername = forms.CharField(label='Producer Name',
                            widget= forms.TextInput(attrs={'placeholder':'Producer name',
                                                           'aria-label': 'Producer name'},
                                                          )) 
-    terroir = forms.CharField(label='Terroir Name',
+    terroirname = forms.CharField(label='Terroir Name',
                            widget= forms.TextInput(attrs={'placeholder':'Terroir name',
                                                           'aria-label': 'Terroir name'},
                                                          )) 
-    varietal = forms.CharField(label='Primary Varietal Name',
+    varietalname = forms.CharField(label='Primary Varietal Name',
                            widget= forms.TextInput(attrs={'placeholder':'Varietal name',
                                                           'aria-label': 'Varietal name'},
                                                          ))  
@@ -89,8 +89,24 @@ class WineRegisterForm(forms.Form):
                                                          ))         
     winetype = forms.ChoiceField(label='Wine Style')
 
+    ''' Hidden Fileds '''
+    producer = forms.CharField(widget=forms.HiddenInput)
+    terroir = forms.CharField(widget=forms.HiddenInput)
+    varietal = forms.CharField(widget=forms.HiddenInput)
+
     def __init__(self, *args, **kwargs):
         super(WineRegisterForm, self).__init__(*args, **kwargs)
+
+    def save(self):
+        producer = Producer.objects.get(pk=self.cleaned_data['producer'])
+        terroir = Terroir.objects.get(pk=self.cleaned_data['terroir'])
+        varietal = VarietalBlend.objects.get(mastervarietal__id=self.cleaned_data['varietal'])
+        wine = Wine(producer=producer,
+                    terroir=terroir,
+                    varietal=varietal,
+                    name=self.cleaned_data['name'],
+                    wtype =self.cleaned_data['winetype'])
+        wine.save()
 
         
 class ProducerForm(forms.ModelForm):

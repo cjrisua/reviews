@@ -142,7 +142,7 @@ class Wine(models.Model):
         (ROSE_WINE,'Rosé Wine'),
         (LIGHTBODIED_RED_WINE,'Light-Bodied Red Wine'),
         (MEDIUMBODIED_RED_WINE,'Medium-Bodied Red Wine'),
-        (DESSERT_WINE,'Full-Bodied Red Wine'),
+        (FULLBODIED_RED_WINE,'Full-Bodied Red Wine'),
         (DESSERT_WINE,'Dessert Wine')
     )
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)

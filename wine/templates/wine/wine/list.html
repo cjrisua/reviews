@@ -2,22 +2,39 @@
 {% block content %}
 {% load wine_tags %}
 
-<table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Name</th>
-        
-      </tr>
-    </thead>
-    <tbody>
-        {% for model in inventory_object %}
-          <tr>
-            <td>{{ model.name }}</td>
-          </tr>
-
-      {% endfor %}
-    </tbody>
-  </table>
+{% for model in inventory_object %}
+{% if forloop.first == True %}
+<div class="row">
+  <div class="col-7">
+    <span>Wine Name</span>
+  </div>
+  <div class="col-auto">
+    <span>Vintage</span>
+  </div>
+</div>
+{% endif %}
+<div class="row">
+  <div class="col-7">
+    {{ model.name }}
+  </div>
+  <div class="col-auto">
+    {% for vintages in model.vintages_indexing %}
+      <div class="row">
+        <div class="col">
+          <span class="strong">View all xy vintages</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <span class="strong"><a href="#" class="small">New Vintage</a></span>
+        </div>
+      </div>
+    {% empty %}
+      <span><a href="#" class="small">Add Vintage</a></span>
+    {% endfor %} 
+  </div>
+</div>
+{% endfor %}
 
 {% include "../pagination.html" with inventory_object=inventory_object %}
 

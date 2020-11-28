@@ -110,61 +110,42 @@ class Dashboard(View):
                 }
         ]
        
-        return render(request,
-                  'wine/dashboard.html',
-                  {
-                   'section': 'wine-dashboard',
-                   'inventory' : vinomio_data
-                  })
+        return render(request,'wine/dashboard.html',{'section': 'wine-dashboard','inventory' : vinomio_data})
 
 class WineRegisterView(SuccessMessageMixin, CreateView):
 
-
-    #@method_decorator(login_required)
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         wine_form = WineRegisterForm()
         wine_form.fields['winetype'].choices =Wine.WINETYPE
+        #wine_form.fields['winetype'].choices
         return render(request,'wine/register.html', {'wine_form': wine_form,})
 
+    @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         wine_form = WineRegisterForm(request.POST)
+        wine_form.fields['winetype'].choices =Wine.WINETYPE
         if wine_form.is_valid():
-            new_wine = wine_form.save(commit=False)
-            new_wine.save()
-            messages.success(request, f"{new_wine.name} was created successfully")
+            wine_form.save()
+            messages.success(request, f"blah was created successfully")
             return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
         else:
             return render(request,'wine/register.html', {'wine_form': wine_form,})
 
-    def get_initial(self, *args, **kwargs):
-        print(">>>")
-        initial = super(WineRegisterView, self).get_initial(**kwargs)
-        initial['name'] = 'My Title'
-        return initial
-'''
-@login_required
-def register(request):
-    if request.method == 'POST':
-        wine_form = WineRegisterForm(request.POST)
-        if wine_form.is_valid():
-            new_wine = wine_form.save(commit=False)
-            new_wine.save()
-            messages.success(request, f"{new_wine.name} was created successfully")
-            print(reverse_lazy('wine:wine_dashboard'))
-            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
-            #return render(request,
-            #              'wine/dashboard.html',
-            #              {})
-    else:
-        wine_form = WineRegisterForm()
-    
-    return render(request,
-                  'wine/register.html',
-                  {'wine_form': wine_form,
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        #self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
-                  })
-'''
+class VarietalBlendUpdateView(SuccessMessageMixin, UpdateView):
+    model = VarietalBlend
+    fields = ('mastervarietal','varietal')
+    template_name = 'wine/varietalblend/detail.html'
+    success_url ="/"
+
 class ProducerCreateView(SuccessMessageMixin, CreateView):
+
     def get(self, request, *args, **kwargs):
         context = {'form': ProducerForm()}
         return render(request, 'wine/producer/create.html', context)
@@ -177,12 +158,6 @@ class ProducerCreateView(SuccessMessageMixin, CreateView):
         else:
              messages.add_message(request, messages.ERROR, 'Something went wrong!')
         return render(request, 'wine/varietalblend/create.html', {'form': form})
-
-class VarietalBlendUpdateView(SuccessMessageMixin, UpdateView):
-    model = VarietalBlend
-    fields = ('mastervarietal','varietal')
-    template_name = 'wine/varietalblend/detail.html'
-    success_url ="/"
 
 class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     #template_name = 'wine/varietalblend/create.html'
@@ -316,14 +291,12 @@ class TerroirViewSet(viewsets.ModelViewSet):
         return queryset
 
 class MasterVarietalViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows producers to be viewed or edited.
-    """
-    queryset = MasterVarietal.objects.order_by('name')
-    serializer_class = MasterVarietalSerializer
-    lookup_field = 'slug'
-    search_fields = ['name']
-    filter_backends = (filters.SearchFilter,)
+    #"""API endpoint that allows producers to be viewed or edited."""
+     queryset = MasterVarietal.objects.order_by('name')
+     serializer_class = MasterVarietalSerializer
+     lookup_field = 'slug'
+     search_fields = ['name']
+     filter_backends = (filters.SearchFilter,)
 
 class VarietalBlendViewSet(viewsets.ModelViewSet):
     """
