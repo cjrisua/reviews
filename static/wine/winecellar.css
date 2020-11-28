@@ -1,5 +1,11 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
+div.tr{
+  margin: 10px -10px 10px -10px;
+}
+div.tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 
 .sidebar-list-group li{
   border: 0 none;

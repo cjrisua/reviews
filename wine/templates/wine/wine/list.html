@@ -2,40 +2,48 @@
 {% block content %}
 {% load wine_tags %}
 
+<div style="border: 1px solid #ddd;padding:10px;margin-bottom;">
 {% for model in inventory_object %}
 {% if forloop.first == True %}
-<div class="row">
-  <div class="col-7">
-    <span>Wine Name</span>
+  <div class="pb-2 row">
+    <div class="col-9">
+      <strong>Wine Name</strong>
+    </div>
+    <div class="col-auto">
+      <strong>Vintage</strong>
+    </div>
   </div>
-  <div class="col-auto">
-    <span>Vintage</span>
-  </div>
-</div>
-{% endif %}
-<div class="row">
-  <div class="col-7">
-    {{ model.name }}
-  </div>
-  <div class="col-auto">
-    {% for vintages in model.vintages_indexing %}
-      <div class="row">
-        <div class="col">
-          <span class="strong">View all xy vintages</span>
+  {% endif %}
+  <div class="tr row">
+    <div class="col-9">
+      {{ model }}
+    </div>
+    <div class="col-auto">
+      {% if model.vintages_indexing|length > 0 %}
+        <div class="d-flex flex-row">
+          {% for vintage in model.vintages_indexing %}
+          <div class="pr-2 remove-tag">
+            <span class="keep-together"><a  class="remove-filter">{{vintage}}</a></span>
+          </div>
+          {% endfor %}
         </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <span class="strong"><a href="#" class="small">New Vintage</a></span>
+        <div class="row">
+          <div class="col">
+            <span class="strong">View all {{model.vintages_indexing|length}} vintages</span>
+          </div>
         </div>
-      </div>
-    {% empty %}
-      <span><a href="#" class="small">Add Vintage</a></span>
-    {% endfor %} 
+        <div class="row">
+          <div class="col">
+            <span class="strong"><a href="#" class="small">New Vintage</a></span>
+          </div>
+        </div>
+      {% else %}
+        <span><a href="#" class="small">Add Vintage</a></span>
+      {% endif %} 
+    </div>
   </div>
-</div>
 {% endfor %}
-
+</div>
 {% include "../pagination.html" with inventory_object=inventory_object %}
 
 {% endblock %}

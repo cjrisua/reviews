@@ -74,7 +74,7 @@ class WineDocument(Document):
     class Django:
         model = Wine
         #fields = []
-        related_models = [Producer,Market]
+        related_models = [Producer,]
 
     class Index:
         name = "wine"

@@ -155,7 +155,7 @@ class Wine(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.producer} {self.name}"
     @property
     def wine_indexing(self):
 
