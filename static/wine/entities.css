@@ -30,7 +30,7 @@ input[type="search"]::-webkit-search-results-decoration { display: none; }
 .vintage-container {
   display: flex;
   flex-flow: column wrap;
-  max-width: 239px !important;
+  max-width: 223px !important;
 }
 .blending-container {
   display: flex;
