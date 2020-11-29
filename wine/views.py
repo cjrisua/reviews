@@ -36,7 +36,7 @@ from django.utils.text import slugify
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views import View
-from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm, ProducerForm
+from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm, ProducerForm, WineMarketForm
 import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -111,6 +111,24 @@ class Dashboard(View):
         ]
        
         return render(request,'wine/dashboard.html',{'section': 'wine-dashboard','inventory' : vinomio_data})
+
+class WineMarketView(SuccessMessageMixin, CreateView):
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        wine = Wine.objects.get(pk=kwargs['wineid'])
+        form = WineMarketForm(initial={'name':wine, 'terroirname':wine.terroir, 'varietalname':wine.varietal})
+        return render(request,'wine/vintage/create.html', {'form': form,})   
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        wine = Wine.objects.get(pk=kwargs['wineid'])
+        form = WineMarketForm(request.POST, initial={'name':wine, 'terroirname':wine.terroir, 'varietalname':wine.varietal})
+        if form.is_valid():
+            form.save(wine=wine)
+            messages.success(request, f"blah was created successfully")
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        return render(request,'wine/vintage/create.html', {'form': form,})        
 
 class WineRegisterView(SuccessMessageMixin, CreateView):
 

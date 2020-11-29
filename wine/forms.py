@@ -1,5 +1,5 @@
 from django import forms
-from .models import Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer
+from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.utils.text import slugify
@@ -69,6 +69,46 @@ class TerroirForm(forms.ModelForm):
 #            'isappellation' : _('Appelation?'),
 #            'isvineyard' : _('Vineyard?')
 #        }
+
+class WineMarketForm(forms.Form):
+
+    vintage = forms.CharField(label='Vintage',
+                           widget= forms.TextInput(attrs={'placeholder':'Vintage',
+                                                          'aria-label': 'Vintage'},
+                                                         ))
+
+    name = forms.CharField(label='Wine Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name',}
+                                                         ),required=False) 
+    terroirname = forms.CharField(label='Terroir Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Terroir name',
+                                                          'aria-label': 'Terroir name'}
+                                                         ),required=False)
+    varietalname = forms.CharField(label='Primary Varietal Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name'}
+                                                         ),required=False)                                               
+
+    price = forms.CharField(label='Release Price',
+                           widget= forms.TextInput(attrs={'placeholder':'Price $$$',
+                                                          'aria-label': 'Price $$$'},
+                                                         ))
+    def __init__(self, *args, **kwargs):
+        super(WineMarketForm, self).__init__(*args, **kwargs)
+        self.fields['name'].disabled = True
+        self.fields['terroirname'].disabled = True
+        self.fields['varietalname'].disabled = True
+
+    def save(self,**kwargs):
+        market = Market(wine=kwargs['wine'],
+                        varietal=kwargs['wine'].varietal,
+                        producerslug=kwargs['wine'].producer.slug,
+                        wineslug=slugify(kwargs['wine']),
+                        price=self.cleaned_data['price'],
+                        year=self.cleaned_data['vintage'])
+        market.save()
+        
 class WineRegisterForm(forms.Form):
 
     producername = forms.CharField(label='Producer Name',

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Vintage{% endblock %}
+{% load wine_tags %}
+
+{%block content %}
+<h2> Add Vintage</h2>
+<form action="" method="post">
+    {% csrf_token %}
+    {{form|crispy}}
+    <button type="submit" id="submitProducer"  class="btn btn-dark">Add</button>
+</form>
+{% endblock %}
+{% block javascript %}
+{% endblock %}
