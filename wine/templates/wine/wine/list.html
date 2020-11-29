@@ -19,27 +19,29 @@
       {{ model }}
     </div>
     <div class="col-auto">
-      {% if model.vintages_indexing|length > 0 %}
-        <div class="d-flex flex-row" style="width:15%;">
-          {% for vintage in model.vintages_indexing %}
-          <div class="pr-2 remove-tag">
-            <span class="keep-together"><a  class="remove-filter">{{vintage}}</a></span>
+      <div class="container vintage-container">
+        {% if model.vintages_indexing|length > 0 %}
+          <div class="flex-row">
+            {% for vintage in model.vintages_indexing %}
+            <div class="vintage-tag">
+              <span class="keep-tag-together"><a class="vintage-filter">{{vintage}}</a></span>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
-        <div class="row">
-          <div class="col">
-            <strong class="small">View all {{model.vintages_indexing|length}} vintages</strong>
+          <div class="row">
+            <div class="col">
+              <strong class="small">View all {{model.vintages_indexing|length}} vintages</strong>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <span class="strong"><a href="/wine/inventory/wine/{{model.id}}/vintage/add/" class="small">New Vintage</a></span>
+          <div class="row">
+            <div class="col">
+              <span class="strong"><a href="/wine/inventory/wine/{{model.id}}/vintage/add/" class="small">New Vintage</a></span>
+            </div>
           </div>
-        </div>
-      {% else %}
-        <span><a href="/wine/inventory/wine/{{model.id}}/vintage/add/" class="small">Add Vintage</a></span>
-      {% endif %} 
+        {% else %}
+          <span><a href="/wine/inventory/wine/{{model.id}}/vintage/add/" class="small">Add Vintage</a></span>
+        {% endif %} 
+     </div>
     </div>
   </div>
 {% endfor %}
