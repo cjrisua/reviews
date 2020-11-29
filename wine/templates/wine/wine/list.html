@@ -6,7 +6,7 @@
 {% for model in inventory_object %}
 {% if forloop.first == True %}
   <div class="pb-2 row">
-    <div class="col-8">
+    <div class="col-md-8 col-lg-9">
       <strong>Wine Name</strong>
     </div>
     <div class="col-auto">
@@ -15,7 +15,7 @@
   </div>
   {% endif %}
   <div class="tr row">
-    <div class="col-8">
+    <div class="col-md-8 col-lg-9">
       {{ model }}
     </div>
     <div class="col-auto">
