@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% load wine_tags %}
 
+
 {%block sidenavcontent %}
     {% include "../main_sidebar.html" with inventory=inventory section=section %}
 {% endblock %}
 
 {% block content %}
 
-
+   
+{% with showonly=7 %}
 <div style="border: 1px solid #ddd;padding:10px;margin-bottom;">
 {% for model in inventory_object %}
 {% if forloop.first == True %}
@@ -16,7 +18,7 @@
       <strong>Wine Name</strong>
     </div>
     <div class="col-auto">
-      <strong>Vintage</strong>
+      <strong>Vintage {{showonly}}</strong>
     </div>
   </div>
   {% endif %}
@@ -25,16 +27,16 @@
       {{ model }}
     </div>
     <div class="col-lg-3 col-sm-1">
-      <div class="">
+      <div class="winelisting">
         {% if model.vintages_indexing|length > 0 %}
           <div class="flex-row">
             {% for vintage in model.vintages_indexing %}
-            <div class="vintage-tag {% if forloop.counter > 7 %}d-none hideme{%endif%}">
+            <div class="vintage-tag {% if forloop.counter > showonly %}d-none hideme{%endif%}">
               <span class="keep-tag-together"><a class="vintage-filter">{{vintage}}</a></span>
             </div>
             {% endfor %}
           </div>
-          {% if model.vintages_indexing|length > 7 %}
+          {% if model.vintages_indexing|length > showonly %}
           <div class="row">
             <div class="col">
               <strong class="small"><a class="showall" href="#">Show all {{model.vintages_indexing|length}} vintages</a></strong>
@@ -56,15 +58,31 @@
 </div>
 {% include "../pagination.html" with inventory_object=inventory_object %}
 
+{% endwith %}
 {% endblock %}
 
 {% block  javascript %}
 <script>
    $( document ).ready(function() {
+    var showonly = 7
+
      $(".showall").on('click', function(event){
-      $('div.vintage-tag.d-none').removeClass("d-none")
-      $('div.vintage-tag.hideme').addClass('d-inline')
+       targetrow = $(this).closest('.winelisting').find('.hideme')
+       vintage_cnt = $(targetrow).parent().find('.vintage-tag').length;
+
+       if($(targetrow).hasClass("d-none")){
+          $(targetrow).removeClass("d-none")
+          $(targetrow).addClass('d-inline')
+          $(this).text("Only show " + showonly +" recent vintages")
+       }
+       else if ($(targetrow).hasClass('d-inline')){
+          $(targetrow).removeClass("d-inline")
+          $(targetrow).addClass('d-none')
+          $(this).text("Show all "+ vintage_cnt + " vintages")
+       }
+      
      });
    });
 </script>
 {% endblock %}
+
