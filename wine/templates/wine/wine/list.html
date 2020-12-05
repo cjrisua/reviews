@@ -1,6 +1,12 @@
 {% extends "base.html" %}
-{% block content %}
 {% load wine_tags %}
+
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=section %}
+{% endblock %}
+
+{% block content %}
+
 
 <div style="border: 1px solid #ddd;padding:10px;margin-bottom;">
 {% for model in inventory_object %}
@@ -23,16 +29,18 @@
         {% if model.vintages_indexing|length > 0 %}
           <div class="flex-row">
             {% for vintage in model.vintages_indexing %}
-            <div class="vintage-tag">
+            <div class="vintage-tag {% if forloop.counter > 7 %}d-none hideme{%endif%}">
               <span class="keep-tag-together"><a class="vintage-filter">{{vintage}}</a></span>
             </div>
             {% endfor %}
           </div>
+          {% if model.vintages_indexing|length > 7 %}
           <div class="row">
             <div class="col">
-              <strong class="small">View all {{model.vintages_indexing|length}} vintages</strong>
+              <strong class="small"><a class="showall" href="#">Show all {{model.vintages_indexing|length}} vintages</a></strong>
             </div>
           </div>
+          {%endif%}
           <div class="row">
             <div class="col">
               <span class="strong"><a href="/wine/inventory/wine/{{model.id}}/vintage/add/" class="small">New Vintage</a></span>
@@ -48,4 +56,15 @@
 </div>
 {% include "../pagination.html" with inventory_object=inventory_object %}
 
+{% endblock %}
+
+{% block  javascript %}
+<script>
+   $( document ).ready(function() {
+     $(".showall").on('click', function(event){
+      $('div.vintage-tag.d-none').removeClass("d-none")
+      $('div.vintage-tag.hideme').addClass('d-inline')
+     });
+   });
+</script>
 {% endblock %}
