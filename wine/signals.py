@@ -26,6 +26,7 @@ def delete_document(sender, **kwargs):
 
     if app_label == 'wine':
         if model_name == 'market':
-            instances = instance.wine.all()
-            for _instance in instances:
-                registry.update(_instance)
+            registry.update(instance.wine)
+            #instances = instance.wine.all()
+            #for _instance in instances:
+            #    registry.update(_instance)
