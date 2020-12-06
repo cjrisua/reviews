@@ -23,6 +23,7 @@ html_strip = analyzer(
 
 @INDEX.doc_type
 class WineDocument(Document):
+    id = fields.IntegerField(attr='id')
     '''
     id = fields.IntegerField(attr='id')
 
@@ -67,7 +68,13 @@ class WineDocument(Document):
     #    'name': fields.TextField(),
     #})
     #varietal = fields.TextField(attr='varietal_indexing')
-    winename = fields.TextField(attr='wine_indexing')
+    #winename = fields.TextField(attr='wine_indexing')
+    winename = fields.TextField(
+        attr='wine_indexing',
+        fields={
+            'raw': fields.TextField(analyzer='keyword'),
+        }
+    )
     vintages = fields.TextField(attr='vintages_indexing')
     #vinatges = fields.TextField()
 

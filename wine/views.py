@@ -27,6 +27,7 @@ from django_elasticsearch_dsl_drf.constants import (
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
     OrderingFilterBackend,
+    SearchFilterBackend,
     DefaultOrderingFilterBackend,
     CompoundSearchFilterBackend,
 )
@@ -246,14 +247,13 @@ class WineDocumentViewSet(DocumentViewSet):
 
     document = WineDocument
     serializer_class = WineDocumentSerializer
-
     lookup_field = 'winename'
-
     filter_backends = [
         FilteringFilterBackend,
         OrderingFilterBackend,
         DefaultOrderingFilterBackend,
         CompoundSearchFilterBackend,
+        SearchFilterBackend,
     ]
     # Define search fields
     search_fields = (
@@ -261,7 +261,8 @@ class WineDocumentViewSet(DocumentViewSet):
     )
     # Filter fields
     filter_fields = {
-        'winename' : 'wine_indexing.keyword'
+        'id': None,
+        'winename' : 'winename.raw'
         
     }
     # Define ordering fields
