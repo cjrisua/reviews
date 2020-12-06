@@ -17,17 +17,22 @@ from .serializers import (  WineDocumentSerializer,
                             TerroirSerializer, CountrySerializer, VarietalSerializer,
                             MasterVarietalSerializer, VarietalBlendSerializer)
 from django_elasticsearch_dsl_drf.constants import (
+    LOOKUP_FILTER_TERMS,
     LOOKUP_FILTER_RANGE,
+    LOOKUP_FILTER_PREFIX,
+    LOOKUP_FILTER_WILDCARD,
     LOOKUP_QUERY_IN,
     LOOKUP_QUERY_GT,
     LOOKUP_QUERY_GTE,
     LOOKUP_QUERY_LT,
     LOOKUP_QUERY_LTE,
+    LOOKUP_QUERY_EXCLUDE,
+    
 )
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
+    IdsFilterBackend,
     OrderingFilterBackend,
-    SearchFilterBackend,
     DefaultOrderingFilterBackend,
     CompoundSearchFilterBackend,
 )
@@ -250,10 +255,10 @@ class WineDocumentViewSet(DocumentViewSet):
     lookup_field = 'winename'
     filter_backends = [
         FilteringFilterBackend,
+        IdsFilterBackend,
         OrderingFilterBackend,
         DefaultOrderingFilterBackend,
         CompoundSearchFilterBackend,
-        SearchFilterBackend,
     ]
     # Define search fields
     search_fields = (
@@ -262,7 +267,7 @@ class WineDocumentViewSet(DocumentViewSet):
     # Filter fields
     filter_fields = {
         'id': None,
-        'winename' : 'winename.raw'
+        'winename' : 'winename'
         
     }
     # Define ordering fields
@@ -271,7 +276,7 @@ class WineDocumentViewSet(DocumentViewSet):
     }
 
     # Specify default ordering
-    #ordering = ('varietal',)   
+    #ordering = ('winename',)   
 
 class VarietalViewSet(viewsets.ModelViewSet):
     queryset = Varietal.objects.all()
