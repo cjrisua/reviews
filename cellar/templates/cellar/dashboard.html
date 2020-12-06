@@ -76,7 +76,36 @@
  <script>
    $( document ).ready(function() {
 
+    $("#main-search-input")
+
     $('#main-search-input')
+      .autocomplete({
+            minLength: 0,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/wine/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search_simple_query_string: "Napa+Favia+2016"
+                    },
+                    success: function( data ) {
+                        console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                //$("#id_varietalId").text(ui.item.id)
+            }
+        })
        .on('focusout',function() {
           $('.search-results').remove()
           //improvements 

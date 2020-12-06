@@ -24,13 +24,13 @@ html_strip = analyzer(
 @INDEX.doc_type
 class WineDocument(Document):
     id = fields.IntegerField(attr='id')
-    
     winename = fields.TextField(
         attr='wine_indexing',
         #fields={
         #    'raw': fields.TextField(analyzer='keyword'),
         #}
     )
+    terroir = fields.TextField(attr='region_indexing')
     vintages = fields.TextField(attr='vintages_indexing')
 
     class Django:

@@ -166,6 +166,12 @@ class Wine(models.Model):
         if self.name is not None:
             return f"{self.producer.name} {self.name}"
     @property
+    def region_indexing(self):
+        print(f'adding region_indexing...pk {self.id}')
+        if self.terroir is not None:
+              return [str(terroirname).strip(" ")  for terroirname in str(self.terroir.region_traverse).split('>')]
+
+    @property
     def vintages_indexing(self):
 
         """Wine for indexing.

@@ -11,10 +11,12 @@ class WineDocumentSerializer(DocumentSerializer):
     class Meta:
         document = WineDocument
         fields = (
+            'id',
             'winename',
             'vintages',
             'review',
             'varietal',
+            'terroir',
         )
 class MasterVarietalSerializer(serializers.ModelSerializer):
         class Meta:

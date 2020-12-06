@@ -35,6 +35,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     OrderingFilterBackend,
     DefaultOrderingFilterBackend,
     CompoundSearchFilterBackend,
+    SimpleQueryStringSearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents.wine import WineDocument
@@ -259,17 +260,29 @@ class WineDocumentViewSet(DocumentViewSet):
         OrderingFilterBackend,
         DefaultOrderingFilterBackend,
         CompoundSearchFilterBackend,
+        SimpleQueryStringSearchFilterBackend,
     ]
     # Define search fields
     search_fields = (
+        #'id',
         'winename',
+        'terroir',
+        'vintages',
     )
     # Filter fields
     filter_fields = {
         'id': None,
-        'winename' : 'winename'
+        'winename' : 'winename',
+        'vintages' : 'vintages'
         
     }
+
+    simple_query_string_search_fields = {
+        'winename': {'boost': 4},
+        'terroir': {'boost': 2},
+        'vintages': None,
+    }
+
     # Define ordering fields
     ordering_fields = {
         'winename': 'winename',
