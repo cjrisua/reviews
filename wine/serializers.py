@@ -4,6 +4,7 @@ from .models import (Producer, Wine, Critic,
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents.wine import WineDocument
+from .documents.producer import ProducerDocument
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework.response import Response
 
@@ -17,6 +18,14 @@ class WineDocumentSerializer(DocumentSerializer):
             'review',
             'varietal',
             'terroir',
+        )
+class ProducerDocumentSerializer(DocumentSerializer):
+    class Meta:
+        document = ProducerDocument
+        fields = (
+            'id',
+            'producername',
+            'winename',
         )
 class MasterVarietalSerializer(serializers.ModelSerializer):
         class Meta:

@@ -78,6 +78,23 @@ class Producer(models.Model):
         self.slug = slugify(self.name)
         super(Producer, self).save(*args, **kwargs)
 
+    @property
+    def producer_indexing(self):
+        if self.name is not None:
+            return f"{self.name}"
+    @property
+    def winename_indexing(self):
+        wines_results =[]
+        if self.name is not None:
+            wine_data = Wine.objects.filter(producer__id=self.id)
+            wines = [w for w in wine_data]
+            for w in wines:
+                years = [v.year for v in Market.objects.filter(wine__id=w.id)]
+                for y in years:
+                    wines_results.append(f"{y} {self.name} {w.name}")
+            return wines_results
+
+
 class MasterVarietal(models.Model):
     name = models.CharField(max_length=150, unique=True)
     slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')

@@ -5,11 +5,8 @@ from django.urls import reverse_lazy
 
 app_name = 'wine'
 router = SimpleRouter()
-router.register(
-    prefix=r'',
-    basename='wines',
-    viewset=views.WineDocumentViewSet
-)
+router.register(prefix=r'w',basename='wines',viewset=views.WineDocumentViewSet)
+router.register(prefix=r'p',basename='producers',viewset=views.ProducerDocumentViewSet)
 #urlpatterns = router.urls
 
 

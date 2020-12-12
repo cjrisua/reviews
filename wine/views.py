@@ -15,7 +15,7 @@ from .serializers import (  WineDocumentSerializer,
                             ProducerSerializer, WineSerializer, CriticSerializer, 
                             MarketSerializer, ReviewSerializer, WineReviewSerializer, 
                             TerroirSerializer, CountrySerializer, VarietalSerializer,
-                            MasterVarietalSerializer, VarietalBlendSerializer)
+                            MasterVarietalSerializer, VarietalBlendSerializer,ProducerDocumentSerializer)
 from django_elasticsearch_dsl_drf.constants import (
     LOOKUP_FILTER_TERMS,
     LOOKUP_FILTER_RANGE,
@@ -39,6 +39,7 @@ from django_elasticsearch_dsl_drf.filter_backends import (
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents.wine import WineDocument
+from .documents.producer import ProducerDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
@@ -248,7 +249,62 @@ def terrori_detail(request, **kwargs):
            'terroirid' : dict(serializer.data)['id'],
            #'traverse' : dict(serializer.data)['traverse'] if "traverse" in dict(serializer.data) is not None else None
         })
-
+'''
+class VinoMioDocumentViewSet(DocumentViewSet):
+    document = VinoMioDocument
+    serializer_class = VinoMioDocumentSerializer
+    filter_backends = [
+        FilteringFilterBackend,
+        IdsFilterBackend,
+        OrderingFilterBackend,
+        DefaultOrderingFilterBackend,
+        CompoundSearchFilterBackend,
+        SimpleQueryStringSearchFilterBackend,
+    ]
+    search_fields = (
+        #'id',
+        'producername',
+    )
+    filter_fields = {
+        'id': None,
+        'producername' : 'producername', 
+    }
+    simple_query_string_search_fields = {
+        'producername': {'boost': 4},
+    }
+    ordering_fields = {
+        'producername': 'producername',
+    }
+'''
+class ProducerDocumentViewSet(DocumentViewSet):
+    document = ProducerDocument
+    serializer_class = ProducerDocumentSerializer
+    lookup_field = 'producername'
+    filter_backends = [
+        FilteringFilterBackend,
+        IdsFilterBackend,
+        OrderingFilterBackend,
+        DefaultOrderingFilterBackend,
+        CompoundSearchFilterBackend,
+        SimpleQueryStringSearchFilterBackend,
+    ]
+    search_fields = (
+        #'id',
+        'producername',
+        'winename'
+    )
+    filter_fields = {
+        'id': None,
+        'producername' : 'producername', 
+        'winename' : 'winename',
+    }
+    simple_query_string_search_fields = {
+        'producername': {'boost': 4},
+        'winename' :  {'boost':2}
+    }
+    ordering_fields = {
+        'producername': 'producername',
+    }
 class WineDocumentViewSet(DocumentViewSet):
 
     document = WineDocument

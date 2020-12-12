@@ -20,13 +20,11 @@ html_strip = analyzer(
     filter=["standard", "lowercase", "stop", "snowball"],
     char_filter=["html_strip"]
 ) 
-
 @INDEX.doc_type
-class WineDocument(Document):
+class ProducerDocument(Document):
     id = fields.IntegerField(attr='id')
-    winename = fields.TextField(attr='wine_indexing')
-    terroir = fields.TextField(attr='region_indexing')
-    vintages = fields.TextField(attr='vintages_indexing')
+    producername = fields.TextField(attr='producer_indexing')
+    winename = fields.TextField(attr='winename_indexing')
 
     class Django:
-        model = Wine
+        model = Producer

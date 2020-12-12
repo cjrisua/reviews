@@ -75,34 +75,48 @@
 {% block  javascript %}
  <script>
    $( document ).ready(function() {
-
-    $("#main-search-input")
-
     $('#main-search-input')
       .autocomplete({
             minLength: 0,
             source: function( request, response ) {
                 $.ajax({
-                    url: "/wine/",
+                    url: "/wine/p/",
                     type: 'get',
                     dataType: "json",
                     data: {
-                        search_simple_query_string: "Napa+Favia+2016"
+                        search_simple_query_string:function(){
+                          string = request.term.replace(/\s+/g, '+')
+                          //console.log(string)
+                          return string + "*";
+                          //return "Napa+Favia+2016"
+                        }
                     },
                     success: function( data ) {
-                        console.log(data.results)
-                        response( $.map( data.results, function( item ) {
-                            var object = new Object();
-                            object.id = item.id;
-                            object.label = item.name;
-                            object.value = item.name;
-                            return object
-                        }));
+                        
+                        wineitems = $.map( data.results, function( item ) {
+                            //var object = new Object();
+                            //object.id = item.id;
+                            //object.label = item.winename;
+                            //object.value = item.winename;
+                            //console.log(item)
+                            //return object
+                            return '<li><i class="mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">'+item.producername+'</span></li>';
+                            //return object
+                        });
+                        //items.forEach(function(item){
+                        //  copyItems.push(item)
+                        //})
+                        $('.search-results').remove()
+                        
+                        $('#main-search').append('<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">'+
+                          wineitems.join(" ")+
+                        '</ul><div></div>');
+                        //console.log(results)
                     }
                 });
             },
             select: function (event, ui) {
-                console.log(ui.item)
+                //console.log(ui.item)
                 //$("#id_varietalId").text(ui.item.id)
             }
         })
