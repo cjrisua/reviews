@@ -26,6 +26,7 @@ class ProducerDocumentSerializer(DocumentSerializer):
             'id',
             'producername',
             'winename',
+            'vintages',
         )
 class MasterVarietalSerializer(serializers.ModelSerializer):
         class Meta:

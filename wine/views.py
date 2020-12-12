@@ -291,16 +291,19 @@ class ProducerDocumentViewSet(DocumentViewSet):
     search_fields = (
         #'id',
         'producername',
-        'winename'
+        'winename',
+        'vintages',
     )
     filter_fields = {
         'id': None,
         'producername' : 'producername', 
         'winename' : 'winename',
+        'vintages' : 'vintages',
     }
     simple_query_string_search_fields = {
         'producername': {'boost': 4},
-        'winename' :  {'boost':2}
+        'winename' :  {'boost':2},
+        'vintages' : None
     }
     ordering_fields = {
         'producername': 'producername',

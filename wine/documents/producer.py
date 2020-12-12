@@ -25,6 +25,7 @@ class ProducerDocument(Document):
     id = fields.IntegerField(attr='id')
     producername = fields.TextField(attr='producer_indexing')
     winename = fields.TextField(attr='winename_indexing')
+    vintages = fields.TextField(attr='vintages_indexing')
 
     class Django:
         model = Producer
