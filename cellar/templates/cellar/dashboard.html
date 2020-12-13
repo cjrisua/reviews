@@ -92,23 +92,27 @@
                         }
                     },
                     success: function( data ) {
-                        
-                        wineitems = $.map( data.results, function( item ) {
-                          
-                          //filter vintgae
-                          if ((/([0-9]{4})/).test(request.term) && item.vintages.length  > 0){
-                            console.log('?' + item.vintages.length)
-                          }
-                          
-                          console.log(request.term)
-                            return '<li><i class="mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">'+item.producername+'</span></li>';
-                            //return object
+                        wine_items = $.map( data.results, function( item ) {
+                          var object = new Object();
+                          object.producer = item.producer
+                          object.wine_name = item.producer + " " + item.wine;
+                          object.vintage = item.vintage;
+                          return object
+                        });
+                        console.log(wine_items)
+                        wine_matches = [...new Set(wine_items.map(x => x.wine_name))]
+                        wine_list = $.map(wine_matches, function(item){
+                          vintage = ""
+                          if(/[0-9]{4}/.test(request.term))
+                            vintage = String(request.term).match(/[0-9]{4}/) + " " ;
+
+                          return '<li><i class="mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">'+vintage+item+'</span></li>';
                         });
 
                         $('.search-results').remove()
                         
                         $('#main-search').append('<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">'+
-                          wineitems.join(" ")+
+                          wine_list.join(" ")+
                         '</ul><div></div>');
                         //console.log(results)
                     }

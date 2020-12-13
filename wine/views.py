@@ -304,7 +304,7 @@ class ProducerDocumentViewSet(DocumentViewSet):
         #'id',
         'producer',
         'wine',
-        'year',
+        'vintage',
     )
     #search_nested_fields = {
     #    'wine': {
@@ -312,21 +312,19 @@ class ProducerDocumentViewSet(DocumentViewSet):
     #        'fields': ['name'],
     #    }
     #}
-    ''''
+    
     filter_fields = {
         'id': None,
-        'wine' : 'wine.name.raw',
-        #'producername' : 'producername', 
+        'vintage' : 'vintage',
     }
     post_filter_fields = {
         'wine_pf': 'wine.name.raw',
         'country_pf': 'city.country.name.raw',
     }
-    '''
     simple_query_string_search_fields = {
         'producer': {'boost': 4},
         'wine' :  {'boost': 2},
-        'vintage' :  {'boost': 2},
+        'vintage' :  {'boost': 1},
     }
     '''
     suggester_fields = {
