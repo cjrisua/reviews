@@ -27,15 +27,21 @@ from django_elasticsearch_dsl_drf.constants import (
     LOOKUP_QUERY_LT,
     LOOKUP_QUERY_LTE,
     LOOKUP_QUERY_EXCLUDE,
-    
+    SUGGESTER_COMPLETION,
 )
 from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend,
-    IdsFilterBackend,
-    OrderingFilterBackend,
-    DefaultOrderingFilterBackend,
-    CompoundSearchFilterBackend,
-    SimpleQueryStringSearchFilterBackend,
+   FacetedSearchFilterBackend,
+        FilteringFilterBackend,
+        OrderingFilterBackend,
+        SearchFilterBackend,
+        GeoSpatialFilteringFilterBackend,
+        GeoSpatialOrderingFilterBackend,
+        NestedFilteringFilterBackend,
+        DefaultOrderingFilterBackend,
+        SuggesterFilterBackend,
+        IdsFilterBackend,
+        CompoundSearchFilterBackend,
+        SimpleQueryStringSearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from .documents.wine import WineDocument
@@ -279,35 +285,69 @@ class VinoMioDocumentViewSet(DocumentViewSet):
 class ProducerDocumentViewSet(DocumentViewSet):
     document = ProducerDocument
     serializer_class = ProducerDocumentSerializer
-    lookup_field = 'producername'
+    lookup_field = 'id'
     filter_backends = [
-        FilteringFilterBackend,
-        IdsFilterBackend,
-        OrderingFilterBackend,
+        #FacetedSearchFilterBackend,
+        #FilteringFilterBackend,
+        #OrderingFilterBackend,
+        #SearchFilterBackend,
+        #GeoSpatialFilteringFilterBackend,
+        #GeoSpatialOrderingFilterBackend,
+        #NestedFilteringFilterBackend,
         DefaultOrderingFilterBackend,
+        SuggesterFilterBackend,
+        #IdsFilterBackend,
         CompoundSearchFilterBackend,
         SimpleQueryStringSearchFilterBackend,
     ]
     search_fields = (
         #'id',
-        'producername',
-        'winename',
-        'vintages',
+        'producer',
+        'wine',
+        'year',
     )
+    #search_nested_fields = {
+    #    'wine': {
+    #        'path': 'wine',
+    #        'fields': ['name'],
+    #    }
+    #}
+    ''''
     filter_fields = {
         'id': None,
-        'producername' : 'producername', 
-        'winename' : 'winename',
-        'vintages' : 'vintages',
+        'wine' : 'wine.name.raw',
+        #'producername' : 'producername', 
     }
+    post_filter_fields = {
+        'wine_pf': 'wine.name.raw',
+        'country_pf': 'city.country.name.raw',
+    }
+    '''
     simple_query_string_search_fields = {
-        'producername': {'boost': 4},
-        'winename' :  {'boost':2},
-        'vintages' : None
+        'producer': {'boost': 4},
+        'wine' :  {'boost': 2},
+        'vintage' :  {'boost': 2},
+    }
+    '''
+    suggester_fields = {
+        'wine_suggest': {
+            'field': 'wine.name.suggest',
+            'suggesters': [
+                SUGGESTER_COMPLETION,
+            ],
+        },
+    }
+    
+    # Facets
+    faceted_search_fields = {
+        'wine': {
+            'field': 'wine.name.raw',
+            'enabled': True,
+        },
     }
     ordering_fields = {
         'producername': 'producername',
-    }
+    }'''
 class WineDocumentViewSet(DocumentViewSet):
 
     document = WineDocument

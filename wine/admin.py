@@ -1,11 +1,12 @@
 from django.contrib import admin
 from wine.models import (Varietal, Wine, Producer, Market, 
                          Critic, Review, Terroir, Country, MasterVarietal,
-                         VarietalBlend)
+                         VarietalBlend, ProducerWine)
 
 admin.site.register(Producer)
 admin.site.register(Market)
 admin.site.register(Critic)
+admin.site.register(ProducerWine)
 #admin.site.register(MasterVarietal)
 #admin.site.register(VarietalBlend)
 

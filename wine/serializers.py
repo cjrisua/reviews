@@ -20,13 +20,14 @@ class WineDocumentSerializer(DocumentSerializer):
             'terroir',
         )
 class ProducerDocumentSerializer(DocumentSerializer):
+
     class Meta:
         document = ProducerDocument
         fields = (
             'id',
-            'producername',
-            'winename',
-            'vintages',
+            'producer',
+            'wine',
+            'vintage',
         )
 class MasterVarietalSerializer(serializers.ModelSerializer):
         class Meta:

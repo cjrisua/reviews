@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from jsonfield import JSONField
 from django.utils.text import slugify
+from django_elasticsearch_dsl_drf.wrappers import dict_to_obj
 
 
 class Varietal(models.Model):
@@ -84,15 +85,36 @@ class Producer(models.Model):
             return f"{self.name}"
     @property
     def winename_indexing(self):
+        wrapper = []
+        if self.name is not None:
+            wine_data = Wine.objects.filter(producer__id=self.id)
+            wines = [w for w in wine_data]
+            for wine in wines:
+                '''return dict_to_obj({
+                    'name': wine.name,
+                    'vintages': {
+                        'vintage': [v.year for v in Market.objects.filter(wine__id=wine.id)]
+                    }
+                })'''
+                wrapper.append(dict_to_obj({
+                    'name': wine.name,
+                    'vintages': {
+                        'vintage': [v.year for v in Market.objects.filter(wine__id=wine.id)]
+                    }
+                }))
+        return wrapper
+        '''
         wines_results =[]
         if self.name is not None:
             wine_data = Wine.objects.filter(producer__id=self.id)
             wines = [w for w in wine_data]
             for w in wines:
-                #years = [v.year for v in Market.objects.filter(wine__id=w.id)]
-                #for y in years:
-                wines_results.append(f"{w.name}")
+                years = [v.year for v in Market.objects.filter(wine__id=w.id)]
+                for y in years:
+                    wines_results.append(f"{w.name}")
             return wines_results
+        '''
+    '''
     @property
     def vintages_indexing(self):
         wines_results =[]
@@ -102,7 +124,7 @@ class Producer(models.Model):
             for w in wines:
                 return [v.year for v in Market.objects.filter(wine__id=w.id)]
         return wines_results
-
+    '''
 class MasterVarietal(models.Model):
     name = models.CharField(max_length=150, unique=True)
     slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')
@@ -282,3 +304,26 @@ class InboundException(models.Model):
 
     def __str__(self):
         return f"{self.house} {self.terroir}"
+
+class ProducerWine(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    producer = models.ForeignKey(Producer, on_delete=models.DO_NOTHING)
+    wine = models.ForeignKey(Wine, on_delete=models.DO_NOTHING, blank=True)
+    market = models.ForeignKey(Market, on_delete=models.DO_NOTHING, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'wine_searchindexview'
+
+    @property
+    def producername_indexing(self):
+        if self.producer is not None:
+             return self.producer.name
+    @property
+    def winename_indexing(self):
+        if self.wine is not None:
+             return self.wine.name
+    @property
+    def winevintage_indexing(self):
+        if self.market is not None:
+             return self.market.year

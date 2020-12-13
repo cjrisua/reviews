@@ -94,14 +94,13 @@
                     success: function( data ) {
                         
                         wineitems = $.map( data.results, function( item ) {
-                            //var object = new Object();
-                            //object.id = item.id;
-                            //object.label = item.winename;
-                            //object.value = item.winename;
-                            //console.log(item)
-                            //return object
-                            console.log(item.winename)
-
+                          
+                          //filter vintgae
+                          if ((/([0-9]{4})/).test(request.term) && item.vintages.length  > 0){
+                            console.log('?' + item.vintages.length)
+                          }
+                          
+                          console.log(request.term)
                             return '<li><i class="mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">'+item.producername+'</span></li>';
                             //return object
                         });
