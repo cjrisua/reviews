@@ -35,7 +35,7 @@
 <p>Welcome to your dashboard. You can <a href="{% url "account:edit" %}">edit your profile</a> or <a
     href="{% url "account:password_change" %}">change your password</a>.</p>-->
     <!--<div class="search-box"> -->
-      <div id="main-search" class="input-group mb-3">
+      <div id="main-search" class="input-group mb-0">
         <input id="main-search-input" type="text" class="form-control vinomio-search" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon2">
         <span id="search-img"><i class="fas fa-search"></i></span>
       </div>
@@ -86,34 +86,45 @@
                     data: {
                         search_simple_query_string:function(){
                           string = request.term.replace(/\s+/g, '+')
-                          //console.log(string)
-                          return string + "*";
-                          //return "Napa+Favia+2016"
+                          //console.log(request.term.length)
+                          return string + (request.term.length > 0 ? "*" : "");
+                          
                         }
                     },
                     success: function( data ) {
                         wine_items = $.map( data.results, function( item ) {
                           var object = new Object();
                           object.producer = item.producer
-                          object.wine_name = item.producer + " " + item.wine;
+                          object.wine = item.wine
                           object.vintage = item.vintage;
                           return object
                         });
-                        console.log(wine_items)
-                        wine_matches = [...new Set(wine_items.map(x => x.wine_name))]
-                        wine_list = $.map(wine_matches, function(item){
+                        //Producers
+                        producers_matches = [...new Set(wine_items.map(x => x.producer))]
+                        producers_list = $.map(producers_matches, function(item){
+                          return {'type':'p','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+item+'</span></a></li>'}
+                        });
+                        wine_matches = [...new Set(wine_items.map(x => ({producer:x.producer,wine:x.wine})))]
+                        wine_list = $.map(wine_matches.sort((a,b) => (a.wine == undefined) ? -1 : 1), function(item){
                           vintage = ""
                           if(/[0-9]{4}/.test(request.term))
                             vintage = String(request.term).match(/[0-9]{4}/) + " " ;
-
-                          return '<li><i class="mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">'+vintage+item+'</span></li>';
+                          if (item.wine != undefined)
+                             return {'type':'w','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item.producer+' '+item.wine+'</span></a></li>'}
                         });
 
                         $('.search-results').remove()
                         
-                        $('#main-search').append('<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">'+
-                          wine_list.join(" ")+
-                        '</ul><div></div>');
+                        console.log(wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" "))
+
+                        $('#main-search').append(
+                            '<div class="search-results">'+
+                              '<div class="search-result-detail">'+
+                                (producers_list.filter(p => p.type =='p').length == 0 ? "" : '<div class=""><strong>Producer</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">'+producers_list.filter(p => p.type =='p').map(i => i.list_item).join(" ") +'</ul></div>')+
+                                (wine_list.filter(p => p.type =='w').length == 0 ? "" : '<div class=""><strong>Wine</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">'+wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" ") +'</ul></div>'+
+                              '</div>'+
+                            '</div>')
+                           );
                         //console.log(results)
                     }
                 });

@@ -80,9 +80,20 @@ footer > .container {
 
 .default-link{
   color:#212529;
+  cursor: pointer;
 }
 .click-region-name, .default-link {
   color: inherit;
+}
+a:link { 
+  text-decoration: underline; 
+} 
+a:hover { 
+  text-decoration: none; 
+} 
+ul li:hover a {
+  color : #262626;
+  font-weight:500
 }
  .wrapper {
   display: flex;
