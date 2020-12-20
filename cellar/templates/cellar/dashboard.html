@@ -99,23 +99,25 @@
                           object.vintage = item.vintage;
                           return object
                         });
+                        //console.log(wine_items)
                         //Producers
                         producers_matches = [...new Set(wine_items.map(x => x.producer))]
                         producers_list = $.map(producers_matches, function(item){
                           return {'type':'p','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+item+'</span></a></li>'}
                         });
-                        wine_matches = [...new Set(wine_items.map(x => ({producer:x.producer,wine:x.wine})))]
-                        wine_list = $.map(wine_matches.sort((a,b) => (a.wine == undefined) ? -1 : 1), function(item){
+                        wine_matches = [...new Set(wine_items.map(x => x.producer+' '+x.wine))]
+                        console.log(wine_matches)
+                        wine_list = $.map(wine_matches, function(item){
                           vintage = ""
                           if(/[0-9]{4}/.test(request.term))
                             vintage = String(request.term).match(/[0-9]{4}/) + " " ;
-                          if (item.wine != undefined)
-                             return {'type':'w','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item.producer+' '+item.wine+'</span></a></li>'}
+                          
+                          return {'type':'w','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item+'</span></a></li>'}
                         });
 
                         $('.search-results').remove()
                         
-                        console.log(wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" "))
+                        //console.log(wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" "))
 
                         $('#main-search').append(
                             '<div class="search-results">'+
