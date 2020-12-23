@@ -398,7 +398,7 @@ class VarietalViewSet(viewsets.ModelViewSet):
 class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    lookup_field = ('abbreviation')
+    lookup_field = ('slug')
 
 class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')

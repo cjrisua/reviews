@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 #from .models import ProducerWine
 from django_elasticsearch_dsl.registries import registry
@@ -17,7 +17,7 @@ def update_document(sender, **kwargs):
             registry.update(producer_wine.objects.get(market_id=instance.id))
             registry.update(instance.wine)
 
-@receiver(post_delete)
+@receiver(pre_delete)
 def delete_document(sender, **kwargs):
     print('delete_document')
     app_label = sender._meta.app_label

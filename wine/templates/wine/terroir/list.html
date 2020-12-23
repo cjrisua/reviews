@@ -4,7 +4,26 @@
 {% block title %}Registered {{section|title}} {% endblock %}
 
 {%block sidenavcontent %}
+    
     {% include "../main_sidebar.html" with inventory=inventory section=section %}
+
+     <!--
+    <div class="treeview w-20 border canscroll">
+      <ul class="mb-1 pl-3 pb-2 wr-root"> 
+        {% for region in inventory_object %}
+        <li id="{{region.id}}"><i class="fas fa-angle-right rotate wr-is-clickable"></i>
+          <span><i class="far fa-globe ic-w mx-1 draggable" draggable="true"></i>
+              <span class="droppable">
+                  <a href="#" class="click-region-name">{{region.name}}</a>
+              </span>
+          </span>
+          <ul class="nested">
+          </ul>
+        </li>
+        {% endfor %}
+    </ul>  
+    </div>
+     -->
 {% endblock %}
 
 {% block content %}
