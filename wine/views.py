@@ -73,9 +73,9 @@ sidebar_inventory=[
 
 @login_required
 def inventory(request,section):
-    print(f"->{section}")
+    #print(f"->{section}")
     Model = apps.get_model('wine', section)
-    print(f"Model {Model}")
+    #print(f"Model {Model}")
     inventory_object = Model.objects.all()
 
     page = request.GET.get('page', 1)
@@ -399,6 +399,24 @@ class CountryViewSet(viewsets.ModelViewSet):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
     lookup_field = ('slug')
+
+class TerroirListViewSet(ListView):
+    template_name = 'wine/terroir/terroir_list.html'
+    #context_object_name = 'inventory_object'
+    paginate_by = 1000
+    
+    def get_queryset(self):
+        self.terroir = Terroir.objects.filter(parentterroir=self.kwargs['pk']) 
+        return self.terroir
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in the publisher
+        context['inventory_object'] = self.terroir
+        print(self.kwargs['pk'])
+        context['terroir'] = Terroir.objects.get(id=self.kwargs['pk']) 
+        return context
 
 class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')

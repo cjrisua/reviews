@@ -1,0 +1,36 @@
+{% load wine_tags %}
+{% load crispy_forms_tags %}
+
+<div id="terroir-list">
+  {% if terroir %}
+  <div>
+    <h3>{{terroir.name}}</h3> 
+  </div>
+  {%endif%}
+  {% for model in inventory_object %}
+    {% if forloop.first %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Country</th>
+          <th>Full Terroir</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+      {% endif %}
+        <tr>
+          <td>{{ model.name }}</td>
+          <td>{{ model.country }}</td>
+          <td>{{ model.id|region_traverse }}</td>
+        </tr>
+      {% if forloop.last %}
+          </tbody>
+        </table>
+        {% include "../pagination.html" with inventory_object=inventory_object %}
+      {% endif %}
+  {%empty%}
+    There are no {{section|title}}s yet.  
+  {% endfor %}
+</div>
