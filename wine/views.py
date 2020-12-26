@@ -403,10 +403,19 @@ class CountryViewSet(viewsets.ModelViewSet):
 class TerroirListViewSet(ListView):
     template_name = 'wine/terroir/terroir_list.html'
     #context_object_name = 'inventory_object'
-    paginate_by = 1000
+    #paginate_by = 1000
     
     def get_queryset(self):
-        self.terroir = Terroir.objects.filter(parentterroir=self.kwargs['pk']) 
+        terroir = Terroir.objects.filter(parentterroir=self.kwargs['pk']) 
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(terroir, 100)
+
+        try:
+            self.terroir = paginator.page(page)
+        except PageNotAnInteger:
+            self.terroir = paginator.page(1)
+        except EmptyPage:
+            self.terroir = paginator.page(paginator.num_pages)
         return self.terroir
 
     def get_context_data(self, **kwargs):
