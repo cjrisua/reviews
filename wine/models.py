@@ -47,7 +47,10 @@ class Terroir(models.Model):
             name = Terroir.traverse_terroir(self, terroir.parentterroir, f'{terroir.parentterroir.name} > {name}')
         else:
            self.__traversed_name = name
-    
+    @property
+    def with_subterroir(self):
+        return True if Terroir.objects.filter(parentterroir=self.id).exists() else False
+
     @property
     def region_traverse(self): 
         region_names = Terroir.traverse_terroir(self, self.parentterroir,f'{self.parentterroir.name} > {self.name}')

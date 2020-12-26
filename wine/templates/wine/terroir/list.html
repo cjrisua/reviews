@@ -6,7 +6,7 @@
 {%block sidenavcontent %}
     
     {% include "../main_sidebar.html" with inventory=inventory section=section %}
-
+    {% terroir_treeview %}
      <!--
     <div class="treeview w-20 border canscroll">
       <ul class="mb-1 pl-3 pb-2 wr-root"> 
@@ -58,6 +58,8 @@
 {% block  javascript %}
 <script>
    $( document ).ready(function() {
+     $('.treeview').mdbTreeview();
+     const csrftoken = Cookies.get('csrftoken');
      var minlength = 3;
      var searchRequest = null;
      $("#searchItem").on('keyup',function(){
@@ -81,6 +83,104 @@
                     }
                 }
             });
+          }
+     });
+     $(document).on('drop','.droppable', function(event){
+            var data = event.originalEvent.dataTransfer.getData("text");
+            event.target.parentNode.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data))
+            //event.target.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data));
+            data = JSON.stringify({parentterroir: $(this)[0].parentNode.parentNode.id})
+            console.log(data)
+            
+            $.ajax({
+                    type: "PATCH",
+                    url: "/api/terroir/"+selected_node+"/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    headers:{"X-CSRFToken": csrftoken},
+                    dataType: "json",
+                    success: successCallback
+                });
+                function successCallback(response) {
+                        console.log("Update Done!")
+                }
+        });
+     $(document).on('dragover','.droppable', function(event){
+            event.preventDefault();
+            let over_id = $(this)[0].parentNode.parentNode.id;
+            console.log(selected_node + " dragged over " + $(this).find('a')[0].innerText +" ["+over_id+"]")
+        });
+     $(document).on('dragstart','.draggable', function(event){
+            selected_node = $(this)[0].parentNode.parentNode.id
+            console.log("dragstart " + selected_node);
+            event.originalEvent.dataTransfer.setData("text",selected_node);
+        });
+     $(document).on('click', '.wr-is-clickable', function(){
+        let parent_content = $(this)[0].nextElementSibling
+        let nested_active_node =$($(this)[0].parentNode).find(".nested")[0]
+
+        if (!$(this).hasClass("stage-up") && !$(this).hasClass("stage-down")){
+            if ($(this).hasClass("down"))
+                $($(this)[0]).addClass("stage-down");
+            else{
+                $($(this)[0]).addClass("stage-down");
+                $($(this)[0]).addClass("down");
+            }
+        }
+        else{
+            if (!$(this).hasClass("down") && $(this).hasClass("stage-down")){
+                $($(this)[0]).removeClass("stage-down");
+                $($(this)[0]).addClass("stage-up");
+                $(nested_active_node).removeClass('active')
+            }
+            else if ($(this).hasClass("down") && $(this).hasClass("stage-down")){
+                $($(this)[0]).addClass("stage-up");
+                $($(this)[0]).removeClass("down");
+                $($(this)[0]).removeClass("stage-down");
+                $(nested_active_node).removeClass('active')
+            }
+            else if (!$(this).hasClass("down") && $(this).hasClass("stage-up")){
+                $($(this)[0]).removeClass("stage-up");
+                $($(this)[0]).addClass("stage-down");
+                $($(this)[0]).addClass("down");
+            }
+            else if ($(this).hasClass("down") && $(this).hasClass("stage-up"))
+            {
+                $($(this)[0]).removeClass("stage-up");
+                $($(this)[0]).addClass("stage-down");
+                $(nested_active_node).removeClass('active')
+            }
+            else
+            {
+                print("????")
+            }
+        }
+        if ($(this).hasClass("down")){
+            $(nested_active_node).removeClass('d-none')
+            $(parent_content).find('i').removeClass('rotate-bottle')
+            $.ajax({
+                url: "/api/terroir/",
+                type: 'get',
+                dataType: "json",
+                data: {
+                  parentterroir: $(this)[0].parentNode.id
+                },
+                success: successCallback
+            });
+        }
+        else{
+          $(nested_active_node).addClass('d-none')
+          $(parent_content).find('i').addClass('rotate-bottle')
+        }
+        function successCallback(response) {
+            if (!$(nested_active_node).hasClass('active'))
+                $(nested_active_node).addClass('active')
+            $(nested_active_node).empty()
+            subregions = $.map( response.results, function( item ) {
+                            //console.log(Boolean(item.with_subterroir))
+                            return '<li id="'+item.id+'" class="tree-item">'+(item.with_subterroir == "True" ?'<i class="fas fa-angle-right rotate wr-is-clickable"></i>':'')+'<span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a href="#" class="click-region-name"><small>'+item.name+'</small></a></span></span><ul class="nested"></ul></li>'
+                          });
+            $(nested_active_node).append(subregions)
           }
      });
   });

@@ -22,3 +22,12 @@ def get_terroirs(terroir):
             return terroirs[0]
         else:
             return terroir.name
+
+@register.inclusion_tag('wine/terroir/terroir_treeview.html')
+def terroir_treeview():
+    return {'terroirs' :  Terroir.objects.filter(parentterroir__isnull=True)}
+    
+    #html = ""
+    #for t in Terroir.objects.filter(parentterroir__isnull=True):
+    #    html += f'<li id="{t.id}"><i class="fas fa-angle-right rotate wr-is-clickable"></i><span><i class="far fa-globe ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a href="#" class="click-region-name">{t.name}</a></span></span><ul class="nested"></ul></li>'
+    #return html
