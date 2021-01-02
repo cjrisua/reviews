@@ -79,7 +79,7 @@ def inventory(request,section):
     inventory_object = Model.objects.all()
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(inventory_object, 11)
+    paginator = Paginator(inventory_object, 50)
 
     try:
         inventory_object = paginator.page(page)
@@ -408,7 +408,7 @@ class TerroirListViewSet(ListView):
     def get_queryset(self):
         terroir = Terroir.objects.filter(parentterroir=self.kwargs['pk']) 
         page = self.request.GET.get('page', 1)
-        paginator = Paginator(terroir, 100)
+        paginator = Paginator(terroir, 50)
 
         try:
             self.terroir = paginator.page(page)

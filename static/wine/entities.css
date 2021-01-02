@@ -39,10 +39,27 @@ ul .nested{
   
 }
 .keep-tag-together{
-  /*background-color: lightsteelblue;*/
   margin: 3px;
   border-radius: 2px;
   text-align: center;
+}
+
+.action-button-link:hover {
+  text-decoration: none;
+  color: whitesmoke;
+  font-weight: 500;
+  background-color: rgb(81, 84, 103);
+}
+.action-button-link {
+  font-size: 14px;
+  display: inline-block;
+  font-weight: 400;
+  text-decoration: none;
+  width:auto;
+  background-color: rgb(98, 102, 125);
+  color: whitesmoke;
+  padding: 5px 15px 5px 15px;
+  border-radius: 5px;
 }
 .vintage-tag{
   background-color: lightslategray;
