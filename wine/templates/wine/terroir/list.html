@@ -33,6 +33,7 @@
 {% block  javascript %}
 <script>
    $( document ).ready(function() {
+    let selected_node = undefined;
      $('.treeview').mdbTreeview();
      const csrftoken = Cookies.get('csrftoken');
      var minlength = 3;

@@ -43,7 +43,7 @@ class Terroir(models.Model):
 
     @staticmethod
     def traverse_terroir(self, terroir, name):
-        if terroir.parentterroir is not None:
+        if terroir is not None and terroir.parentterroir is not None:
             name = Terroir.traverse_terroir(self, terroir.parentterroir, f'{terroir.parentterroir.name} > {name}')
         else:
            self.__traversed_name = name
@@ -53,7 +53,8 @@ class Terroir(models.Model):
 
     @property
     def region_traverse(self): 
-        region_names = Terroir.traverse_terroir(self, self.parentterroir,f'{self.parentterroir.name} > {self.name}')
+        parent_name = f'{self.parentterroir.name}' if self.parentterroir is not None else self.country
+        region_names = Terroir.traverse_terroir(self, self.parentterroir, f'{parent_name} > {self.name}')
         return self.__traversed_name
 
     def __str__(self):
