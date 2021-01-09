@@ -77,6 +77,64 @@
            shownoshow($(this))
         
      });
+     $(document).on("keyup.autocomplete","#search-region-w-ac", function(){
+        $(this).autocomplete({
+            appendTo: ".modal-body",
+            minLength: 3,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/terroir/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        //console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                //$("#id_varietalId").text(ui.item.id)
+            }
+        });
+     });
+     /*
+     $("#search-region-w-ac").autocomplete({
+            minLength: 3,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/terroir/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                //$("#id_varietalId").text(ui.item.id)
+            }
+    });*/
      $("#searchItem").on('keyup',function(){
       var that = this,
           value = $(this).val();
@@ -219,6 +277,8 @@
                 $('div #terroir-list').html($(response).html())
                 $(".terroir-action").bind("transitionend", hidden);
                 $(".terroir-action-show").bind("transitionend", hidden);
+                //$("#search-region-w-ac").bind("autocomplete", hidden);
+                console.log("bind done!")
             }
 
             /*
