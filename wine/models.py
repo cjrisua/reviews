@@ -56,7 +56,20 @@ class Terroir(models.Model):
         parent_name = f'{self.parentterroir.name}' if self.parentterroir is not None else self.country
         region_names = Terroir.traverse_terroir(self, self.parentterroir, f'{parent_name} > {self.name}')
         return self.__traversed_name
+    @property
+    def related_regions(self): 
+        hierarchy = []
+        Terroir.traverse_region(self,hierarchy)
+        hierarchy.reverse()
+        return hierarchy[:-1]
 
+    @staticmethod
+    def traverse_region(self,hierarchy):
+        hierarchy.append(self)
+        if self.parentterroir is not None:
+            Terroir.traverse_region(self.parentterroir,hierarchy)
+            
+        
     def __str__(self):
         return self.name 
 
@@ -66,7 +79,7 @@ class Terroir(models.Model):
 
     def __init__(self, *args, **kwargs):
         self.__traversed_name = None
-
+        self.__hierarchy = []
         super().__init__(*args, **kwargs)
 
 class Producer(models.Model):

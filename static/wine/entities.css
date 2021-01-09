@@ -44,13 +44,28 @@ ul .nested{
   text-align: center;
 }
 
-.action-button-link:hover {
-  text-decoration: none;
-  color: whitesmoke;
-  font-weight: 500;
-  background-color: rgb(81, 84, 103);
+
+thead{
+  background-color: #fafafa;
+}
+.terroir-action{
+  height: 0px;
+  visibility: hidden;
+  opacity: 0;
+  transition: height .5s;
+
+}
+.terroir-action-show{
+  height: 33px;
+  visibility: visible;
+  opacity: 1;
+  z-index: -1;
+  padding-left: 8px;
+  padding-right: 10px;
+  transition: height .5s;
 }
 .action-button-link {
+  margin-left: -10px;
   font-size: 14px;
   display: inline-block;
   font-weight: 400;
@@ -61,6 +76,13 @@ ul .nested{
   padding: 5px 15px 5px 15px;
   border-radius: 5px;
 }
+.action-button-link:hover {
+  text-decoration: none;
+  color: whitesmoke;
+  font-weight: 500;
+  background-color: rgb(81, 84, 103);
+}
+
 .vintage-tag{
   background-color: lightslategray;
   display: inline-block;
@@ -463,17 +485,19 @@ img {
       height: subtract(100vh, 4rem);
     }*/
     border-right: 1px solid rgba(0, 0, 0, .1);
+    
 }
 /* Medium media */
 @media (min-width: 768px) {
   .bd-sidebar {
-    height: calc(100vh - 4rem);
+    /*height: auto;*/
     min-width: 200px;
     max-width: 500px;
   }
 }
 @media (min-width: 1200px){
   .bd-sidebar{
+    /*height: calc(100vh - 0rem);*/
     flex: 0 1 400px;
   }
 }

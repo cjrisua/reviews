@@ -75,9 +75,15 @@ sidebar_inventory=[
 def inventory(request,section):
     #print(f"->{section}")
     Model = apps.get_model('wine', section)
-    #print(f"Model {Model}")
-    inventory_object = Model.objects.all()
 
+    #filters
+    name = request.GET.get('name', None)
+    if name is not None:
+        inventory_object = Model.objects.filter(name__icontains=name)
+    else:
+        inventory_object = Model.objects.all()
+   
+    #page
     page = request.GET.get('page', 1)
     paginator = Paginator(inventory_object, 50)
 
@@ -431,7 +437,8 @@ class TerroirViewSet(viewsets.ModelViewSet):
     queryset = Terroir.objects.order_by('slug')
     filter_backends = [filters.SearchFilter]
     serializer_class = TerroirSerializer
-    search_fields = ['name','parentterroir__name']
+    #search_fields = ['name','parentterroir__name']
+    search_fields = ['name']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,17 +1,44 @@
 {% load wine_tags %}
 {% load crispy_forms_tags %}
 <div id="terroir-list">
+    <!-- Modal -->
+    <div class="modal fade" id="RelocateTerroirModal" tabindex="-1" role="dialog" aria-labelledby="RelocateTerroirModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="RelocateTerroirModalLabel">Relocate Region</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                  <input type="search" class="form-control" id="searchItem" placeholder="Relocate to...">
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+      </div>
+    </div>
   {% if terroir %}
   <div>
     <h3>{{terroir.name}}</h3>
-    <h6 class="text-muted">{{terroir.region_traverse}}</h6>
+    <h6 class="text-muted">
+      {% for region in terroir.related_regions %}
+        <a id="{{region.id}}" href="#" class="click-region-name"><span class="text-muted">{{region.name}}</span></a> {% if forloop.last %}{%else%}>{%endif%}
+      {% endfor %}
+    </h6>
     <p></p>
   </div>
   {%endif%}
   {% for model in inventory_object %}
   {% if forloop.first %}
-  <div class="d-flex flex-row bd-highlight mb-2">
-    <div class="d-none p-2 bd-highlight"><span class="keep-tag-together"><a class="action-button-link">Move Terroir</a></span></div>
+  <div class="d-flex flex-row bd-highlight mb-1">
+    <div class="bd-highlight terroir-action"><span class="keep-tag-together"><a href="#" class="action-button-link" data-toggle="modal" data-target="#RelocateTerroirModal">Move Terroir</a></span></div>
+    <div class="bd-highlight terroir-action"><span class="keep-tag-together"><a href="#" class="action-button-link">Delete Terroir</a></span></div>
   </div>
   <table class="table table-bordered">
     <thead>
@@ -31,12 +58,12 @@
       {% endif %}
       <tr>
         <td>
-          <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input"  id="customCheck{{model.id}}">
-            <label class="custom-control-label" for="customCheck{{model.id}}"></label>
+          <div class="custom-control custom-checkbox terroir" style="z-index: 0;">
+            <input type="checkbox" class="custom-control-input" name="terroirCheck" id="{{model.id}}">
+            <label class="custom-control-label" for="{{model.id}}"></label>
           </div>
         </td>
-        <td>{{ model.name }}</td>
+        <td><a id="{{model.id}}" href="#" class="click-region-name">{{ model.name }}</a></td>
         <td>{{ model.country }}</td>
         <td>{{ model.id|region_traverse }}</td>
       </tr>

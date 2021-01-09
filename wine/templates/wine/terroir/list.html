@@ -7,23 +7,7 @@
     
     {% include "../main_sidebar.html" with inventory=inventory section=section %}
     {% terroir_treeview %}
-     <!--
-    <div class="treeview w-20 border canscroll">
-      <ul class="mb-1 pl-3 pb-2 wr-root"> 
-        {% for region in inventory_object %}
-        <li id="{{region.id}}"><i class="fas fa-angle-right rotate wr-is-clickable"></i>
-          <span><i class="far fa-globe ic-w mx-1 draggable" draggable="true"></i>
-              <span class="droppable">
-                  <a href="#" class="click-region-name">{{region.name}}</a>
-              </span>
-          </span>
-          <ul class="nested">
-          </ul>
-        </li>
-        {% endfor %}
-    </ul>  
-    </div>
-     -->
+    
 {% endblock %}
 
 {% block content %}
@@ -32,35 +16,94 @@
 
 {% block  javascript %}
 <script>
+   function sitckysidebarselector() {
+
+      if($('.bd-sidebar').height() <= $('#terroir-list').height()){
+        /*$('.bd-sidebar').css("height","calc(100vh - 0rem");*/
+        console.log("small list: " + $('.bd-sidebar').height() +" vs" + $('#terroir-list').height())
+        /*$('.bd-sidebar').css("height","auto");*/
+      }
+      else{
+        console.log("sidebar is  larger " + $('.bd-sidebar').height() +" vs" + $('#terroir-list').height())
+      }
+   }
+   function hidden()
+   {
+       terroir_btn = $("div .terroir-action-show,.terroir-action");
+       if($(terroir_btn).hasClass("terroir-action-show"))
+          $(terroir_btn).toArray().forEach(e => e.style.zIndex="0");
+       else
+          $(terroir_btn).toArray().forEach(e => e.style.zIndex="");
+       
+   }
+   function shownoshow(checkbox){
+        if($(checkbox).is(':checked')){
+            terroirdiv = $('div .terroir-action');
+            $(terroirdiv).removeClass("terroir-action")
+            $(terroirdiv).addClass("terroir-action-show")
+        }
+        else{
+            terroirdiv = $('div .terroir-action-show');
+            $(terroirdiv).removeClass("terroir-action-show")
+            $(terroirdiv).addClass("terroir-action")
+        }
+   }
    $( document ).ready(function() {
     let selected_node = undefined;
      $('.treeview').mdbTreeview();
      const csrftoken = Cookies.get('csrftoken');
      var minlength = 3;
      var searchRequest = null;
-     $("#customCheckAll").on('click',function(even){
-       
+
+     //var $bdsidebar = $('.bd-sidebar');
+     //$bdsidebar.bind("DOMSubtreeModified", sitckysidebarselector);
+     //var $terroirlist = $('#terroir-list');
+     //$terroirlist.bind("DOMSubtreeModified", sitckysidebarselector);
+
+     $(".terroir-action").bind("transitionend", hidden);
+     $(".terroir-action-show").bind("transitionend", hidden);
+     //$(document).bind('transitionend', ".terroir-action", hidden)
+     //$(document).bind('transitionend', ".terroir-action-show", hidden)
+
+     $(document).on('click','#customCheckAll',function(even){
+        checked = $(this).is(':checked');
+        ($('div .custom-checkbox,.terroir input')).toArray().forEach(function(i){
+            $(i).prop('checked', checked)
+        });
+        shownoshow($(this))
+     });
+     $(document).on('click','input[name="terroirCheck"]',function(even){
+        if(!$('#customCheckAll').is(':checked'))
+           shownoshow($(this))
+        
      });
      $("#searchItem").on('keyup',function(){
       var that = this,
           value = $(this).val();
           if (value.length >= minlength ) {
-            if (searchRequest != null) 
-                searchRequest.abort();
-            searchRequest = $.ajax({
+            //if (searchRequest != null){
+            //    console.log("aborted!")
+            //    searchRequest.abort();
+            //}
+            //searchRequest = 
+            $.ajax({
                 type: "GET",
-                url: "/api/terroir/",
+                url: "/wine/inventory/terroir/",
+                //contentType: "application/json; charset=utf-8", 
+                //async: false,
+                dataType: 'JSON',
+                headers:{"X-CSRFToken": csrftoken},
                 data: {
-                    'search' : value
+                    'name' : value
                 },
                 dataType: "text",
                 success: function(msg){
-                    //we need to check if the value is the same
-                    if (value==$(that).val()) {
-                    //Receiving the result of search here
-                    console.log(msg)
-                    }
+                    $("#terroir-list").html($(msg).find('#terroir-list')[0].innerHTML)
+                    $(".terroir-action").bind("transitionend", hidden);
+                    $(".terroir-action-show").bind("transitionend", hidden);
                 }
+            }).done(function(){
+               console.log("done!")
             });
           }
      });
@@ -162,9 +205,10 @@
             $(nested_active_node).append(subregions)
           }
      });
-     $(document).on( 'click', '.click-region-name', function(event, action){
+     $(document).on('click', '.click-region-name', function(event, action){
             event.preventDefault();
-            let terroirid = $(this)[0].parentNode.parentNode.parentNode.id
+            //let terroirid = $(this)[0].parentNode.parentNode.parentNode.id
+            let terroirid = $(this)[0].id;
             $('div #terroir-list').empty()
             $.ajax({
                 url: "/wine/inventory/terroir/"+terroirid+"/",
@@ -173,6 +217,8 @@
             });
             function successCallback(response) {
                 $('div #terroir-list').html($(response).html())
+                $(".terroir-action").bind("transitionend", hidden);
+                $(".terroir-action-show").bind("transitionend", hidden);
             }
 
             /*
@@ -231,7 +277,31 @@
                     console.log("Done!")
                 }*/
         });
+     $(document).on('show.bs.modal','#RelocateTerroirModal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        //var recipient = button.data('whatever') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this)
+        //modal.find('.modal-title').text('New message to ')
+        //modal.find('.modal-body input').val(recipient)
+     });
   });
 </script>
  
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

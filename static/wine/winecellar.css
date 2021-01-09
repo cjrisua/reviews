@@ -97,7 +97,7 @@ a.click-region-country, a.click-region-name{
 }
 a.click-region-country:hover, a.click-region-name:hover{
   color:#1b1f22;
-  font-weight:bold;
+  font-weight:500;
 }
 
 ul li:hover a {
