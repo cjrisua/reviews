@@ -473,16 +473,20 @@ class TerroirViewSet(viewsets.ModelViewSet):
     def patch(self, request):
          many = isinstance(request.data, list)
          instances = self.get_queryset(ids=[terroir['id'] for terroir in request.data])
-         serializer = TerroirSerializer(instances, data=request.data,many=many, partial=False)
+         serializer = TerroirSerializer(instance=instances, data=request.data,many=True, partial=True)
          if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
-        serializer = TerroirSerializer(data=request.data,many=True)
-        if serializer.is_valid():
-             return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+         many = isinstance(request.data, list)
+         instances = self.get_queryset(ids=[terroir['id'] for terroir in request.data])
+         serializer = TerroirSerializer(instance=instances, data=[{"name":'hello1'},{'name':'hello2'}], many=many)
+         if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MasterVarietalViewSet(viewsets.ModelViewSet):
     #"""API endpoint that allows producers to be viewed or edited."""

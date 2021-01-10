@@ -70,11 +70,11 @@ class TerroirListSerializer(serializers.ListSerializer):
         # Perform creations and updates.
         ret = []
         for terroir_id, data in data_mapping.items():
-            book = terroir_mapping.get(terroir_id, None)
-            if book is None:
+            terroir = terroir_mapping.get(terroir_id, None)
+            if terroir is None:
                 ret.append(self.child.create(data))
             else:
-                ret.append(self.child.update(book, data))
+                ret.append(self.child.update(terroir, data))
         # Perform deletions.
         for terroir_id, terroir in data_mapping.items():
             if terroir_id not in data_mapping:
@@ -82,9 +82,11 @@ class TerroirListSerializer(serializers.ListSerializer):
         return ret
 
 class TerroirSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     country_name = serializers.StringRelatedField(source='country',read_only=True)
     traverse = serializers.StringRelatedField(source='region_traverse',read_only=True)
     with_subterroir = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Terroir
         fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country','traverse','with_subterroir']
