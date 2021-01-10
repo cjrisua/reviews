@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404, render
+from rest_framework.response import Response
+from rest_framework import status
 from .models import (
     MasterVarietal, 
     VarietalBlend, 
@@ -457,6 +459,27 @@ class TerroirViewSet(viewsets.ModelViewSet):
         if parentterroir is not None:
             queryset = queryset.filter(parentterroir__id=parentterroir)
         return queryset
+    def update(self):
+        print("update")
+        pass
+
+    def partial_update(self):
+        print("partial_update")
+        pass
+        
+    def patch(self, request):
+         many = isinstance(request.data, list)
+         print (request.data, many)
+         serializer = TerroirSerializer(data=request.data,many=many, partial=True)
+         if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        serializer = TerroirSerializer(data=request.data,many=True)
+        if serializer.is_valid():
+             return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
 
 class MasterVarietalViewSet(viewsets.ModelViewSet):
     #"""API endpoint that allows producers to be viewed or edited."""

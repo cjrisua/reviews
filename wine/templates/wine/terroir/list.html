@@ -54,6 +54,7 @@
      const csrftoken = Cookies.get('csrftoken');
      var minlength = 3;
      var searchRequest = null;
+     let new_parentterroir = null;
 
      //var $bdsidebar = $('.bd-sidebar');
      //$bdsidebar.bind("DOMSubtreeModified", sitckysidebarselector);
@@ -75,7 +76,6 @@
      $(document).on('click','input[name="terroirCheck"]',function(even){
         if(!$('#customCheckAll').is(':checked'))
            shownoshow($(this))
-        
      });
      $(document).on("keyup.autocomplete","#search-region-w-ac", function(){
         $(this).autocomplete({
@@ -103,40 +103,13 @@
             },
             select: function (event, ui) {
                 console.log(ui.item)
-                //$("#id_varietalId").text(ui.item.id)
+                new_parentterroir = undefined
+                new_parentterroir = ui.item.id
             }
         });
      });
-     /*
-     $("#search-region-w-ac").autocomplete({
-            minLength: 3,
-            source: function( request, response ) {
-                $.ajax({
-                    url: "/api/terroir/",
-                    type: 'get',
-                    dataType: "json",
-                    data: {
-                        search: request.term
-                    },
-                    success: function( data ) {
-                        console.log(data.results)
-                        response( $.map( data.results, function( item ) {
-                            var object = new Object();
-                            object.id = item.id;
-                            object.label = item.name;
-                            object.value = item.name;
-                            return object
-                        }));
-                    }
-                });
-            },
-            select: function (event, ui) {
-                console.log(ui.item)
-                //$("#id_varietalId").text(ui.item.id)
-            }
-    });*/
      $("#searchItem").on('keyup',function(){
-      var that = this,
+          var that = this,
           value = $(this).val();
           if (value.length >= minlength ) {
             //if (searchRequest != null){
@@ -258,7 +231,7 @@
             $(nested_active_node).empty()
             subregions = $.map( response.results, function( item ) {
                             //console.log(Boolean(item.with_subterroir))
-                            return '<li id="'+item.id+'" class="tree-item">'+(item.with_subterroir == "True" ?'<i class="fas fa-angle-right rotate wr-is-clickable"></i>':'')+'<span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a href="#" class="click-region-name"><small>'+item.name+'</small></a></span></span><ul class="nested"></ul></li>'
+                            return '<li id="'+item.id+'" class="tree-item">'+(item.with_subterroir == "True" ?'<i class="fas fa-angle-right rotate wr-is-clickable"></i>':'')+'<span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a id="'+item.id+'" href="#" class="click-region-name"><small>'+item.name+'</small></a></span></span><ul class="nested"></ul></li>'
                           });
             $(nested_active_node).append(subregions)
           }
@@ -266,7 +239,8 @@
      $(document).on('click', '.click-region-name', function(event, action){
             event.preventDefault();
             //let terroirid = $(this)[0].parentNode.parentNode.parentNode.id
-            let terroirid = $(this)[0].id;
+            let terroirid =$(this).attr('id');
+            console.log($(this))
             $('div #terroir-list').empty()
             $.ajax({
                 url: "/wine/inventory/terroir/"+terroirid+"/",
@@ -280,63 +254,28 @@
                 //$("#search-region-w-ac").bind("autocomplete", hidden);
                 console.log("bind done!")
             }
-
-            /*
-            let region_array = Array();
-            let data = JSON.stringify({id: $(this)[0].parentNode.parentNode.parentNode.id})
-            let name = $(this)[0].parentNode.parentNode.parentNode;
-            console.log('Data: '  + data)
-            function GetParentName(nodename){
-                if ($(nodename)[0].parentNode.parentNode.parentNode.parentNode.parentNode.id != ""){   
-                    region_array.push($(nodename)[0].innerText)
-                    new_nodename = $(nodename)[0].parentNode.parentNode.parentNode.parentNode.parentNode;
-                    GetParentName($(new_nodename).find('.click-region-name')[0])
-                }
-                else
-                    region_array.push($(nodename)[0].innerText)
-
-            }
-            if ($("[name=child-terroirs")[0] != undefined)
-                $("[name=child-terroirs")[0].remove()
-
-            $.ajax({
-                    type: action == "action-remove" ? "DELETE": "POST",
-                    url: "wine/inventory/terroir/2/",
-                    data: data,
-                    contentType: "application/json; charset=utf-8", 
-                    async: false,
-                    headers:{"X-CSRFToken": csrftoken},
-                    success: function successCallback(response){
-                        divholder = $("#region-form")[0].parentNode
-                        $("#region-form").remove()
-                        divholder.append($(response).find('#region-form')[0])
-                        GetParentName($(name).find('.click-region-name')[0])
-                        $('#region-path-info').html(region_array.reverse().join(" > "))
-                        
-                        console.log("??" + $("#traverse").val())
-                        //GetRegions(64173)
-                        dropdowntext = $("#traverse").val()
-                        if($("#traverse").val() == "None")
-                            GetRegions($("#terroirid").val())
-
-                        $("#id_region").empty()
-                        $("#id_region").append("<option value='"+$("#terroirid").val()+"' selected>"+dropdowntext+"</option>"); // + "["+start+"]")
-
-                        vineyards = $(response).filter('[name=child-terroirs]')  
-                        if( $(vineyards)[0] != undefined)                
-                            divholder.append($(vineyards)[0])
-                        
-                    },
-                    error: function (textStatus, errorThrown) {
-                         console.log("error")
-                         console.log(textStatus)
-                         console.log(errorThrown)
-                    }
-                });
-                function successCallback(response) {
-                    console.log("Done!")
-                }*/
         });
+     $(document).on('click','#update-terroir',function(event){
+        var selected = [];
+        //parentterroir__name
+        $.map($('input[name=terroirCheck]:checked'), function(input){
+            selected.push({id:$(input).attr('id'),parentterroir:new_parentterroir})
+        });
+        $.ajax({
+                type: "PATCH",
+                url: "/api/terroir/",
+                data: JSON.stringify(selected),
+                contentType: "application/json; charset=utf-8", 
+                headers:{"X-CSRFToken": csrftoken},
+                dataType: "json",
+                success: function(data){
+                    alert("done!");
+                },
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+        });
+     });
      $(document).on('show.bs.modal','#RelocateTerroirModal', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         //var recipient = button.data('whatever') // Extract info from data-* attributes
