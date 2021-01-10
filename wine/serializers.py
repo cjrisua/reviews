@@ -1,4 +1,4 @@
-from .models import (Producer, Wine, Critic, 
+from .models import (Producer, Wine, Critic,
                     Market, Review, Terroir, Country, Varietal,
                     MasterVarietal, VarietalBlend)
 from rest_framework import serializers
@@ -7,6 +7,7 @@ from .documents.wine import WineDocument
 from .documents.producer import ProducerDocument
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework.response import Response
+
 
 class WineDocumentSerializer(DocumentSerializer):
     class Meta:
@@ -19,6 +20,8 @@ class WineDocumentSerializer(DocumentSerializer):
             'varietal',
             'terroir',
         )
+
+
 class ProducerDocumentSerializer(DocumentSerializer):
 
     class Meta:
@@ -29,30 +32,54 @@ class ProducerDocumentSerializer(DocumentSerializer):
             'wine',
             'vintage',
         )
+
+
 class MasterVarietalSerializer(serializers.ModelSerializer):
         class Meta:
             model = MasterVarietal
-            fields = ['id','name','slug']
-            lookup_field ='slug'
+            fields = ['id', 'name', 'slug']
+            lookup_field = 'slug'
+
 
 class VarietalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Varietal
-        fields = ['id','name','slug']
-        lookup_field ='slug'
+        fields = ['id', 'name', 'slug']
+        lookup_field = 'slug'
+
 
 class VarietalBlendSerializer(serializers.ModelSerializer):
     #mastervarietal_id = serializers.PrimaryKeyRelatedField(source='mastervarietal', read_only=True)
     class Meta:
         model = VarietalBlend
-        fields = ['id','mastervarietal','varietal']
-        lookup_field ='id'
+        fields = ['id', 'mastervarietal', 'varietal']
+        lookup_field = 'id'
+
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ['id','name','abbreviation','slug','productionrank']
-        lookup_field ='slug'
+        fields = ['id', 'name', 'abbreviation', 'slug', 'productionrank']
+        lookup_field = 'slug'
+
+
+class TerroirListSerializer(serializers.ListSerializer):
+      def update(self, instance, validated_data):
+        terroir_mapping = {terroir.id: terroir for terroir in instance}
+        data_mapping = {item['id']: item for item in validated_data}
+        # Perform creations and updates.
+        ret = []
+        for terroir_id, data in data_mapping.items():
+            book = terroir_mapping.get(terroir_id, None)
+            if book is None:
+                ret.append(self.child.create(data))
+            else:
+                ret.append(self.child.update(book, data))
+        # Perform deletions.
+        for terroir_id, terroir in data_mapping.items():
+            if terroir_id not in data_mapping:
+                terroir.delete()
+        return ret
 
 class TerroirSerializer(serializers.ModelSerializer):
     country_name = serializers.StringRelatedField(source='country',read_only=True)
@@ -61,18 +88,14 @@ class TerroirSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terroir
         fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country','traverse','with_subterroir']
-        #lookup_field = 'slug'
+        list_serializer_class = TerroirListSerializer
 
     def create(self, validated_data):
          terroir, created = Terroir.objects.get_or_create(**validated_data)
          return terroir
     
     def update(self, instance, validated_data):
-        print(self.context['request'].data)
         print(validated_data)
-        #if self.context['request'].method == "PUT":
-        #   pass
-        #elif self.context['request'].method == "PATCH":
         instance.name = validated_data.get('name', instance.name)
         instance.isvineyard = validated_data.get('isvineyard', instance.isvineyard)
         instance.isappellation = validated_data.get('isappellation', instance.isappellation)

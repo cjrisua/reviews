@@ -445,19 +445,22 @@ class TerroirViewSet(viewsets.ModelViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def get_queryset(self):
-    #    print("???")
-        queryset = Terroir.objects.all()
-        country = self.request.query_params.get('country', None)
-        name = self.request.query_params.get('name', None)
-        parentterroir = self.request.query_params.get('parentterroir', None)
-        recursive = self.request.query_params.get('recursive', None)
-        if country is not None:
-            queryset = queryset.filter(country__slug=slugify(country))
-        if name is not None:
-            queryset = queryset.filter(slug=slugify(name))
-        if parentterroir is not None:
-            queryset = queryset.filter(parentterroir__id=parentterroir)
+    def get_queryset(self, ids=None):
+        queryset = None
+        if ids:
+            queryset  = Terroir.objects.filter(id__in=ids)
+        else:
+            queryset = Terroir.objects.all()
+            country = self.request.query_params.get('country', None)
+            name = self.request.query_params.get('name', None)
+            parentterroir = self.request.query_params.get('parentterroir', None)
+            recursive = self.request.query_params.get('recursive', None)
+            if country is not None:
+                queryset = queryset.filter(country__slug=slugify(country))
+            if name is not None:
+                queryset = queryset.filter(slug=slugify(name))
+            if parentterroir is not None:
+                queryset = queryset.filter(parentterroir__id=parentterroir)
         return queryset
     def update(self):
         print("update")
@@ -469,8 +472,8 @@ class TerroirViewSet(viewsets.ModelViewSet):
         
     def patch(self, request):
          many = isinstance(request.data, list)
-         print (request.data, many)
-         serializer = TerroirSerializer(data=request.data,many=many, partial=True)
+         instances = self.get_queryset(ids=[terroir['id'] for terroir in request.data])
+         serializer = TerroirSerializer(instances, data=request.data,many=many, partial=False)
          if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
