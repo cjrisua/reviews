@@ -102,7 +102,10 @@ class TerroirSerializer(serializers.ModelSerializer):
         instance.isvineyard = validated_data.get('isvineyard', instance.isvineyard)
         instance.isappellation = validated_data.get('isappellation', instance.isappellation)
         instance.parentterroir = validated_data.get('parentterroir', instance.parentterroir)
-        instance.save()
+        try:
+            instance.save()
+        except Exception as inst:
+            print(inst)
         return instance
     
     def delete(self, instance):

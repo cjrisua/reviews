@@ -1,7 +1,7 @@
 <div class="pagination">
     <span class="step-links">
         {% if inventory_object.has_previous %}          
-            <a href="?page={{ inventory_object.previous_page_number }}">previous</a>
+            <a {% if id %}id="{{id}}"{%endif%} class="paginatior previous" href="/wine/inventory/{{section}}/?page={{ inventory_object.previous_page_number }}">previous</a>
         {% endif %}
 
         <span class="current">
@@ -9,7 +9,7 @@
         </span>
 
         {% if inventory_object.has_next %}
-            <a href="/wine/inventory/{{section}}/?page={{ inventory_object.next_page_number }}">next</a>
+            <a {% if id %}id="{{id}}"{%endif%} class="paginatior next" href="/wine/inventory/{{section}}/?page={{ inventory_object.next_page_number }}">next</a>
         {% endif %}
     </span>
 </div

@@ -77,6 +77,26 @@
         if(!$('#customCheckAll').is(':checked'))
            shownoshow($(this))
      });
+     $(document).on('click', '.action-button-link.delete',function(){
+        var selected = [];
+        $.map($('input[name=terroirCheck]:checked'), function(input){
+            selected.push({id:$(input).attr('id')})
+        });
+        $.ajax({
+                type: "DELETE",
+                url: "/api/terroir/",
+                data: JSON.stringify(selected),
+                contentType: "application/json; charset=utf-8", 
+                headers:{"X-CSRFToken": csrftoken},
+                dataType: "json",
+                success: function(data){
+                    alert("done!");
+                },
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+        });
+     });
      $(document).on("keyup.autocomplete","#search-region-w-ac", function(){
         $(this).autocomplete({
             appendTo: ".modal-body",
@@ -142,13 +162,14 @@
             var data = event.originalEvent.dataTransfer.getData("text");
             event.target.parentNode.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data))
             //event.target.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data));
-            data = JSON.stringify({parentterroir: $(this)[0].parentNode.parentNode.id})
-            console.log(data)
+            var selected = []
+            selected.push({id:parseInt(selected_node), parentterroir: parseInt($(this)[0].parentNode.parentNode.id)})
+            console.log(selected)
             
             $.ajax({
                     type: "PATCH",
-                    url: "/api/terroir/"+selected_node+"/",
-                    data: data,
+                    url: "/api/terroir/",
+                    data: JSON.stringify(selected),
                     contentType: "application/json; charset=utf-8", 
                     headers:{"X-CSRFToken": csrftoken},
                     dataType: "json",
@@ -211,15 +232,18 @@
         if ($(this).hasClass("down")){
             $(nested_active_node).removeClass('d-none')
             $(parent_content).find('i').removeClass('rotate-bottle')
-            $.ajax({
-                url: "/api/terroir/",
-                type: 'get',
-                dataType: "json",
-                data: {
-                  parentterroir: $(this)[0].parentNode.id
-                },
-                success: successCallback
-            });
+            parentterroir_id=$(this)[0].parentNode.id
+            if(parentterroir_id != undefined && parentterroir_id != ""){
+                $.ajax({
+                    url: "/api/terroir/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                    parentterroir: parentterroir_id
+                    },
+                    success: successCallback
+                });
+            }
         }
         else{
           $(nested_active_node).addClass('d-none')
@@ -230,31 +254,53 @@
                 $(nested_active_node).addClass('active')
             $(nested_active_node).empty()
             subregions = $.map( response.results, function( item ) {
-                            //console.log(Boolean(item.with_subterroir))
+                            console.log(Slugify.get(item.country_name))
                             return '<li id="'+item.id+'" class="tree-item">'+(item.with_subterroir == "True" ?'<i class="fas fa-angle-right rotate wr-is-clickable"></i>':'')+'<span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a id="'+item.id+'" href="#" class="click-region-name"><small>'+item.name+'</small></a></span></span><ul class="nested"></ul></li>'
                           });
             $(nested_active_node).append(subregions)
           }
      });
-     $(document).on('click', '.click-region-name', function(event, action){
-            event.preventDefault();
-            //let terroirid = $(this)[0].parentNode.parentNode.parentNode.id
-            let terroirid =$(this).attr('id');
-            console.log($(this))
-            $('div #terroir-list').empty()
-            $.ajax({
-                url: "/wine/inventory/terroir/"+terroirid+"/",
-                type: 'get',
-                success: successCallback
-            });
-            function successCallback(response) {
-                $('div #terroir-list').html($(response).html())
-                $(".terroir-action").bind("transitionend", hidden);
-                $(".terroir-action-show").bind("transitionend", hidden);
-                //$("#search-region-w-ac").bind("autocomplete", hidden);
-                console.log("bind done!")
-            }
+     $(document).on('click','#region-nav',function(event,action){
+        event.preventDefault();
+
+        $('div #terroir-list').empty()
+        $.ajax({
+            url: $(this).attr('href'),
+            type: 'get',
+            success: successCallback
         });
+        function successCallback(response) {
+            $('div #terroir-list').html($(response).html())
+            $(".terroir-action").bind("transitionend", hidden);
+            $(".terroir-action-show").bind("transitionend", hidden);
+            console.log('bind!')
+        }
+     });
+     $(document).on('click', '.click-region-name,.click-region-country', function(event, action){
+        event.preventDefault();
+        if($(this).hasClass("iscountry")){
+            console.log("country")
+        }
+
+        let url="/wine/inventory/terroir/"
+        if($(this).hasClass("click-region-country"))
+            url+=Slugify.get($(this).text())+"/";
+        if($(this).hasClass("click-region-name"))
+            url+=$(this).attr('id')+"/";
+
+        $('div #terroir-list').empty()
+        $.ajax({
+            url: url,
+            type: 'get',
+            success: successCallback
+        });
+        function successCallback(response) {
+            $('div #terroir-list').html($(response).html())
+            $(".terroir-action").bind("transitionend", hidden);
+            $(".terroir-action-show").bind("transitionend", hidden);
+            console.log('bind!')
+        }
+     });
      $(document).on('click','#update-terroir',function(event){
         var selected = [];
         //parentterroir__name

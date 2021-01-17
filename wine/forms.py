@@ -1,9 +1,10 @@
 from django import forms
-from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer
+from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer, Country
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.utils.text import slugify
-
+from django.core.exceptions import ValidationError
+import django.shortcuts 
 class VarietalBlendForm(forms.Form):
     name = forms.CharField(label='Master Varietal Name',
                            widget= forms.TextInput(attrs={'placeholder':'Master Varietal...',
@@ -40,36 +41,87 @@ class VarietalBlendForm(forms.Form):
         for v in varietal:
             vblend.varietal.add(Varietal.objects.get(pk=v))
 
-class TerroirField(forms.ChoiceField):
+class BaseChoiceField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
-            super(TerroirField, self).__init__(*args, **kwargs)
-            #self.error_messages = {"required":"Please select a gender, it's required"}
-            #self.choices = ((None,'Select gender'),('M','Male'),('F','Female'))
-            self.choices = ((None,'-------'),)
+            super(BaseChoiceField, self).__init__(*args, **kwargs)
+            self.choices = [(None,'-------'),]
             self.required = False
 
-class TerroirForm(forms.ModelForm):
-    #region = TerroirField()
-    class Meta:
-        model = Terroir
-        exclude = ['slug']
-        labels = {
-            'name' : _('Terroir Name'),
-            'parentterroir' : _('Regions'),
-            'isappellation' : _('Appelation?'),
-            'isvineyard' : _('Vineyard?')
-        }
+class TerroirForm(forms.Form):
+    country = BaseChoiceField(label='Country Name',required=True)
+    region_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
 
-#class WineRegisterForm(forms.ModelForm):
-#    class Meta:
-#        model = Wine
-#        fields = ('producer','terroir','varietal','name','wtype',)
-#        labels = {
-#            'wtype' : _('Wine Type'),
-#            'isappellation' : _('Appelation?'),
-#            'isvineyard' : _('Vineyard?')
-#        }
+    region = forms.CharField(label='Region Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Region name',
+                                                          'aria-label': 'Region name'}
+                                                         ),required=False)
+    name = forms.CharField(label='Terroir Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Terroir name',
+                                                          'aria-label': 'Terroir name'}
+                                                         ),required=True)
+    isappellation = forms.BooleanField(label='Is an Appellation', required=False)
+    isvineyard = forms.BooleanField(label='Is a Vineyard', required=False)
 
+    def __init__(self, *args, **kwargs):
+        super(TerroirForm, self).__init__(*args, **kwargs)
+        choice_init = self.fields['country'].choices
+        if self.initial.get('country',None):
+            choice_init.extend([(x[0],x[1]) for x in self.initial['country']])
+        self.fields['country'].choices = choice_init
+        if self.initial.get('choice_initial_id',None):
+            self.fields['country'].choices.pop(0)
+            index = self.fields['country'].choices.index(self.initial['choice_initial_id'])
+            self.fields['country'].choices = self.fields['country'].choices[index:] + self.fields['country'].choices[:index]
+    def clean_country(self):
+        return Country.objects.get(pk=self.cleaned_data['country'])
+    def clean_region_hidden(self):
+        if self.cleaned_data['region_hidden'] == '':
+         return self.initial.get('region_hidden')
+        return self.cleaned_data['region_hidden']
+    def clean_region(self):
+        if self.cleaned_data['region'] == '':
+            return None
+        else:
+            terroir = Terroir.objects.get(pk=self.cleaned_data['region_hidden'])
+            if terroir:
+                return terroir
+            else:
+                 raise ValidationError("Region not found!")
+    def clean_name(self):
+        data = self.cleaned_data['name']
+        country = None
+        if self.cleaned_data.get('country',None):
+            country = self.cleaned_data['country']
+        else:
+            country = Country.objects.get(pk=self.data['country'])
+
+        exists = Terroir.objects.filter(
+                        slug=slugify(self.cleaned_data['name']), 
+                        country=country,
+                        parentterroir=self.cleaned_data['region']).exists()
+        if exists and self.cleaned_data['region'] != self.initial['region']:
+            raise ValidationError(f"Terroir {data} already exists")
+        return data
+    def save(self,**kwargs):
+        obj, created = Terroir.objects.update_or_create(
+            id=self.initial.get('id',None),
+            defaults={
+                        'country': self.cleaned_data['country'],
+                        'parentterroir':self.cleaned_data['region'],
+                        'name':self.cleaned_data['name'],
+                        'isappellation':self.cleaned_data['isappellation'],
+                        'isvineyard':self.cleaned_data['isvineyard']
+                    }
+        )
+    #class Meta:
+    #    model = Terroir
+    #    exclude = ['slug']
+    #    labels = {
+    #        'name' : _('Terroir Name'),
+    #        'parentterroir' : _('Regions'),
+    #        'isappellation' : _('Appelation?'),
+    #        'isvineyard' : _('Vineyard?')
+    #   }
 class WineMarketForm(forms.Form):
 
     vintage = forms.CharField(label='Vintage',

@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load wine_tags %}
+{% block title %}Update {{section|title}} {% endblock %}
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=section %}
+    {% terroir_treeview %}
+{% endblock %}
+
+
 {%block content %}
 <form action="" method="post">
     {% csrf_token %}

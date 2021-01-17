@@ -8,6 +8,10 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration { display: none; }
 
+
+.custom-control-input{
+  z-index: 1000;
+}
 .modal-body{
   position:unset !important;
 }

@@ -25,20 +25,24 @@
     </div>
   {% if terroir %}
   <div>
-    <h3>{{terroir.name}}</h3>
+    <h3><a id="{{terroir.id}}" href="{{terroir.slug}}" class="{% if iscountry == True %}click-region-country{%else%}click-region-name{%endif%}">{{terroir.name}}</a>{% if iscountry == False %}<small class="pl-2"><a href="{% url 'wine:inventory_terroir_update' terroir.id %}" class="text-muted h5"><i class="fas fa-edit"></i></a></small>{%endif%}</h3>
     <h6 class="text-muted">
+      {% if not terroir.parentterroir and not iscountry %}
+        <a id="{{terroir.id}}" href="#" class="click-region-country"><span class="text-muted">{{terroir.country.name}}</span></a>
+      {%endif%}
       {% for region in terroir.related_regions %}
         <a id="{{region.id}}" href="#" class="click-region-name"><span class="text-muted">{{region.name}}</span></a> {% if forloop.last %}{%else%}>{%endif%}
       {% endfor %}
     </h6>
     <p></p>
   </div>
+  
   {%endif%}
   {% for model in inventory_object %}
   {% if forloop.first %}
   <div class="d-flex flex-row bd-highlight mb-1">
     <div class="bd-highlight terroir-action"><span class="keep-tag-together"><a href="#" class="action-button-link" data-toggle="modal" data-target="#RelocateTerroirModal">Move Terroir</a></span></div>
-    <div class="bd-highlight terroir-action"><span class="keep-tag-together"><a href="#" class="action-button-link">Delete Terroir</a></span></div>
+    <div class="bd-highlight terroir-action"><span class="keep-tag-together"><a href="#" class="action-button-link delete">Delete Terroir</a></span></div>
   </div>
   <table class="table table-bordered">
     <thead>
@@ -52,6 +56,7 @@
         <th>Name</th>
         <th>Country</th>
         <th>Full Terroir</th>
+        <th>Count</th>
       </tr>
     </thead>
     <tbody>
@@ -66,11 +71,26 @@
         <td><a id="{{model.id}}" href="#" class="click-region-name">{{ model.name }}</a></td>
         <td>{{ model.country }}</td>
         <td>{{ model.id|region_traverse }}</td>
+        <td>{{ model.id|child_count }}</td>
       </tr>
       {% if forloop.last %}
     </tbody>
   </table>
-  {% include "../pagination.html" with inventory_object=inventory_object %}
+    {% if terroir %}
+       {% if iscountry %}
+          {% with 'terroir/'|add:terroir.slug as section %}
+          {% include "../pagination.html" with id="region-nav" inventory_object=inventory_object section=section%}
+          {% endwith %}
+       {% else %}
+          {% with terroir.id|stringformat:'i' as terroirid %}
+            {% with 'terroir/'|add:terroirid as section %}
+            {% include "../pagination.html" with id="region-nav" inventory_object=inventory_object section=section%}
+            {% endwith %}
+          {% endwith %}
+          {% endif %}
+    {% else %}
+      {% include "../pagination.html" with inventory_object=inventory_object %}
+    {% endif %}
   {% endif %}
   {%empty%}
   There are no {{section|title}}s yet.

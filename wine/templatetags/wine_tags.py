@@ -3,6 +3,10 @@ from wine.models import Terroir
 
 register = template.Library()
 
+@register.filter(name='child_count')
+def region_traverse(value):
+    return Terroir.objects.filter(parentterroir_id=value).count()
+
 @register.filter(name='region_traverse')
 def region_traverse(value):
     return get_terroirs(Terroir.objects.filter(pk=value)[0])

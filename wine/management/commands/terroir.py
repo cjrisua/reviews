@@ -13,8 +13,7 @@ class Command(BaseCommand):
 
         print(f"Dataset Size {df_terroir.shape[0]}")
         for name, group in df_terroir.groupby('country'):
-            if name != 'France':
-                continue
+            print(name)
             #producer, created = Producer.objects.get_or_create(slug=slugify(name), defaults={'name': name})
             has_alias = next(filter(lambda x: slugify(name) in [slugify(f) for f in x.values()][0], countryAlias),None)
             country_name = name if has_alias is None else list(has_alias.keys())[0]
@@ -24,7 +23,7 @@ class Command(BaseCommand):
                                 'productionrank':pd_country.Rank.values[0], 
                                 'abbreviation':pd_country.Alpha3.values[0]})
             parentname = None
-            for item in group[group['region']=='Burgundy'].iloc():
+            for item in group[group['region'] !='Burgundy'].iloc():
                 region_list = item[2:6].values.tolist()
                 terroir = None
                 for name in region_list:

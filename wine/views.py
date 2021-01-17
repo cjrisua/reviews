@@ -73,39 +73,6 @@ sidebar_inventory=[
     {'id':'varietalblend','name':'Varietal'}
 ]
 
-@login_required
-def inventory(request,section):
-    #print(f"->{section}")
-    Model = apps.get_model('wine', section)
-
-    #filters
-    name = request.GET.get('name', None)
-    if name is not None:
-        inventory_object = Model.objects.filter(name__icontains=name)
-    else:
-        inventory_object = Model.objects.all()
-   
-    #page
-    page = request.GET.get('page', 1)
-    paginator = Paginator(inventory_object, 50)
-
-    try:
-        inventory_object = paginator.page(page)
-    except PageNotAnInteger:
-        inventory_object = paginator.page(1)
-    except EmptyPage:
-        inventory_object = paginator.page(paginator.num_pages)
-
-    return render(request, f'wine/{section}/list.html', 
-        {   'section' : section,
-            'inventory_object': inventory_object,
-            'columns' : [field.name for field in Model._meta.fields if field.name != 'id'],
-            'inventory' : [{'name' : [s['name'] for s in sidebar_inventory if s.get('id') == section][0],
-                    'count':  Model.objects.count(),
-                    'section': section,
-                    'search' : 'ON'
-                    }]
-        })
 
 class Dashboard(View):
     @method_decorator(login_required)
@@ -200,15 +167,6 @@ class ProducerCreateView(SuccessMessageMixin, CreateView):
         return render(request, 'wine/varietalblend/create.html', {'form': form})
 
 class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
-    #template_name = 'wine/varietalblend/create.html'
-    #form_class = VarietalBlendForm
-    #success_message = "%(name)s was created successfully"
-
-    #def __str__(self):
-    #    return self.title
-
-    #def get_absolute_url(self):
-    #    return reverse('books:detail', args=[self.id])
     def get(self, request, *args, **kwargs):
         context = {'form': VarietalBlendForm()}
         return render(request, 'wine/varietalblend/create.html', context)
@@ -234,14 +192,75 @@ class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+class TerroirUpdateView(SuccessMessageMixin, UpdateView):
+    success_message = "%(name)s was updated successfully"
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+
+        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
+        terroir = Terroir.objects.get(pk=self.kwargs['pk'])
+        initial={
+            'id' : self.kwargs['pk'],
+            'country' : country_init,
+            'name' : terroir.name,
+            'region' : terroir.parentterroir,
+            'isappellation': terroir.isappellation,
+            'isvineyard' : terroir.isvineyard,
+            'region_hidden' : terroir.parentterroir.id,
+            'choice_initial_id' : (terroir.country.id, terroir.country.name)
+        }
+        context = {'form': TerroirForm(request.POST, initial=initial)}
+        if context['form'].is_valid():
+            context['form'].save()
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        else:
+             messages.add_message(request, messages.ERROR, 'Something went wrong!')
+        return render(request, 'wine/terroir/update.html', context)
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
+        terroir = Terroir.objects.get(pk=self.kwargs['pk'])
+        initial={
+            'country' : country_init,
+            'name' : terroir.name,
+            'region' : terroir.parentterroir,
+            'isappellation': terroir.isappellation,
+            'isvineyard' : terroir.isvineyard,
+            'choice_initial_id' : (terroir.country.id, terroir.country.name)
+        }
+        context = {'form': TerroirForm(initial=initial)}
+        return render(request, 'wine/terroir/update.html', context)
+
 class TerroriCreateView(SuccessMessageMixin, CreateView):
-    template_name = 'wine/terroir/create.html'
-    form_class = TerroirForm
+    #template_name = 'wine/terroir/create.html'
+    #form_class = TerroirForm
     success_message = "%(name)s was created successfully"
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        
+        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
+        
+        context = {'form': TerroirForm(request.POST, initial={'country':country_init})}
+        if context['form'].is_valid():
+            context['form'].save()
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        else:
+             messages.add_message(request, messages.ERROR, 'Something went wrong!')
+        return render(request, 'wine/terroir/create.html', context)
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
+        context = {'form': TerroirForm(initial={'country':country_init})}
+        return render(request, 'wine/terroir/create.html', context)
 
 def terrori_detail(request, **kwargs):
     #print("???")
@@ -408,31 +427,86 @@ class CountryViewSet(viewsets.ModelViewSet):
     serializer_class = CountrySerializer
     lookup_field = ('slug')
 
+@login_required
+def inventory(request,section):
+    #print(f"->{section}")
+    Model = apps.get_model('wine', section)
+    #filters
+    name = request.GET.get('name', None)
+    if name is not None:
+        inventory_object = Model.objects.filter(name__icontains=name)
+    else:
+        inventory_object = Model.objects.all()
+    #page
+    page = request.GET.get('page', 1)
+    paginator = Paginator(inventory_object, 10)
+
+    try:
+        inventory_object = paginator.page(page)
+    except PageNotAnInteger:
+        inventory_object = paginator.page(1)
+    except EmptyPage:
+        inventory_object = paginator.page(paginator.num_pages)
+
+    return render(request, f'wine/{section}/list.html', 
+        {   'section' : section,
+            'inventory_object': inventory_object,
+            'columns' : [field.name for field in Model._meta.fields if field.name != 'id'],
+            'inventory' : [{'name' : [s['name'] for s in sidebar_inventory if s.get('id') == section][0],
+                    'count':  Model.objects.count(),
+                    'section': section,
+                    'search' : 'ON'
+                    }]
+        })
+
 class TerroirListViewSet(ListView):
     template_name = 'wine/terroir/terroir_list.html'
     #context_object_name = 'inventory_object'
-    #paginate_by = 1000
+    paginate_by = 75
     
     def get_queryset(self):
-        terroir = Terroir.objects.filter(parentterroir=self.kwargs['pk']) 
-        page = self.request.GET.get('page', 1)
-        paginator = Paginator(terroir, 50)
+        self.terroir = None
+        pk_id = self.kwargs.get('pk',None)
+        country_slug = self.kwargs.get('country',None)
+        if country_slug and pk_id:
+            self.terroir  = Terroir.objects.filter(country__slug=country_slug, parentterroir=pk_id)
+        elif country_slug:
+            self.terroir  = Terroir.objects.filter(country__slug=country_slug, parentterroir=None)
+        else:
+            self.terroir  = Terroir.objects.filter(parentterroir=pk_id)
 
-        try:
-            self.terroir = paginator.page(page)
-        except PageNotAnInteger:
-            self.terroir = paginator.page(1)
-        except EmptyPage:
-            self.terroir = paginator.page(paginator.num_pages)
         return self.terroir
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
+        context = {}
+        try:
+            context = super().get_context_data(**kwargs)
+        except Exception as inst:
+            print("Error")
         # Add in the publisher
-        context['inventory_object'] = self.terroir
-        print(self.kwargs['pk'])
-        context['terroir'] = Terroir.objects.get(id=self.kwargs['pk']) 
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(self.terroir, 75)
+
+        try:
+            paginatorobject = paginator.page(page)
+        except PageNotAnInteger:
+            paginatorobject = paginator.page(1)
+        except EmptyPage:
+            paginatorobject = paginator.page(paginator.num_pages)
+
+        context['inventory_object'] = paginatorobject
+
+        pk_id = self.kwargs.get('pk',None)
+        if pk_id:
+            context['terroir'] = Terroir.objects.get(id=pk_id)
+            context['form'] = TerroirForm()
+            context['iscountry'] = False
+        else:
+            context['terroir'] = {'name':self.terroir.first().country.name,
+                                  'slug':self.terroir.first().country.slug}
+            context['iscountry'] = True
+
         return context
 
 class TerroirViewSet(viewsets.ModelViewSet):
@@ -465,6 +539,15 @@ class TerroirViewSet(viewsets.ModelViewSet):
     def update(self):
         print("update")
         pass
+    
+    def delete(self,request):
+        many = isinstance(request.data, list)
+        instances = self.get_queryset(ids=[terroir['id'] for terroir in request.data])
+        #serializer = TerroirSerializer(instance=instances, data=request.data,many=True, partial=True)
+        #snippet = self.get_object(self.kwargs.get('pk',None))
+        for i in instances:
+            i.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def partial_update(self):
         print("partial_update")
@@ -563,7 +646,7 @@ class WineReviewViewSet(viewsets.ModelViewSet):
 class WineRegions2ListView(ListView):
     template_name = 'wine/region/region_list.html'
     context_object_name = 'regions'
-    paginate_by = 1000
+    paginate_by = 10
     queryset = Terroir.objects.all()
     
 
