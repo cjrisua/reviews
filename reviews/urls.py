@@ -37,7 +37,8 @@ router.register(r'market', wineviews.MarketViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account/', include('account.urls',namespace='account')),
-    path('cellar/', include('cellar.urls', namespace='cellar')),    path('wine/', include('wine.urls', namespace='wine')),
+    path('cellar/', include('cellar.urls', namespace='cellar')),    
+    path('wine/', include('wine.urls', namespace='wine')),
     path('analytics/', include('analytics.urls', namespace='analytics')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/',  include(router.urls)),

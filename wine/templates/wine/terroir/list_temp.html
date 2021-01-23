@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% load wine_tags %}
 {% load crispy_forms_tags %}
-{% block title %}Wine Region {% endblock %}
+{% block title %}Registered {{section|title}} {% endblock %}
 
 {%block sidenavcontent %}
+    
     {% include "../main_sidebar.html" with inventory=inventory section=section %}
     {% terroir_treeview %}
+    
 {% endblock %}
 
 {% block content %}
-    {% include "./terroir_list.html" with inventory=regions section=section %}
+  {% include "./terroir_list.html" with inventory=inventory_object section=section %}
 {% endblock %}
 
 {% block  javascript %}
@@ -126,12 +128,15 @@
             }
         });
      });
-     var keyupFired = false;
-     $("#searchItem").on('keypress',function(){
+     $("#searchItem").on('keyup',function(){
           var that = this,
           value = $(this).val();
           if (value.length >= minlength ) {
-            $('div #terroir-list').empty()
+            //if (searchRequest != null){
+            //    console.log("aborted!")
+            //    searchRequest.abort();
+            //}
+            //searchRequest = 
             $.ajax({
                 type: "GET",
                 url: "/wine/inventory/terroir/",
@@ -144,12 +149,12 @@
                 },
                 dataType: "text",
                 success: function(msg){
-                    //$("#terroir-list").html($(msg).find('#terroir-list').html())
+                    $("#terroir-list").html($(msg).find('#terroir-list')[0].innerHTML)
                     $(".terroir-action").bind("transitionend", hidden);
                     $(".terroir-action-show").bind("transitionend", hidden);
                 }
-            }).done(function(msg){
-                $("#terroir-list").html($(msg).find('#terroir-list').html())
+            }).done(function(){
+               console.log("done!")
             });
           }
      });
@@ -290,7 +295,7 @@
             success: successCallback
         });
         function successCallback(response) {
-            $('div #terroir-list').html($(response).find('#terroir-list').html())
+            $('div #terroir-list').html($(response).html())
             $(".terroir-action").bind("transitionend", hidden);
             $(".terroir-action-show").bind("transitionend", hidden);
             console.log('bind!')
@@ -317,11 +322,6 @@
                 }
         });
      });
-     $(document).on('click','.set-terroir-parent',function(event){
-        event.preventDefault();
-        $('#search-region-w-ac').val($('.terroir-count').attr("name"))
-        console.log($('.terroir-count'))
-     });
      $(document).on('show.bs.modal','#RelocateTerroirModal', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         //var recipient = button.data('whatever') // Extract info from data-* attributes
@@ -330,8 +330,6 @@
         var modal = $(this)
         //modal.find('.modal-title').text('New message to ')
         //modal.find('.modal-body input').val(recipient)
-        modal.find('#region-count').text($('.terroir-count').val())
-        //console.log($('#terroir-count'))
      });
   });
 </script>

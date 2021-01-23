@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework import status
-from .models import (
+from ..models import (
     MasterVarietal, 
     VarietalBlend, 
     Producer,Wine, 
@@ -13,7 +13,7 @@ from .models import (
     Varietal)
 from rest_framework import viewsets
 from django.http import HttpResponse
-from .serializers import (  WineDocumentSerializer, 
+from ..serializers import (  WineDocumentSerializer, 
                             ProducerSerializer, WineSerializer, CriticSerializer, 
                             MarketSerializer, ReviewSerializer, WineReviewSerializer, 
                             TerroirSerializer, CountrySerializer, VarietalSerializer,
@@ -46,13 +46,13 @@ from django_elasticsearch_dsl_drf.filter_backends import (
         SimpleQueryStringSearchFilterBackend,
 )
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-from .documents.wine import WineDocument
-from .documents.producer import ProducerDocument
+from ..documents.wine import WineDocument
+from ..documents.producer import ProducerDocument
 from django.utils.text import slugify
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views import View
-from .forms import TerroirForm,WineRegisterForm,VarietalBlendForm, ProducerForm, WineMarketForm
+from ..forms import TerroirForm,WineRegisterForm,VarietalBlendForm, ProducerForm, WineMarketForm
 import json
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -191,49 +191,6 @@ class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-
-class TerroirUpdateView(SuccessMessageMixin, UpdateView):
-    success_message = "%(name)s was updated successfully"
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-    @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
-
-        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
-        terroir = Terroir.objects.get(pk=self.kwargs['pk'])
-        initial={
-            'id' : self.kwargs['pk'],
-            'country' : country_init,
-            'name' : terroir.name,
-            'region' : terroir.parentterroir,
-            'isappellation': terroir.isappellation,
-            'isvineyard' : terroir.isvineyard,
-            'region_hidden' : terroir.parentterroir.id,
-            'choice_initial_id' : (terroir.country.id, terroir.country.name)
-        }
-        context = {'form': TerroirForm(request.POST, initial=initial)}
-        if context['form'].is_valid():
-            context['form'].save()
-            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
-        else:
-             messages.add_message(request, messages.ERROR, 'Something went wrong!')
-        return render(request, 'wine/terroir/update.html', context)
-
-    @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
-        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
-        terroir = Terroir.objects.get(pk=self.kwargs['pk'])
-        initial={
-            'country' : country_init,
-            'name' : terroir.name,
-            'region' : terroir.parentterroir,
-            'isappellation': terroir.isappellation,
-            'isvineyard' : terroir.isvineyard,
-            'choice_initial_id' : (terroir.country.id, terroir.country.name)
-        }
-        context = {'form': TerroirForm(initial=initial)}
-        return render(request, 'wine/terroir/update.html', context)
 
 class TerroriCreateView(SuccessMessageMixin, CreateView):
     #template_name = 'wine/terroir/create.html'
