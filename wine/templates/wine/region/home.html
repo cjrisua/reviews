@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Region {% endblock %}
+
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=inventory.section %}
+    {% region_treeview %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+    <div class="row justify-content-center">
+      <h4>To Wine Producing Regions</h4>
+    </div>
+    <div class="row justify-content-center">
+      <h4>of The World</h4>
+    </div>
+    <div class="accordion" id="accordionExample">
+      {% for region in regions %}
+      <div class="card">
+        <div class="card-header" id="heading{{ forloop.counter }}">
+          <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+              {{region.country__name}}
+            </button>
+          </h2>
+        </div>
+        <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordionExample">
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <a href="{% url 'wine:region_country' country=region.country__slug %}">Regions: {{region.country_region_count}}</a>
+              </div>
+              <div class="row">
+                Major Grapes: {{region.country_region_count}}
+              </div>
+              <div class="row">
+                Important Regions: {{region.country_region_count}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {%endfor%}
+  </div>
+{% endblock %}
+
+{% block  javascript %}
+
+{% endblock %}

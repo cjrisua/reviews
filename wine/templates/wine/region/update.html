@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load wine_tags %}
+{% block title %}Update {{section|title}} {% endblock %}
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=section %}
+    {% region_treeview %}
+{% endblock %}
+
+
+{%block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{form|crispy}}
+    <a class="mr-4 btn btn-secondary" href="{% url 'wine:region_country' country=form.request.country region=form.request.region %}" role="button">Cancel</a>
+    <button type="submit" id="submitProducer"  class="ml-4 btn btn-dark">Update</button>
+</form>
+{% endblock %}
+{% block javascript %}
+<script>
+    $(document).ready(function() {
+        $('#div_id_name div').addClass('input-group')
+        $('#div_id_name div').append('<div class="input-group-append"><button id="bulkregion" class="btn btn-outline-secondary" type="button">Bulk</button></div>')
+        $('#div_id_bulk').hide()
+        $(document).on("keyup.autocomplete","#id_region", function(){
+            $(this).autocomplete({
+                minLength: 3,
+                source: function( request, response ) {
+                    $.ajax({
+                        url: "/api/region/",
+                        type: 'get',
+                        dataType: "json",
+                        data: {
+                            search: request.term
+                        },
+                        success: function( data ) {
+                            //console.log(data.results)
+                            response( $.map( data.results, function( item ) {
+                                var object = new Object();
+                                object.id = item.id;
+                                object.label = item.name;
+                                object.value = item.name;
+                                return object
+                            }));
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    console.log(ui.item)
+                    new_parentregion = undefined
+                    new_parentregion = ui.item.id
+                    $("#id_region_hidden").val(new_parentregion)
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

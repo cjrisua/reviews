@@ -3,7 +3,7 @@
 
 
 {%block sidenavcontent %}
-    {% include "../main_sidebar.html" with inventory=inventory section=section %}
+    {% include "../main_sidebar.html" with inventory=inventory section=inventory.section%}
 {% endblock %}
 
 {% block content %}
@@ -11,17 +11,17 @@
    
 {% with showonly=7 %}
 <div style="border: 1px solid #ddd;padding:10px;margin-bottom;">
-{% for model in inventory_object %}
-{% if forloop.first == True %}
-  <div class="pb-2 row">
-    <div class="col-sm-6 col-md-7 col-lg-9">
-      <strong>Wine Name</strong>
+{% for model in wines %}
+  {% if forloop.first == True %}
+    <div class="pb-2 row">
+      <div class="col-sm-6 col-md-7 col-lg-9">
+        <strong>Wine Name</strong>
+      </div>
+      <div class="col-auto">
+        <strong>Vintage</strong>
+      </div>
     </div>
-    <div class="col-auto">
-      <strong>Vintage {{showonly}}</strong>
-    </div>
-  </div>
-  {% endif %}
+    {% endif %}
   <div class="tr row">
     <div class="col-sm-6 col-md-7 col-lg-9">
       {{ model }}
@@ -54,11 +54,14 @@
      </div>
     </div>
   </div>
+  {%empty%}
+  {% with inventory|first as item %}
+    There are no {{item.section|title}}s yet.  
+  {%endwith%}
 {% endfor %}
 </div>
-{% include "../pagination.html" with inventory_object=inventory_object %}
-
 {% endwith %}
+{% include "../pagination.html" with page_obj=page_obj %}
 {% endblock %}
 
 {% block  javascript %}

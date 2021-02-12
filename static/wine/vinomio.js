@@ -1,6 +1,10 @@
 
 'use strict';
 
+function toggleSidebarScrollBar()
+{
+    //alert("action")
+};
 class Cookies{
     constructor() {}
     static get(name){

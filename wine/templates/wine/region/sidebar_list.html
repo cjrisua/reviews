@@ -1,0 +1,472 @@
+{% extends "cellar/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block sidenavcontent %}
+<div class="treeview w-20 border canscroll">
+    <h6 class="pt-3 pl-3"><a href="cellar/regions/" class="default-link">Wine? Regions</a></h6>
+    <hr>
+    <ul class="mb-1 pl-3 pb-2 wr-root" style="height: 200px; overflow: auto"> 
+        {% for region in regions %}
+        <li id="{{region.id}}"><i class="fas fa-angle-right rotate wr-is-clickable"></i>
+            <span><i class="far fa-globe ic-w mx-1 draggable" draggable="true"></i>
+                <span class="droppable">
+                    <a href="#" class="click-region-name">{{region.name}}</a>
+                </span>
+            </span>
+            <ul class="nested">
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>   
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $( document ).ready(function() {
+
+        let isroot = false;
+        let selected_node = undefined;
+        const csrftoken = getCookie('csrftoken');
+        $('[data-toggle="tooltip"]').tooltip();
+        // Slugify a string
+        function slugify(str)
+        {
+            str = str.replace(/^\s+|\s+$/g, '');
+
+            // Make the string lowercase
+            str = str.toLowerCase();
+
+            // Remove accents, swap ñ for n, etc
+            var from = "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆÍÌÎÏŇÑÓÖÒÔÕØŘŔŠŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇíìîïňñóöòôõøðřŕšťúůüùûýÿžþÞĐđßÆa·/_,:;";
+            var to   = "AAAAAACCCDEEEEEEEEIIIINNOOOOOORRSTUUUUUYYZaaaaaacccdeeeeeeeeiiiinnooooooorrstuuuuuyyzbBDdBAa------";
+            for (var i=0, l=from.length ; i<l ; i++) {
+                str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+            }
+
+            // Remove invalid chars
+            str = str.replace(/[^a-z0-9 -]/g, '') 
+            // Collapse whitespace and replace by -
+            .replace(/\s+/g, '-') 
+            // Collapse dashes
+            .replace(/-+/g, '-'); 
+
+            return str;
+        }
+        /* TODO */
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function GetRegions(id)
+        {
+            $.ajax({
+                    url: $('head base').attr('href') + "api/region/?parentregion="+id,
+                    //url: $('head base').attr('href') + "api/region/"+id,
+                    dataType: 'JSON',
+                    success: function successCallback(response){
+                        $('#id_region').find('option').remove().end()
+                        .append('<option value="'+id+'">Self</option>')
+                        response['results'].forEach(function(item){
+                            $('#id_region')
+                            .append('<option value="'+item['id']+'">'+item['name']+'</option>')
+                        });
+                        //$('#id_region').val( id )
+                    },
+                    error: function (textStatus, errorThrown) {
+                        console.log(textStatus)
+                    }
+                });
+
+        }
+        function GetValue(dict,name){
+            let dicvalue;
+            try {
+                dict.forEach((item) =>{
+                    if (item.name == name){
+                        dicvalue = item.value
+                        throw BreakException;
+                    }   
+                });
+            }
+            catch (e) {}
+            return dicvalue;
+        }
+        $('.treeview').mdbTreeview();
+        $(document).on('submit','#region-form',function(e){
+            e.preventDefault();
+            url = $(this).attr('action')
+            serialized_dat = $(this).serializeArray()
+            serialized_dat = serialized_dat.filter(function(item){
+                        return item['name'] == 'name' || 
+                               item['name'] == 'country' ||
+                               item['name'] == 'isvineyard' ||
+                               item['name'] == 'isappellation' ||
+                               item['name'] == 'region'
+                    });
+            data =  JSON.stringify(
+                {
+                    name: GetValue(serialized_dat,'name'),
+                    parentregion: GetValue(serialized_dat,'region'),
+                    isappellation: GetValue(serialized_dat,'isappellation')  =='on' ? true : false,
+                    isvineyard: GetValue(serialized_dat,'isvineyard') ? true : false,
+                    country: GetValue(serialized_dat,'country')
+                }
+            ); 
+            //alert("Update Successfully" + data)
+            
+            $.ajax({
+                    type: "POST",
+                    url: $('head base').attr('href') + "api/region/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    async: false,
+                    headers:{"X-CSRFToken": csrftoken},
+                    success: function successCallback(response){
+                        //$(document).find("#region-form").replaceWith($(response))
+                        setTimeout(function(){ location.reload(); }, 000);
+                    },
+                    error: function (textStatus, errorThrown) {
+                         console.log("error")
+                         console.log(textStatus)
+                         console.log(errorThrown)
+                    }
+                });
+        });
+        $('#id_country').on( 'change', function(event){
+            slugifytext = slugify($('option:selected')[0].text);
+            $.ajax({
+                    url: $('head base').attr('href') + "api/region/?name="+slugifytext,
+                    dataType: 'JSON',
+                    success: function successCallback(response){
+                        response['results'].forEach(function(item){
+                            //console.log(item['id']);
+                            GetRegions(item['id'])
+                        });
+                    },
+                    error: function (textStatus, errorThrown) {
+                        console.log(textStatus)
+                    }
+                });
+        });
+        $(document).on( 'click', '.click-vineyard-name', function(event){
+            event.preventDefault();
+            console.log('click-vineyard-name')
+            //alert("call API" + $(this).attr('href'));
+            let region_path = $('#region-path-info')[0].innerHTML;
+            let data = JSON.stringify({id:$(this).attr('href')})
+            if ($("[name=child-regions")[0] != undefined)
+                $("[name=child-regions")[0].remove()
+            $.ajax({
+                    type: "POST",
+                    url: $('head base').attr('href') + "cellar/region/detail/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    async: false,
+                    headers:{"X-CSRFToken": csrftoken},
+                    success: function successCallback(response){
+                        console.log($(response).find("#region-form"))
+                        $(document).find("#region-form").replaceWith($(response).find("#region-form")[0])
+                        $('#region-path-info').html(region_path)
+                        //console.log($("#parrentregionid").val())
+                        //console.log($("#traverse").val().substring(0, $("#traverse").val().lastIndexOf(">")))
+                        $("#id_region").empty()
+                        $("#id_region").append("<option value='"+$("#parrentregionid").val()+"'>"+$("#traverse").val().substring(0, $("#traverse").val().lastIndexOf(">"))+"</option>"); // + "["+start+"]")
+
+                    },
+                    error: function (textStatus, errorThrown) {
+                        alert(textStatus)
+                         console.log(textStatus)
+                         console.log(errorThrown)
+                    }
+                });
+        });
+        /* When user selects a region from the nav region bar
+           then set form with region details
+        */
+        $(document).on( 'click', '.click-region-name', function(event, action){
+            event.preventDefault();
+            console.log('click-region-name: action is ' + action)
+            console.log("traverse" + $("#traverse")[0])
+            let region_array = Array();
+            let data = JSON.stringify({id: $(this)[0].parentNode.parentNode.parentNode.id})
+            let name = $(this)[0].parentNode.parentNode.parentNode;
+            console.log('Data: '  + data)
+            function GetParentName(nodename){
+                if ($(nodename)[0].parentNode.parentNode.parentNode.parentNode.parentNode.id != ""){   
+                    region_array.push($(nodename)[0].innerText)
+                    new_nodename = $(nodename)[0].parentNode.parentNode.parentNode.parentNode.parentNode;
+                    GetParentName($(new_nodename).find('.click-region-name')[0])
+                }
+                else
+                    region_array.push($(nodename)[0].innerText)
+
+            }
+            if ($("[name=child-regions")[0] != undefined)
+                $("[name=child-regions")[0].remove()
+
+            $.ajax({
+                    type: action == "action-remove" ? "DELETE": "POST",
+                    url: $('head base').attr('href') + "cellar/region/detail/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    async: false,
+                    headers:{"X-CSRFToken": csrftoken},
+                    success: function successCallback(response){
+                        divholder = $("#region-form")[0].parentNode
+                        $("#region-form").remove()
+                        divholder.append($(response).find('#region-form')[0])
+                        GetParentName($(name).find('.click-region-name')[0])
+                        $('#region-path-info').html(region_array.reverse().join(" > "))
+                        
+                        console.log("??" + $("#traverse").val())
+                        //GetRegions(64173)
+                        dropdowntext = $("#traverse").val()
+                        if($("#traverse").val() == "None")
+                            GetRegions($("#regionid").val())
+
+                        $("#id_region").empty()
+                        $("#id_region").append("<option value='"+$("#regionid").val()+"' selected>"+dropdowntext+"</option>"); // + "["+start+"]")
+
+                        vineyards = $(response).filter('[name=child-regions]')  
+                        if( $(vineyards)[0] != undefined)                
+                            divholder.append($(vineyards)[0])
+                        
+                    },
+                    error: function (textStatus, errorThrown) {
+                         console.log("error")
+                         console.log(textStatus)
+                         console.log(errorThrown)
+                    }
+                });
+                function successCallback(response) {
+                    console.log("Done!")
+                }
+        });
+        $(document).on('drop','.droppable', function(event){
+            var data = event.originalEvent.dataTransfer.getData("text");
+            event.target.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data));
+            
+            data = JSON.stringify({parentregion: $(this)[0].parentNode.parentNode.id})
+            
+            $.ajax({
+                    type: "PATCH",
+                    url: $('head base').attr('href') + "api/region/"+selected_node+"/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    headers:{"X-CSRFToken": csrftoken},
+                    dataType: "json",
+                    success: successCallback
+                });
+                function successCallback(response) {
+                        console.log("Update Done!")
+                }
+        });
+        $(document).on('dragover','.droppable', function(event){
+            event.preventDefault();
+            let over_id = $(this)[0].parentNode.parentNode.id;
+            console.log(selected_node + " dragged over " + $(this).find('a')[0].innerText +" ["+over_id+"]")
+        });
+        $(document).on('dragstart','.draggable', function(event){
+            selected_node = $(this)[0].parentNode.parentNode.id
+            console.log("dragstart " + selected_node);
+            event.originalEvent.dataTransfer.setData("text",selected_node);
+        });
+        $(document).on('click', '.wr-is-clickable', function(){
+
+            let parent_content = $(this)[0].nextElementSibling
+            let nested_active_node =$($(this)[0].parentNode).find(".nested")[0]
+
+            if (!$(this).hasClass("stage-up") && !$(this).hasClass("stage-down")){
+                if ($(this).hasClass("down"))
+                    $($(this)[0]).addClass("stage-down");
+                else{
+                    $($(this)[0]).addClass("stage-down");
+                    $($(this)[0]).addClass("down");
+                }
+
+            }
+            else{
+                if (!$(this).hasClass("down") && $(this).hasClass("stage-down")){
+                    $($(this)[0]).removeClass("stage-down");
+                    $($(this)[0]).addClass("stage-up");
+                    $(nested_active_node).removeClass('active')
+                }
+                else if ($(this).hasClass("down") && $(this).hasClass("stage-down")){
+                    $($(this)[0]).addClass("stage-up");
+                    $($(this)[0]).removeClass("down");
+                    $($(this)[0]).removeClass("stage-down");
+                    $(nested_active_node).removeClass('active')
+                }
+                else if (!$(this).hasClass("down") && $(this).hasClass("stage-up")){
+                    $($(this)[0]).removeClass("stage-up");
+                    $($(this)[0]).addClass("stage-down");
+                    $($(this)[0]).addClass("down");
+                }
+                else if ($(this).hasClass("down") && $(this).hasClass("stage-up"))
+                {
+                    $($(this)[0]).removeClass("stage-up");
+                    $($(this)[0]).addClass("stage-down");
+                    $(nested_active_node).removeClass('active')
+                }
+                else
+                {
+                    print("????")
+                }
+            }
+            console.log($(this))
+            //let parent_content = $(this)[0].nextElementSibling
+            //let nested_active_node =$($(this)[0].parentNode).find(".nested")[0]
+            if ($(this).hasClass("down")){
+                console.log($('head base').attr('href') + "cellar/regions/"+  $(this)[0].parentNode.id+"/");
+                $.ajax({
+                    url: $('head base').attr('href') + "cellar/regions/"+  $(this)[0].parentNode.id+"/",
+                    context: document.body,
+                    success: successCallback
+                });
+            }
+            function successCallback(response) {
+                //console.log(parent_content)
+                //subregions = $(response).find('.wr-root')[0]
+                //$(response).find('.wr-root')[0].insertAfter($(this)[0].nextElementSibling)
+                //let nested = $('<ul class="nested"/>').insertAfter($(parent_content))
+                let subregions = $(response).find('.wr-root')[0].cloneNode(true)
+                if (!$(nested_active_node).hasClass('active'))
+                    $(nested_active_node).addClass('active')
+                $(nested_active_node).empty()
+                $(nested_active_node).append(subregions.innerHTML)
+                //$(nested).append($(subregions).html())
+            }
+            
+        } );
+        //update-region
+        $(document).on('click','.update-region', function(event){
+            event.preventDefault();
+            data = JSON.stringify({ name: $("#id_name").val(),
+                                    isappellation: $("#id_isappellation").is(":checked"),
+                                    isvineyard: $('#id_isvineyard').is(":checked")});
+            id = $('[name=regionid]')[0].attributes['value'].value;
+            console.log(id)
+            $.ajax({
+                    type: "PATCH",
+                    url: $('head base').attr('href') + "api/region/"+id+"/",
+                    data: data,
+                    contentType: "application/json; charset=utf-8", 
+                    headers:{"X-CSRFToken": csrftoken},
+                    dataType: "json",
+                    success: successCallback
+                });
+                function successCallback(response) {
+                    $("#banner-update").html("<i class='far fa-check-circle pr-2' style='color:green;'>\
+                        </i><span>The region '"+ $("#id_name").val() +"'was changed successfully.</span>")
+                            .show().fadeOut(7500, function() {
+                        $(this).hide();
+                    });
+                }
+
+           
+           //$('#banner-update').delay(1000).fadeOut(500)
+           //$('#banner-update').innerHTML="";
+        });
+        $(document).on('click','.remove-region', function(event){
+            var regionname = $('#id_name')[0].attributes['value'].value
+            $('#exampleModalLongTitle')[0].innerText = "Confirm Removal";
+            $('.modal-region-name')[0].innerText = "Would you like to remove " +regionname +"?"
+        });
+        $(document).on("click",".modal-yes", function(event){
+            event.preventDefault();
+            //console.log($('[name=regionid]')[0])
+            //alert('Remove API region: ' +  $('[name=regionid]')[0].attributes['value'].value + " Parent") 
+            //$(this).modal('toggle');
+            let regionlink = $( "#"+  $('[name=pregionid]')[0].attributes['value'].value).find("a")[0]
+            console.log(regionlink)
+            $(regionlink).trigger( "click", "action-remove" );
+            //alert('Call API2')
+        });
+        $(document).on("click",".region-list-item", function(event){
+            event.preventDefault();
+            $("#subregionModal").modal('hide');
+            country = $("h5 .subregion-title")[0].innerText = $("#id_country option:selected").text()
+            //$('option[value^="'+event.target.id+'").find('option:contains("Aurangabad")').hide(); 
+            if($("option[value^='"+event.target.id+"']")[0] == undefined){
+                let start = 0
+                description = $(event.target.parentNode.parentNode).find('.region-traverse-name')[0].innerText
+                //description_path = description.substring(description.indexOf(event.target.innerText))
+                if ($("#id_region option:selected").text().toLowerCase() == 'self')
+                    start = country.length + 3
+                else
+                    start = description.indexOf($("#id_region option:selected").text())
+                
+                $("#id_region").append("<option value='"+event.target.id+"'>"+description.substring(start)+"</option>"); // + "["+start+"]")
+            }
+            $("#id_region").val(event.target.id);
+        });
+        $(document).on("keyup","#subregion-filter", function() {
+            var value = $(this).val().toLowerCase();
+            $(".region-scroll-list #region-row").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        $(document).on("show.bs.modal","#subregionModal", function(event){
+            //let regionlink = $( "#"+  $('[name=pregionid]')[0].attributes['value'].value).find("a")[0]
+            //event.preventDefault()
+            //$("#modal-preloader").show().delay(5000).fadeOut(100);
+
+            let regionid = $("#id_region option:selected").val();
+            if(regionid != '')
+            {
+                if($("#id_region option:selected").text().toLowerCase() == 'self')
+                    $("h5 .subregion-title")[0].innerText = $("#id_country option:selected").text()
+                else
+                    $("h5 .subregion-title")[0].innerText = $("#id_region option:selected").text()
+
+                $.ajax({
+                    url: $('head base').attr('href') + "cellar/regions/v2/"+ regionid + "/",
+                    context: document.body,
+                    success: function successCallback(response){
+                        console.log('success')
+                        //$('div .modal-body .subregion').remove()
+                        $('div .modal-body.subregion')[0].innerHTML = $(response).find('main')[0].innerHTML
+                        //console.log($(response).find('main')[0].innerHTML)
+                        //$(document).find("#region-form").replaceWith($(response).find("#region-form")[0])
+                        //$('#region-path-info').html(region_path)
+                        
+                        var largest_length = 0;
+                        $('div .region-traverse-name').toArray().forEach(function(element){
+                            if (element.innerText.length > largest_length)
+                                largest_length = element.innerText.length;
+                        });
+                        var totalwidth = 14.5 * largest_length;
+                        console.log(totalwidth)
+                        $('.region-scroll-list').css('width', totalwidth);
+                    },
+                    error: function (textStatus, errorThrown) {
+                        alert(textStatus)
+                         console.log(textStatus)
+                         console.log(errorThrown)
+                    }
+                });
+            }
+            else
+                event.preventDefault()
+
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block content %}
+{% include "./detail.html" %}  
+{% endblock %}

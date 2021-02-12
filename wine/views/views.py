@@ -10,7 +10,8 @@ from ..models import (
     Review, 
     Terroir, 
     Country, 
-    Varietal)
+    Varietal,
+    Region)
 from rest_framework import viewsets
 from django.http import HttpResponse
 from ..serializers import (  WineDocumentSerializer, 
@@ -68,7 +69,7 @@ from rest_framework import filters
 
 sidebar_inventory=[
     {'id':'producer','name':'Producers'},
-    {'id':'terroir','name':'Wine Regions'},
+    {'id':'region','name':'Wine Regions'},
     {'id':'wine','name':'Wines'},
     {'id':'varietalblend','name':'Varietal'}
 ]
@@ -83,9 +84,9 @@ class Dashboard(View):
                     'section': 'producer',
                 },
                 {   
-                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'terroir'][0],
-                    'count':  Terroir.objects.count(),
-                    'section': 'terroir',
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'region'][0],
+                    'count':  Region.objects.count(),
+                    'section': 'region',
                 },
                 {
                     'name' :  [s['name'] for s in sidebar_inventory if s.get('id') == 'wine'][0],
@@ -192,32 +193,6 @@ class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-class TerroriCreateView(SuccessMessageMixin, CreateView):
-    #template_name = 'wine/terroir/create.html'
-    #form_class = TerroirForm
-    success_message = "%(name)s was created successfully"
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
-        
-        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
-        
-        context = {'form': TerroirForm(request.POST, initial={'country':country_init})}
-        if context['form'].is_valid():
-            context['form'].save()
-            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
-        else:
-             messages.add_message(request, messages.ERROR, 'Something went wrong!')
-        return render(request, 'wine/terroir/create.html', context)
-    @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
-        country_init = Terroir.objects.order_by().values_list('country__id','country__name').distinct()
-        context = {'form': TerroirForm(initial={'country':country_init})}
-        return render(request, 'wine/terroir/create.html', context)
 
 def terrori_detail(request, **kwargs):
     #print("???")

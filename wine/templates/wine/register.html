@@ -45,14 +45,14 @@
               console.log(ui.item.id)
             }
         });
-      $("#id_terroirname").autocomplete({
-            api_router: "/api/terroir/",
+      $("#id_regionname").autocomplete({
+            api_router: "/api/region/",
             minLength: 0,
             source: callAPI,
             select: function (event, ui) {
-              $("#id_terroir").text(ui.item.id)
-              $("#id_terroir")[0].innerText = ui.item.id
-              $("#id_terroir").val(ui.item.id)
+              $("#id_region").text(ui.item.id)
+              $("#id_region")[0].innerText = ui.item.id
+              $("#id_region").val(ui.item.id)
             }
         });
       $("#id_varietalname").autocomplete({

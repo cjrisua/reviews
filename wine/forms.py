@@ -1,5 +1,5 @@
 from django import forms
-from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer, Country
+from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer, Country, Region
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.utils.text import slugify
@@ -47,6 +47,122 @@ class BaseChoiceField(forms.ChoiceField):
             self.choices = [(None,'-------'),]
             self.required = False
 
+class RegionForm(forms.Form):
+    country = BaseChoiceField(label='Country Name',required=True)
+    region_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    region = forms.CharField(label='Region Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Region name',
+                                                          'aria-label': 'Region name'}
+                                                         ),required=False)
+    name = forms.CharField(label='Terroir Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Terroir name',
+                                                          'aria-label': 'Terroir name'}
+                                                         ),required=False)
+    bulk = forms.CharField( label='Terroir Bulk Load',
+                            widget=forms.Textarea,
+                            required=False)
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request',None)
+        super(RegionForm, self).__init__(*args, **kwargs)
+        self.pk = None
+        self.result = None
+
+        if self.initial.get('id',None):
+            self.pk = self.initial['id']
+
+        choice_init = self.fields['country'].choices
+
+        if self.initial.get('country',None):
+            choice_init.extend([(x[0],x[1]) for x in self.initial['country']])
+            
+        self.fields['country'].choices = choice_init
+        if self.initial.get('choice_initial_id',None):
+            self.fields['country'].choices.pop(0)
+            item = [f for f in self.fields['country'].choices if f == self.initial['choice_initial_id']][0]
+            index = self.fields['country'].choices.index(item)
+            self.fields['country'].choices = self.fields['country'].choices[index:] + self.fields['country'].choices[:index]
+        
+    def clean_country(self):
+        return Country.objects.get(pk=self.cleaned_data['country'])
+    
+    def clean_region_hidden(self):
+        if self.cleaned_data['region_hidden'] == '':
+         return self.initial.get('region_hidden')
+        return self.cleaned_data['region_hidden']
+    def clean_region(self):
+        if self.cleaned_data['region'] == '':
+            return None
+        else:
+            region = Region.objects.get(pk=self.cleaned_data['region_hidden'])
+            if region:
+                return region
+            else:
+                 raise ValidationError("Region not found!")
+    def clean_name(self):
+        data = self.cleaned_data['name'].strip()
+        country = None
+        if self.cleaned_data.get('country',None):
+            country = self.cleaned_data['country']
+        else:
+            country = Country.objects.get(pk=self.data['country'])
+
+        exists = Region.objects.filter(
+                        slug=slugify(self.cleaned_data['name']), 
+                        country=country,
+                        region=self.cleaned_data['region']).exists()
+        if exists and self.cleaned_data['region'] != self.initial['region']:
+            raise ValidationError(f"Terroir {data} already exists")
+        return data
+    def clean_bulk(self):
+        data = self.cleaned_data['bulk']
+        clean_regions=[]
+        for n in data.split('\r\n'):
+            if str(n).strip() == '':
+                continue 
+            exists = Region.objects.filter(
+                        slug=slugify(n), 
+                        country=self.cleaned_data['country'],
+                        region=self.cleaned_data['region']).exists()
+            if not exists:
+                clean_regions.append(n)
+        return clean_regions
+    def save(self,**kwargs):
+        '''
+        obj, created = Region.objects.update_or_create(
+            id=self.initial.get('id',None),
+            defaults={
+                        'country': self.cleaned_data['country'],
+                        'region':self.cleaned_data['region'],
+                        'name':self.cleaned_data['name'],
+                    }
+        )
+        self.result = obj
+        '''
+        if len(self.cleaned_data['bulk']) > 0:
+            for n in self.cleaned_data['bulk']:
+                obj, created = Region.objects.update_or_create(
+                id=self.initial.get('id',None),
+                defaults={
+                            'country': self.cleaned_data['country'],
+                            'region':self.cleaned_data['region'],
+                            'name':n.strip(),
+                        }
+                )
+                self.result = obj
+        else:
+            obj, created = Region.objects.update_or_create(
+                id=self.initial.get('id',None),
+                defaults={
+                            'country': self.cleaned_data['country'],
+                            'region':self.cleaned_data['region'],
+                            'name':self.cleaned_data['name'],
+                        }
+                )
+            self.result = obj
+
+
+
 class TerroirForm(forms.Form):
     country = BaseChoiceField(label='Country Name',required=True)
     region_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
@@ -61,9 +177,14 @@ class TerroirForm(forms.Form):
                                                          ),required=True)
     isappellation = forms.BooleanField(label='Is an Appellation', required=False)
     isvineyard = forms.BooleanField(label='Is a Vineyard', required=False)
+    isunknown = forms.BooleanField(label='Is Unknown', required=False)
 
     def __init__(self, *args, **kwargs):
         super(TerroirForm, self).__init__(*args, **kwargs)
+        self.pk = None
+        if self.initial.get('id',None):
+            self.pk = self.initial['id']
+
         choice_init = self.fields['country'].choices
         if self.initial.get('country',None):
             choice_init.extend([(x[0],x[1]) for x in self.initial['country']])
@@ -110,7 +231,8 @@ class TerroirForm(forms.Form):
                         'parentterroir':self.cleaned_data['region'],
                         'name':self.cleaned_data['name'],
                         'isappellation':self.cleaned_data['isappellation'],
-                        'isvineyard':self.cleaned_data['isvineyard']
+                        'isvineyard':self.cleaned_data['isvineyard'],
+                        'isunknown':self.cleaned_data['isunknown'],
                     }
         )
     #class Meta:

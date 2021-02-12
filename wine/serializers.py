@@ -1,6 +1,6 @@
 from .models import (Producer, Wine, Critic,
                     Market, Review, Terroir, Country, Varietal,
-                    MasterVarietal, VarietalBlend)
+                    MasterVarietal, VarietalBlend, Region)
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents.wine import WineDocument
@@ -80,6 +80,12 @@ class TerroirListSerializer(serializers.ListSerializer):
             if terroir_id not in data_mapping:
                 terroir.delete()
         return ret
+class RegionSerializer(serializers.ModelSerializer):
+     country_name = serializers.StringRelatedField(source='country',read_only=True)
+     country_slug = serializers.SlugRelatedField(source='country',read_only=True, slug_field='slug')
+     class Meta:
+        model = Region
+        fields = ['id','country','name','region','slug', 'country_name','country_slug']
 
 class TerroirSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -89,7 +95,7 @@ class TerroirSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Terroir
-        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country','traverse','with_subterroir']
+        fields = ['id','name', 'parentterroir', 'isappellation', 'isvineyard','country_name','country','traverse','with_subterroir','isunknown']
         list_serializer_class = TerroirListSerializer
 
     def create(self, validated_data):
@@ -102,6 +108,7 @@ class TerroirSerializer(serializers.ModelSerializer):
         instance.isvineyard = validated_data.get('isvineyard', instance.isvineyard)
         instance.isappellation = validated_data.get('isappellation', instance.isappellation)
         instance.parentterroir = validated_data.get('parentterroir', instance.parentterroir)
+        instance.isunknown = validated_data.get('isunknown', instance.isunknown)
         try:
             instance.save()
         except Exception as inst:

@@ -12,7 +12,7 @@ admin.site.register(ProducerWine)
 
 @admin.register(MasterVarietal)
 class BelndVarietalAdmin(admin.ModelAdmin):
-    list_display = ('id','name','slug',)
+    list_display = ('id','name','slug','type')
     search_fields = ('name',)
 
 @admin.register(VarietalBlend)
@@ -39,7 +39,7 @@ class CountryAdmin(admin.ModelAdmin):
     list_filter = ( 'name',)
     search_fields = ('name',)
 
-
+'''
 @admin.register(Terroir)
 class TerroirAdmin(admin.ModelAdmin):
     list_display = ('name','get_terroirs','isappellation','isvineyard','country')
@@ -65,7 +65,7 @@ class TerroirAdmin(admin.ModelAdmin):
             return self.__terroirs[0]
         else:
             return obj.name
-
+'''
 @admin.register(Review)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ('critic','marketitem','score','issuedate',)
@@ -73,24 +73,23 @@ class CollectionAdmin(admin.ModelAdmin):
 @admin.register(Wine)
 class WineAdmin(admin.ModelAdmin):
     
-
-    list_display = ('producer','name','get_terroirs',)
-    list_filter = ( 'terroir', )
-    search_fields = ('producer', 'name','get_terroirs',)
+    list_display = ('producer','name','get_regions',)
+    list_filter = ( 'region', )
+    search_fields = ('producer', 'name','get_regions',)
 
     def __init__(self, model, admin_site):
         self.__terroirs = []
         super().__init__(model, admin_site)
 
-    def parentterroirs(self, terroir):
-        self.__terroirs.append(terroir.name)
-        if terroir.parentterroir is not None:
-            self.parentterroirs(terroir.parentterroir)
+    def parentregion(self, region):
+        self.__terroirs.append(region.name)
+        if region.region is not None:
+            self.parentregion(region.region)
 
-    def get_terroirs(self, obj):
-        self.__terroirs = []
-        self.parentterroirs(obj.terroir)
-        if len(self.__terroirs) > 1:
-            return " > ".join(self.__terroirs[::-1])
+    def get_regions(self, obj):
+        self.__regions = []
+        self.parentregion(obj.terroir)
+        if len(self.__regions) > 1:
+            return " > ".join(self.__regions[::-1])
         else:
-            return self.__terroirs[0]
+            return self.__regions[0]

@@ -1,0 +1,27 @@
+<div class="treeview ml-3">
+    <h6 class="pt-2 pl-3">World</a></h6>
+    <ul class="mt-0 pl-3 wr-root" style="list-style-type:none;height: 350px; overflow: auto"> 
+        {% regroup regions by country as regions_by_country %}
+        {% for country in regions_by_country %}
+        <li id="{{country.grouper.id}}"><i class="fas fa-angle-right rotate wr-is-clickable"></i>
+            <span><i class="fas fa-globe-europe ic-w mx-1 draggable" draggable="true"></i>
+                <span class="droppable">
+                    <a href="{% url 'wine:region_country' country=country.grouper.slug %}" class="click-region-country"><small>{{country.grouper}}</small></a>
+                </span>
+            </span>
+            <ul class="nested d-none">
+                {% for region in country.list %}
+                <li id="{{region.id}}"><i class="fas fa-angle-right rotate wr-is-clickable"></i>
+                    <span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i>
+                        <span class="droppable">
+                            <a id="{{region.id}}" href="{% url 'wine:region_country' country=region.country.slug region=region.slug %}" class="click-region-name"><small>{{region}}</small></a>
+                        </span>
+                    </span>
+                    <ul class="nested"></ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>   
+</div>

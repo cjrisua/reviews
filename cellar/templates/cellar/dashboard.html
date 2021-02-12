@@ -94,6 +94,7 @@
                     success: function( data ) {
                         wine_items = $.map( data.results, function( item ) {
                           var object = new Object();
+                          object.id = item.id
                           object.producer = item.producer
                           object.wine = item.wine
                           object.vintage = item.vintage;
@@ -103,16 +104,24 @@
                         //Producers
                         producers_matches = [...new Set(wine_items.map(x => x.producer))]
                         producers_list = $.map(producers_matches, function(item){
-                          return {'type':'p','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+item+'</span></a></li>'}
+                          slug = Slugify.get(item)
+                          return {'type':'p','list_item':'<li><a href="/wine/inventory/wine/?producer='+slug+'" class="default-link mr-2"><span class="vinomio-search-item">'+item+'</span></a></li>'}
                         });
-                        wine_matches = [...new Set(wine_items.map(x => x.producer+' '+x.wine))]
-                        console.log(wine_matches)
+                        wine_matches = [...new Set(wine_items.map(x => x.producer+'%'+x.wine))]
+                        //console.log(wine_matches)
                         wine_list = $.map(wine_matches, function(item){
                           vintage = ""
-                          if(/[0-9]{4}/.test(request.term))
-                            vintage = String(request.term).match(/[0-9]{4}/) + " " ;
+                          producer = Slugify.get(item.split("%")[0])
+                          wine = Slugify.get(item.split("%")[1])
+                          //console.log(wine_items[0])
+                          q = "?producer="+slug
+                          q += "&wine="+ wine 
                           
-                          return {'type':'w','list_item':'<li><a class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item+'</span></a></li>'}
+                          if(/[0-9]{4}/.test(request.term)){
+                            vintage = String(request.term).match(/[0-9]{4}/) + " " ;
+                            q += "&vintage="+ vintage 
+                          }
+                          return {'type':'w','list_item':'<li><a href="/wine/inventory/wine/'+q+'" class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item.replace("%"," ")+'</span></a></li>'}
                         });
 
                         $('.search-results').remove()
@@ -137,7 +146,7 @@
             }
         })
        .on('focusout',function() {
-          $('.search-results').remove()
+          //$('.search-results').remove()
           //improvements 
        })
        .on('click', function(){ 

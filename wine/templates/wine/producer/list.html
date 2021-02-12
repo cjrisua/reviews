@@ -5,7 +5,8 @@
     {% include "../main_sidebar.html" with inventory=inventory %}
 {% endblock %}
 {% block content %}
-{% for model in inventory_object %}
+<div id='model-list'>
+{% for producer in producers %}
   {% if forloop.first %}
     <table class="table table-bordered">
         <thead>
@@ -16,14 +17,51 @@
         <tbody>
     {% endif %}
         <tr>
-          <td>{{ model.name }}</td>
+          <td>{{ producer.name }}</td>
         </tr>
     {% if forloop.last %}
         </tbody>
       </table>
-      {% include "../pagination.html" with inventory_object=inventory_object %}
+      {% include "../pagination.html" with page_obj=page_obj %}
     {% endif %}
+</div>
 {%empty%}
-  There are no {{section|title}}s yet.  
+  {% with inventory|first as item %}
+    There are no {{item.section|title}}s yet.  
+  {%endwith%}
 {% endfor %}
+{% endblock %}
+{% block  javascript %}
+<script>
+  $( document ).ready(function() {
+    var redytobeFired = true;
+    var minLength = 3;
+    const csrftoken = Cookies.get('csrftoken');
+
+     $("#searchItem").on('keyup',function(){
+        value = $(this).val();
+        if (value.length >= minLength && redytobeFired) {
+          console.log(value)
+          redytobeFired = false
+          $('div #model-list').empty()
+          $.ajax({
+              type: "GET",
+              url: "/wine/inventory/producer/",
+              dataType: 'JSON',
+              headers:{"X-CSRFToken": csrftoken},
+              data: {'name' : value},
+              dataType: "text",
+              success: function(msg){
+                  $("#model-list").html($(msg).find('#model-list').html())
+                  //$(".terroir-action").bind("transitionend", hidden);
+                  //$(".terroir-action-show").bind("transitionend", hidden);
+              }
+          }).done(function(msg){
+              redytobeFired=true
+              //$("#model-list").html($(msg).find('#tmodel-list').html())
+          });
+        }
+     });
+  });
+</script>
 {% endblock %}

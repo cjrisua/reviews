@@ -29,17 +29,77 @@ class Country(models.Model):
         self.slug = slugify(self.name)
         super(Country, self).save(*args, **kwargs)
 
+class Region(models.Model):
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='countryregion')
+    region = models.ForeignKey('self', related_name='parentregion', on_delete=models.CASCADE, default=None, blank=True, null=True)
+    name = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150)
+
+    class Meta:
+        unique_together = ['country', 'slug', 'region']
+        ordering = ('country','region__id')
+    
+    @property
+    def region_traverse(self): 
+        parent_name = f'{self.country.name}' if self.country is not None else self.country
+        region_names = Region.traverse_region(self, self.region, f'{parent_name} > {self.name}')
+        return self.__traversed_name
+
+    @staticmethod
+    def traverse_region(self, region ,name):
+        if region is not None and region.region is not None:
+            name = Region.traverse_region(self, region.region, f'{region.region.name} > {name}')
+        else:
+           self.__traversed_name = name
+    #@property
+    #def with_subterroir(self):
+    #    return True if Terroir.objects.filter(parentterroir=self.id).exists() else False
+    #
+    #@property
+    #def region_traverse(self): 
+    #    parent_name = f'{self.parentterroir.name}' if self.parentterroir is not None else self.country
+    #    region_names = Terroir.traverse_region(self, self.parentterroir, f'{parent_name} > {self.name}')
+    #    return self.__traversed_name
+    
+    @property
+    def related_regions(self): 
+        hierarchy = []
+        Region.traverseregion(self,hierarchy)
+        hierarchy.reverse()
+        return hierarchy[:-1]
+
+    @staticmethod
+    def traverseregion(self,hierarchy):
+        hierarchy.append(self)
+        if self.region is not None:
+            Region.traverseregion(self.region,hierarchy)
+            
+        
+    def __str__(self):
+        return self.name 
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Region, self).save(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        self.__traversed_name = None
+        self.__hierarchy = []
+        super().__init__(*args, **kwargs)
+
 class Terroir(models.Model):
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_region')
-    parentterroir = models.ForeignKey('self', blank='True', null=True, related_name='subterroir', on_delete=models.CASCADE, default=-1)
+    #country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='country_region')
+    #parentterroir = models.ForeignKey('self', blank='True', null=True, related_name='subterroir', on_delete=models.CASCADE, default=-1)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='regionarea', default=None)
     name = models.CharField(max_length=150)
     isappellation = models.BooleanField(default=False)
     isvineyard = models.BooleanField(default=False)
     slug = models.CharField(max_length=150, blank=False, null=False, default='')
+    isunknown = models.BooleanField(default=False)
     
     class Meta:
-        unique_together = ['country', 'slug', 'parentterroir']
-        ordering = ('country','parentterroir__id','slug')
+        unique_together = ['region','slug']
+        ordering = ('region__region__slug','slug')
 
     @staticmethod
     def traverse_terroir(self, terroir, name):
@@ -87,7 +147,7 @@ class Producer(models.Model):
     slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')
 
     class Meta:
-        ordering = ('-name',)
+        ordering = ('name',)
         
     def __str__(self):
         return self.name
@@ -143,8 +203,36 @@ class Producer(models.Model):
         return wines_results
     '''
 class MasterVarietal(models.Model):
+    SPARKLING_WINE = 'SW'
+    LIGHTBODIED_WHITE_WINE = 'LBW'
+    FULLBODIED_WHITE_WINE = 'FBW'
+    AROMATIC_WHITE_WINE = 'AWW'
+    ROSE_WINE = 'RW'
+    LIGHTBODIED_RED_WINE = 'LBR'
+    MEDIUMBODIED_RED_WINE = 'MBR'
+    FULLBODIED_RED_WINE = 'FBR'
+    DESSERT_WINE = 'DW'
+    NONE = 'NONE'
+
+    WINETYPE = models.TextChoices = (
+        (SPARKLING_WINE, 'Sparkling Wine'),
+        (LIGHTBODIED_WHITE_WINE, 'Light-Bodied White Wine'),
+        (FULLBODIED_WHITE_WINE, 'Full-Bodied White Wine'),
+        (AROMATIC_WHITE_WINE,'Aromatic White Wine'),
+        (ROSE_WINE,'Rosé Wine'),
+        (LIGHTBODIED_RED_WINE,'Light-Bodied Red Wine'),
+        (MEDIUMBODIED_RED_WINE,'Medium-Bodied Red Wine'),
+        (FULLBODIED_RED_WINE,'Full-Bodied Red Wine'),
+        (DESSERT_WINE,'Dessert Wine')
+    )
+
     name = models.CharField(max_length=150, unique=True)
     slug = models.CharField(unique=True, max_length=150, blank=False, null=False, default='')
+    type = models.CharField(
+        max_length=4,
+        choices=WINETYPE,
+        default='NONE'
+    )
 
     class Meta:
         ordering = ('-name',)
@@ -170,53 +258,15 @@ class VarietalBlend(models.Model):
         return f"{self.mastervarietal.name} ({varietalstr})"
         
 class Wine(models.Model):
-    COUNTRY = models.TextChoices = (
-        ('FRA','France'),
-        ('NZL','New Zealand'),
-        ('AUS','Australia'),
-        ('CHL','Chile'),
-        ('ARG','Argentina'),
-        ('USA','United States'),
-        ('PRT','Portugal'),
-        ('ESP','Spain'),
-        ('ITA','Italy'),
-        ('HUN','Hungary'),
-        ('DEU','Germany'),
-        ('AUT','Austria'),
-        ('CAN', 'Canada'),
-        ('ISR','Israel'),
-        ('ZAF', 'South Africa'),
-    )
-    SPARKLING_WINE = 'SW'
-    LIGHTBODIED_WHITE_WINE = 'LBW'
-    FULLBODIED_WHITE_WINE = 'FBW'
-    AROMATIC_WHITE_WINE = 'AWW'
-    ROSE_WINE = 'RW'
-    LIGHTBODIED_RED_WINE = 'LBR'
-    MEDIUMBODIED_RED_WINE = 'MBR'
-    FULLBODIED_RED_WINE = 'FBR'
-    DESSERT_WINE = 'DW'
-    NONE = 'NONE'
-
-    WINETYPE = models.TextChoices = (
-        (SPARKLING_WINE, 'Sparkling Wine'),
-        (LIGHTBODIED_WHITE_WINE, 'Light-Bodied White Wine'),
-        (FULLBODIED_WHITE_WINE, 'Full-Bodied White Wine'),
-        (AROMATIC_WHITE_WINE,'Aromatic White Wine'),
-        (ROSE_WINE,'Rosé Wine'),
-        (LIGHTBODIED_RED_WINE,'Light-Bodied Red Wine'),
-        (MEDIUMBODIED_RED_WINE,'Medium-Bodied Red Wine'),
-        (FULLBODIED_RED_WINE,'Full-Bodied Red Wine'),
-        (DESSERT_WINE,'Dessert Wine')
-    )
+    
     producer = models.ForeignKey(Producer, related_name='wines', on_delete=models.CASCADE)
-    terroir = models.ForeignKey(Terroir, on_delete=models.PROTECT)
+    region = models.ForeignKey(Region, on_delete=models.PROTECT, blank=False)
     varietal = models.ForeignKey(VarietalBlend, on_delete=models.PROTECT, blank=False)
-    name = models.CharField(max_length=150)
-    wtype =  models.CharField(
-        max_length=4,
-        choices=WINETYPE,
-    )
+    name = models.CharField(max_length=256)
+    slug = models.CharField(max_length=256, default='')
+
+    class Meta:
+        indexes = [models.Index(fields=['slug', 'producer'])]
 
     def __str__(self):
         return f"{self.producer} {self.name}"
@@ -232,8 +282,8 @@ class Wine(models.Model):
     @property
     def region_indexing(self):
         print(f'adding region_indexing...pk {self.id}')
-        if self.terroir is not None:
-              return [str(terroirname).strip(" ")  for terroirname in str(self.terroir.region_traverse).split('>')]
+        if self.region is not None:
+              return [str(terroirname).strip(" ")  for terroirname in str(self.region.region_traverse).split('>')]
 
     @property
     def vintages_indexing(self):

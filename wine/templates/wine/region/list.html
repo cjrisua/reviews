@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Region {% endblock %}
+
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=inventory.section %}
+    {% region_treeview %}
+{% endblock %}
+
+{% block content %}
+    {% include "./region_table.html" with inventory=regions section=inventory|first %}
+{% endblock %}
+
+{% block  javascript %}
+<script>
+   function sitckysidebarselector() {
+
+      if($('.bd-sidebar').height() <= $('#region-list').height()){
+        /*$('.bd-sidebar').css("height","calc(100vh - 0rem");*/
+        console.log("small list: " + $('.bd-sidebar').height() +" vs" + $('#region-list').height())
+        /*$('.bd-sidebar').css("height","auto");*/
+      }
+      else{
+        console.log("sidebar is  larger " + $('.bd-sidebar').height() +" vs" + $('#region-list').height())
+      }
+   }
+   function hidden()
+   {
+       region_btn = $("div .region-action-show,.region-action");
+       if($(region_btn).hasClass("region-action-show"))
+          $(region_btn).toArray().forEach(e => e.style.zIndex="0");
+       else
+          $(region_btn).toArray().forEach(e => e.style.zIndex="");
+       
+   }
+   function shownoshow(checkbox){
+        if($(checkbox).is(':checked')){
+            regiondiv = $('div .region-action');
+            $(regiondiv).removeClass("region-action")
+            $(regiondiv).addClass("region-action-show")
+        }
+        else{
+            regiondiv = $('div .region-action-show');
+            $(regiondiv).removeClass("region-action-show")
+            $(regiondiv).addClass("region-action")
+        }
+   }
+   $( document ).ready(function() {
+    let selected_node = undefined;
+     $('.treeview').mdbTreeview();
+     const csrftoken = Cookies.get('csrftoken');
+     var minlength = 3;
+     var searchRequest = null;
+     let new_parentregion = null;
+
+     //var $bdsidebar = $('.bd-sidebar');
+     //$bdsidebar.bind("DOMSubtreeModified", sitckysidebarselector);
+     //var $regionlist = $('#region-list');
+     //$regionlist.bind("DOMSubtreeModified", sitckysidebarselector);
+
+     $(".region-action").bind("transitionend", hidden);
+     $(".region-action-show").bind("transitionend", hidden);
+     //$(document).bind('transitionend', ".region-action", hidden)
+     //$(document).bind('transitionend', ".region-action-show", hidden)
+
+     $(document).on('click','#customCheckAll',function(even){
+        checked = $(this).is(':checked');
+        ($('div .custom-checkbox,.region input')).toArray().forEach(function(i){
+            $(i).prop('checked', checked)
+        });
+        shownoshow($(this))
+     });
+     $(document).on('click','input[name="regionCheck"]',function(even){
+        if(!$('#customCheckAll').is(':checked'))
+           shownoshow($(this))
+     });
+     $(document).on('click', '.action-button-link.delete',function(){
+        var selected = [];
+        $.map($('input[name=regionCheck]:checked'), function(input){
+            selected.push({id:$(input).attr('id')})
+        });
+        $.ajax({
+                type: "DELETE",
+                url: "/api/region/",
+                data: JSON.stringify(selected),
+                contentType: "application/json; charset=utf-8", 
+                headers:{"X-CSRFToken": csrftoken},
+                dataType: "json",
+                success: function(data){
+                    alert("done!");
+                },
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+        });
+     });
+     $(document).on("keyup.autocomplete","#search-region-w-ac", function(){
+        $(this).autocomplete({
+            appendTo: ".modal-body",
+            minLength: 3,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/region/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        //console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                new_parentregion = undefined
+                new_parentregion = ui.item.id
+            }
+        });
+     });
+     var keyupFired = false;
+     var searchItem = function(value) {
+        if(value.trim()== "")
+            return;
+        if(value.length >= minlength ) {
+            $('div #region-list').empty()
+            $.ajax({
+                type: "GET",
+                url: "/wine/inventory/region/",
+                //contentType: "application/json; charset=utf-8", 
+                //async: false,
+                dataType: 'JSON',
+                headers:{"X-CSRFToken": csrftoken},
+                data: {
+                    'name' : value
+                },
+                dataType: "text",
+                success: function(msg){
+                    //$("#region-list").html($(msg).find('#region-list').html())
+                    //$(".region-action").bind("transitionend", hidden);
+                    //$(".region-action-show").bind("transitionend", hidden);
+                }
+            }).done(function(msg){
+                //$(".region-action").bind("transitionend", hidden);
+                //$(".region-action-show").bind("transitionend", hidden);
+                $("#region-list").html($(msg).find('#region-list').html())
+                $(".region-action").bind("transitionend", hidden);
+                $(".region-action-show").bind("transitionend", hidden);
+            });
+        }
+     }
+     $("#searchItem").bind({
+         paste:function(){
+            var self = this;
+            setTimeout(function(e) {
+                console.log("paste")
+                searchItem($(self).val());
+            }, 0);
+         },
+         keypress:function(){
+            console.log("keypress")
+            searchItem($(this).val())
+         },
+         keyup:function(ev){
+            ev = ev || window.event;  // Event object 'ev' 
+            var key = ev.which || ev.keyCode; // Detecting keyCode
+            if(key==8){
+                console.log("keyup")
+                searchItem(value = $(this).val())
+            } 
+         }
+     });
+     $(document).on('drop','.droppable', function(event){
+            var data = event.originalEvent.dataTransfer.getData("text");
+            event.target.parentNode.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data))
+            //event.target.parentNode.parentNode.parentNode.lastElementChild.appendChild(document.getElementById(data));
+            var selected = []
+            selected.push({id:parseInt(selected_node), region: parseInt($(this)[0].parentNode.parentNode.id)})
+            console.log(selected)
+            
+            $.ajax({
+                    type: "PATCH",
+                    url: "/api/region/",
+                    data: JSON.stringify(selected),
+                    contentType: "application/json; charset=utf-8", 
+                    headers:{"X-CSRFToken": csrftoken},
+                    dataType: "json",
+                    success: successCallback
+                });
+                function successCallback(response) {
+                        console.log("Update Done!")
+                }
+        });
+     $(document).on('dragover','.droppable', function(event){
+            event.preventDefault();
+            let over_id = $(this)[0].parentNode.parentNode.id;
+            console.log(selected_node + " dragged over " + $(this).find('a')[0].innerText +" ["+over_id+"]")
+        });
+     $(document).on('dragstart','.draggable', function(event){
+            selected_node = $(this)[0].parentNode.parentNode.id
+            console.log("dragstart " + selected_node);
+            event.originalEvent.dataTransfer.setData("text",selected_node);
+        });
+     $(document).on('click', '.wr-is-clickable', function(){
+        let parent_content = $(this)[0].nextElementSibling
+        let nested_active_node =$($(this)[0].parentNode).find(".nested")[0]
+
+        if (!$(this).hasClass("stage-up") && !$(this).hasClass("stage-down")){
+            if ($(this).hasClass("down"))
+                $($(this)[0]).addClass("stage-down");
+            else{
+                $($(this)[0]).addClass("stage-down");
+                $($(this)[0]).addClass("down");
+            }
+        }
+        else{
+            if (!$(this).hasClass("down") && $(this).hasClass("stage-down")){
+                $($(this)[0]).removeClass("stage-down");
+                $($(this)[0]).addClass("stage-up");
+                $(nested_active_node).removeClass('active')
+            }
+            else if ($(this).hasClass("down") && $(this).hasClass("stage-down")){
+                $($(this)[0]).addClass("stage-up");
+                $($(this)[0]).removeClass("down");
+                $($(this)[0]).removeClass("stage-down");
+                $(nested_active_node).removeClass('active')
+            }
+            else if (!$(this).hasClass("down") && $(this).hasClass("stage-up")){
+                $($(this)[0]).removeClass("stage-up");
+                $($(this)[0]).addClass("stage-down");
+                $($(this)[0]).addClass("down");
+            }
+            else if ($(this).hasClass("down") && $(this).hasClass("stage-up"))
+            {
+                $($(this)[0]).removeClass("stage-up");
+                $($(this)[0]).addClass("stage-down");
+                $(nested_active_node).removeClass('active')
+            }
+            else
+            {
+                print("????")
+            }
+        }
+        if ($(this).hasClass("down")){
+            $(nested_active_node).removeClass('d-none')
+            $(parent_content).find('i').removeClass('rotate-bottle')
+            parentregion_id=$(this)[0].parentNode.id
+            if(parentregion_id != undefined && parentregion_id != ""){
+                $.ajax({
+                    url: "/api/region/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        region: parentregion_id
+                    },
+                    success: successCallback
+                });
+            }
+        }
+        else{
+          $(nested_active_node).addClass('d-none')
+          $(parent_content).find('i').addClass('rotate-bottle')
+        }
+        function successCallback(response) {
+            if (!$(nested_active_node).hasClass('active'))
+                $(nested_active_node).addClass('active')
+            $(nested_active_node).empty()
+            subregions = $.map( response.results, function( item ) {
+                            console.log(Slugify.get(item.country_name))
+                            return '<li id="'+item.id+'" class="tree-item">'+(item.with_subregion == "True" ?'<i class="fas fa-angle-right rotate wr-is-clickable"></i>':'')+'<span><i class="fas fa-wine-bottle rotate-bottle ic-w mx-1 draggable" draggable="true"></i><span class="droppable"><a id="'+item.id+'" href="/wine/inventory/region/'+item.country_slug+'/'+item.slug+'" class="click-region-name"><small>'+item.name+'</small></a></span></span><ul class="nested"></ul></li>'
+                          });
+            $(nested_active_node).append(subregions)
+          }
+     });
+     $(document).on('click','#region-nav',function(event,action){
+        event.preventDefault();
+
+        $('div #region-list').empty()
+        $.ajax({
+            url: $(this).attr('href'),
+            type: 'get',
+            success: successCallback
+        });
+        function successCallback(response) {
+            $('div #region-list').html($(response).find('div #region-list').html())
+            $(".region-action").bind("transitionend", hidden);
+            $(".region-action-show").bind("transitionend", hidden);
+            console.log('region-nav!')
+            $('html, body').animate({ scrollTop: 0 }, 0);
+        }
+     });
+     $()
+     $(document).on('click', '.click-region-name,.click-region-country,.custom-control-input', function(event, action){
+        event.preventDefault();
+        if($(this).hasClass("iscountry")){
+            console.log("country")
+        }
+
+        //let url="/wine/inventory/region/"
+        //if($(this).hasClass("click-region-country"))
+        //    url+=Slugify.get($(this).text())+"/";
+        //if($(this).hasClass("click-region-name"))
+        //    url+=$(this).attr('id')+"/";
+        //if($(this).hasClass("custom-control-input"))
+        //    url=window.location.pathname+"?isunknown="+$("#customSwitch1").is(':checked')
+        url = $(this).attr('href')
+
+        checkbox_state = $("#customSwitch1").is(':checked')
+        $('div #region-list').empty()
+        $.ajax({
+            url: $(this).attr('href'),
+            type: 'get',
+            success: successCallback
+        });
+        function successCallback(response) {
+            history.pushState(null, '', url);    
+            $('div #region-list').html($(response).find('#region-list').html())
+            $(".region-action").bind("transitionend", hidden);
+            $(".region-action-show").bind("transitionend", hidden);
+            $("#customSwitch1").prop('checked', checkbox_state)
+        }
+     });
+     $(document).on('click','#update-region',function(event){
+        var selected = [];
+        //parentregion__name
+        $.map($('input[name=regionCheck]:checked'), function(input){
+            selected.push(
+                {id:$(input).attr('id'),
+                 region:new_parentregion,
+                 isunknown:$("#customSwitch1").is(':checked')
+                })
+        });
+        $.ajax({
+                type: "PATCH",
+                url: "/api/region/",
+                data: JSON.stringify(selected),
+                contentType: "application/json; charset=utf-8", 
+                headers:{"X-CSRFToken": csrftoken},
+                dataType: "json",
+                success: function(data){
+                    alert("done!");
+                },
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+        });
+     });
+     $(document).on('click','.set-region-parent',function(event){
+        event.preventDefault();
+        $('#search-region-w-ac').val($('.region-count').attr("name"))
+        console.log($('.region-count'))
+     });
+     $(document).on('show.bs.modal','#RelocateregionModal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        //var recipient = button.data('whatever') // Extract info from data-* attributes
+        // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+        // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+        var modal = $(this)
+        //modal.find('.modal-title').text('New message to ')
+        //modal.find('.modal-body input').val(recipient)
+        modal.find('#region-count').text($('.region-count').val())
+        //console.log($('#region-count'))
+     });
+  });
+</script>
+ 
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

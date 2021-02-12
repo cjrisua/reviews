@@ -1,8 +1,9 @@
 from django.apps import apps
+from django.views.generic.list import ListView
 
 sidebar_inventory=[
     {'id':'producer','name':'Producers'},
-    {'id':'terroir','name':'Wine Regions'},
+    {'id':'region','name':'Wine Regions'},
     {'id':'wine','name':'Wines'},
     {'id':'varietalblend','name':'Varietal'}
 ]
