@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Region {% endblock %}
+{% load humanize %}
+{%block sidenavcontent %}
+   
+{% endblock %}
+
+{% block content %}
+{% with context.market|first as item %}
+    <p class="h4 mt-2 pt-1 mx-5">{{item.wine.producer.name}}</p>
+    <p class="text-muted mx-5">{{item.wine.name}}</p>
+    <dl class="row mx-5">
+      <dt class="col-1">Score</dt>
+      <dd class="col-11">{{context.score|floatformat:1}}</dd>
+      <dt class="col-1">Country</dt>
+      <dd class="col-11">{{item.wine.region.country}}</dd>
+      <dt class="col-1">Region</dt>
+      <dd class="col-11">{{item.wine.region}}</dd>
+    </dl>
+{%endwith%}
+<div class="accordion mx-5" id="accordionExample">
+    {% regroup context.market by id as grouped %}
+    {% for group in grouped %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{forloop.counter}}">
+            <button class="accordion-button{%if forloop.first%}{%else%} collapsed{%endif%}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
+                <div class="container">
+                  {% with group.list|first as item %}  
+                  <div class="row">
+                        <div class="col-sm">
+                            {{item.wine.name}}
+                        </div>
+                        <div class="col-sm">
+                            {{item.year}}
+                        </div>
+                        <div class="col-sm">
+                          {{item.average_rating|floatformat:0}}
+                      </div>
+                        <div class="col-sm">
+                          ${{item.price}}
+                        </div>
+                    {%endwith%}
+                    </div>
+                </div>
+              </button>
+        </h2>
+        <div id="collapse{{forloop.counter}}" class="accordion-collapse collapse {%if forloop.first%}show{%endif%}" aria-labelledby="heading{{forloop.counter}}" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              {% for t in group.list %}
+              <!--
+              <figcaption class="blockquote-footer">
+                {{t.user_critic}} <cite title="Source Title"></cite>
+              </figcaption>-->
+                <blockquote >
+                  <p><strong>{{t.user_critic}}</strong><span class="text-muted"> {{t.user_score}}  </span><span class="h4 text-muted align-top"><sup> . </sup></span><small class="text-muted">{{t.user_issuedate}}</small></p>
+                  <p >{{t.user_review}}</p>
+                </blockquote>
+                
+                {%endfor%}
+            </div>
+          </div>
+    </div>
+    {%endfor%}
+</div>
+
+{% endblock %}
+
+{% block  javascript %}
+
+{% endblock %}

@@ -1,12 +1,14 @@
 from django.contrib import admin
 from wine.models import (Varietal, Wine, Producer, Market, 
                          Critic, Review, Terroir, Country, MasterVarietal,
-                         VarietalBlend, ProducerWine)
+                         VarietalBlend, ProducerWine, Vintage, VintageRegion)
 
 admin.site.register(Producer)
 admin.site.register(Market)
 admin.site.register(Critic)
 admin.site.register(ProducerWine)
+admin.site.register(Vintage)
+admin.site.register(VintageRegion)
 #admin.site.register(MasterVarietal)
 #admin.site.register(VarietalBlend)
 
@@ -73,9 +75,9 @@ class CollectionAdmin(admin.ModelAdmin):
 @admin.register(Wine)
 class WineAdmin(admin.ModelAdmin):
     
-    list_display = ('producer','name','get_regions',)
+    list_display = ('id', 'producer','name',)
     list_filter = ( 'region', )
-    search_fields = ('producer', 'name','get_regions',)
+    #search_fields = ('producer', 'name','get_regions',)
 
     def __init__(self, model, admin_site):
         self.__terroirs = []
@@ -88,7 +90,7 @@ class WineAdmin(admin.ModelAdmin):
 
     def get_regions(self, obj):
         self.__regions = []
-        self.parentregion(obj.terroir)
+        self.parentregion(obj.region)
         if len(self.__regions) > 1:
             return " > ".join(self.__regions[::-1])
         else:

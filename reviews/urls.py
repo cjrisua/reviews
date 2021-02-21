@@ -33,6 +33,7 @@ router.register(r'mastervarietal', wineviews.MasterVarietalViewSet)
 router.register(r'blendvarietal', wineviews.VarietalBlendViewSet)
 router.register(r'producer', wineviews.ProducerViewSet)
 router.register(r'market', wineviews.MarketViewSet)
+router.register(r'vintageregion', wineviews.VintageRegionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

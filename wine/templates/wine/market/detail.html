@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load wine_tags %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Region {% endblock %}
+
+{%block sidenavcontent %}
+   
+{% endblock %}
+
+{% block content %}
+    <p>{{context.market}}</p>
+    <p>{{context.market.wine.region.id|region_traverse}} > {{context.market.wine.region.name}}</p>
+    {% for r in context.reviews %}
+        <p>{{r.critic.name}}</p>
+        <p>{{r.issuedate}}</p>
+        <p>{{r.score}}</p>
+        <p>{{r.observation}}</p>
+    {%endfor%}
+{% endblock %}
+
+{% block  javascript %}
+
+{% endblock %}

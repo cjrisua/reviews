@@ -8,9 +8,14 @@ import re
 from django.db.models import Count
 from datetime import datetime
 
+def KeywordExists(value):
+    keywords=['Riesling','Pinot Noir','Cabernet Sauvignon','Chardonnay','Sauvignon Blanc','Pinot Grigio','Viognier','Zinfandel','Tempranillo','Malbec','Merlot']
+    result = [f for f in keywords if re.findall(f'(^|\s){f}(\s|$)', value, re.IGNORECASE)]
+    return True if len(result) > 0 else False
 class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
+
         producer = Producer.objects.all()
         print(f"Total producers: {len(producer)}")
         df  = pd.read_csv("winespectator.csv")
@@ -19,14 +24,15 @@ class Command(BaseCommand):
         for name, group in df.groupby('house'):
            producer = Producer.objects.get(slug=slugify(name))
            for row, item in group.iterrows():
-                if not re.search('Cabernet Sauvignon', item.terroir, re.IGNORECASE):
-                        continue
+                if KeywordExists(item.terroir) == False:
+                    print('skip!')
+                    continue
                 #res = any(ele in item['terroir'].lower() for ele in varietal)
                 filter_object = list(filter(lambda a:  a.lower() in item['terroir'].lower(), varietal))
                 #region = Region.objects.filter().exists()
                 fuzzymatches = [ {"id":r.id,"ratio":fuzz.token_set_ratio(item['terroir'],r.name),"name":r.name} for r in Region.objects.filter(country__slug=slugify(item['country']))]
                 matches = sorted(fuzzymatches, key = lambda i: i['ratio'],reverse=True)[:3]
-                #print(f"{matches[0]['name']}")
+                print(f"{item['id']}")
                 region = Region.objects.get(
                     slug=slugify(matches[0]['name']),
                     country__slug=slugify(item['country']))
@@ -52,11 +58,21 @@ class Command(BaseCommand):
                                       'price': amount[0]+'.00' if len(amount) > 0 else + 0.00
                                       })
                     print(f'market {market}')
+                    issuedate = None
+                    print(item['issuedate'])
+                    if "Web" not in item['issuedate']:
+                         if len(re.findall("^[a-zA-Z]+\s[0-9,]+\s[0-9]{4}$",item['issuedate'])) > 0:
+                            issuedate = datetime.strptime(item['issuedate'] , '%b %d, %Y')
+                         else:
+                            issuedate = datetime.strptime(item['issuedate'] , '%d-%b-%y')
+                    else:
+                        issuedate = datetime(int(re.findall(r'[0-9]{4}', item['issuedate'])[0]),1,1)
+
                     review, created = Review.objects.get_or_create(
                         critic=Critic.objects.get(id=1),
                         marketitem=market,
                         defaults={'observation': item['observation'],
-                                  'issuedate': datetime.strptime(item['issuedate'] , '%d-%b-%y'),
+                                  'issuedate': issuedate,
                                   'score':item['score']
                                   })
                     print(f'review {review}')

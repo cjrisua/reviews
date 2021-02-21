@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Wine Vintage{% endblock %}
+{% load wine_tags %}
+{%block sidenavcontent %}
+    {% include "../main_sidebar.html" with inventory=inventory section=inventory.section %}
+{% endblock %}
+{% block content %}
+<div id='model-list'>
+  <div id="accordion">
+{% regroup serializer|dictsortreversed:"year" by year as year_list %}
+{% regroup serializer by country_name as country_list %}
+{% for country in country_list %}
+<div class="card">
+  <div class="card-header" id="headingOne">
+    <h5 class="mb-0">
+      <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        {{country.grouper}}
+      </button>
+    </h5>
+  </div>
+  <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+    <div class="card-body">
+      {% ifchanged country.grouper %}
+      <div class="row">
+      {% for year in year_list%}
+      <div class="col-auto">
+        {{year.grouper}}
+      </div>
+      
+      {%endfor%}
+      </div>
+      {% endifchanged %}
+
+      {% regroup country.list by region_name as region_list %}
+      {% for region in region_list %}
+      <div class="row">
+        {{region.grouper}}
+          {% regroup region.list by varietal.mastervarietal_name as mastervarietal_list %}
+          {% for varietal in mastervarietal_list %}
+          <div class="row px-4">
+            {{varietal.grouper}}
+            {% for vintage in varietal.list %}
+            {{vintage.year}} [{{vintage.score}}]
+            {% endfor %}
+          </div>
+          {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+<!--
+{% for vintage in context %}
+{% with vintage.region.region.all|first as region %}
+{% ifchanged date.date %} 
+<div class="card">
+  <div class="card-header" id="headingOne">
+    <h5 class="mb-0">
+      <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        {{region.country}}
+      </button>
+    </h5>
+  </div>
+
+  <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+    <div class="card-body">
+      Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+    </div>
+  </div>
+</div>
+{% endifchanged %}
+{%endwith%}
+  
+{%empty%}
+  {% with inventory|first as item %}
+    There are no {{item.section|title}}s yet.  
+  {%endwith%}
+{% endfor %}
+-->
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}{{inventory.name}}{% endblock %}
+{% load wine_tags %}
+
+{%block content %}
+<div class="container">
+    <div class="row">
+        <p class="h5 text-muted my-3">Add {{inventory.name}}</p>
+    </div>
+    <div class="mt-3 row">
+        <div class="col-8">
+            <form id="form-vr" action="" method="post">
+                {% csrf_token %}
+                {{form|crispy}}
+                <label for="id_blend" class="requiredField">
+                     Regions<span class="asteriskField">*</span>
+                </label>
+                <div id="regions-info" class="container blending-container border mb-3" style="border-radius: 3px; background-color: white; height: 150px;">
+                </div>
+                <div class="row">
+                    <div class="col-2"><a class="mx-0 btn btn-dark" href="{% url 'wine:vintageregion_list' %}" role="button">Cancel</a></div>
+                    <div class="col-10"><button type="submit" id="submitbutn"  class="mx-2  btn btn-dark">Create</button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    console.log("->"+$('#id_region').text())
+    $('#div_id_region div').addClass('input-group')
+    $('#div_id_region div').append('<div class="input-group-append"><button id="add-region" class="btn btn-outline-secondary" disabled type="button">Add</button></div>')
+
+    $('#form-vr').submit(function(){
+        $("#id_region_hidden")[0].innerText = "";
+        varietal_ids = "";
+        console.log($("div#regions-info div"))
+        $("div#regions-info div").toArray().forEach(function(element){
+            varietal_ids += element.id +",";
+            $("#id_region_hidden")[0].innerText = varietal_ids.slice(0, -1)
+            $("#id_region_hidden").val(varietal_ids.slice(0, -1))
+        })
+    });
+    $('#add-region').click(function(event){           
+        if($("div#regions-info").find("div#"+ $("#id_region_hidden").val()).length > 0){
+           alert("Varietal already blended!")
+        }else{
+            newitem = '<div id="'+ $("#id_region_hidden").val()+'" class="remove-tag"><span class="keep-together"> <a id="' +$("#id_region_hidden")[0].innerText+ '" class="remove-filter" href="#">x</a> <a  class="remove-filter">'+$("#id_region").val()+'</a></span></div>'
+            $("#regions-info").append(newitem)
+        }
+        $('#id_region').val("")
+        $("#add-region").prop("disabled", true);
+    });
+    $(document).on('click','.remove-filter',function(event){
+            event.preventDefault();
+            $(this).parent().parent().remove()
+    });
+    $(document).on("keyup.autocomplete","#id_region", function(){
+        $(this).autocomplete({
+            minLength: 3,
+            source: function( request, response ) {
+                $.ajax({
+                    url: "/api/region/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success: function( data ) {
+                        //console.log(data.results)
+                        response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                console.log(ui.item)
+                new_parentregion = undefined
+                new_parentregion = ui.item.id
+                $("#id_region_hidden").val(new_parentregion)
+                $("#add-region").prop("disabled", false);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

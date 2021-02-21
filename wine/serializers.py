@@ -1,6 +1,6 @@
 from .models import (Producer, Wine, Critic,
                     Market, Review, Terroir, Country, Varietal,
-                    MasterVarietal, VarietalBlend, Region)
+                    Vintage, MasterVarietal, VarietalBlend, Region, VintageRegion)
 from rest_framework import serializers
 from .analytics.wineentities import WineEntities
 from .documents.wine import WineDocument
@@ -50,9 +50,11 @@ class VarietalSerializer(serializers.ModelSerializer):
 
 class VarietalBlendSerializer(serializers.ModelSerializer):
     #mastervarietal_id = serializers.PrimaryKeyRelatedField(source='mastervarietal', read_only=True)
+    mastervarietal_name = serializers.StringRelatedField(source='mastervarietal',read_only=True)
+
     class Meta:
         model = VarietalBlend
-        fields = ['id', 'mastervarietal', 'varietal']
+        fields = ['id', 'mastervarietal', 'varietal','mastervarietal_name']
         lookup_field = 'id'
 
 
@@ -118,6 +120,24 @@ class TerroirSerializer(serializers.ModelSerializer):
     def delete(self, instance):
         print("delete " + instance)
         return instance
+
+class VintageRegionSerializer(serializers.ModelSerializer):
+    region = RegionSerializer(many=True)
+    class Meta:
+        model = VintageRegion
+        fields = ['id','name','slug','region']
+
+class VintageChartSerializer(serializers.ModelSerializer):
+    region = VintageRegionSerializer()
+    varietal = VarietalBlendSerializer()
+    country_name = serializers.StringRelatedField(source='country',read_only=True)
+    region_name = serializers.StringRelatedField(source='region',read_only=True)
+    mastervarietal_name = serializers.StringRelatedField(source='mastervarietal',read_only=True)
+    class Meta:
+        model = Vintage
+        fields = '__all__'
+        ordering=['region_name']
+
 
 class CriticSerializer(serializers.ModelSerializer):
     class Meta:

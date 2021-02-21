@@ -24,7 +24,7 @@
     {% endif %}
   <div class="tr row">
     <div class="col-sm-6 col-md-7 col-lg-9">
-      {{ model }}
+      <a href="{% url 'wine:wine_detail' pk=model.id%}">{{model}}</a>
     </div>
     <div class="col-lg-3 col-sm-1">
       <div class="winelisting">

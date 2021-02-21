@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Vintage Regions{% endblock %}
+{% load wine_tags %}
+{%block sidenavcontent %}
+    {% include "../../main_sidebar.html" with inventory=inventory section=inventory.section %}
+{% endblock %}
+{% block content %}
+<div id='model-list'>
+{% for vintageregion in context %}
+  {% if forloop.first %}
+    <table class="table table-striped table-hover vm-table-list caption-top">
+      <caption>List of Vintage Regions</caption>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Regions</th>
+          </tr>
+        </thead>
+        <tbody>
+    {% endif %}
+        <tr>
+         <td>{{vintageregion.name}}</td>
+         <td>
+          {% for region in vintageregion.region.all %}
+          {{region.id|region_traverse}} > {{region.name}}<br/>
+          {%endfor%}
+         </td>
+        </tr>
+    {% if forloop.last %}
+        </tbody>
+      </table>
+      {% include "../../pagination.html" with page_obj=page_obj %}
+    {% endif %}
+</div>
+{%empty%}
+  {% with inventory|first as item %}
+    There are no {{item.section|title}}s yet.  
+  {%endwith%}
+{% endfor %}
+{% endblock %}

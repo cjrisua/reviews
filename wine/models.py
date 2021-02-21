@@ -394,3 +394,37 @@ class ProducerWine(models.Model):
     def winevintage_indexing(self):
         if self.market is not None:
              return self.market.year
+
+class VintageRegion(models.Model):
+    name = models.CharField(max_length=150)
+    region = models.ManyToManyField(Region)
+    slug = models.CharField(max_length=150)
+    
+    class Meta:
+        unique_together = ['slug']
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        # just check if name or location.name has changed
+        self.slug = slugify(self.name)
+        super(VintageRegion, self).save(*args, **kwargs)
+
+class Vintage(models.Model):
+    year = models.CharField(max_length=4, blank=False)
+    region = models.ForeignKey(VintageRegion, on_delete=models.DO_NOTHING, blank=False)
+    varietal = models.ForeignKey(VarietalBlend, on_delete=models.DO_NOTHING, null=True)
+    score = models.IntegerField(blank=False)
+    
+    @property
+    def region_name(self):
+        return self.region.name
+    @property
+    def country(self):
+        return [f for f in self.region.region.all()][0].country
+    class Meta:
+        unique_together = ['year','region']
+    
+    def __str__(self):
+        return f"{self.year} {self.region.name} {self.varietal}"

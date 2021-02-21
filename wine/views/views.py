@@ -10,7 +10,8 @@ from ..models import (
     Review, 
     Terroir, 
     Country, 
-    Varietal,
+    Varietal,VintageRegion,
+    Vintage,
     Region)
 from rest_framework import viewsets
 from django.http import HttpResponse
@@ -18,7 +19,7 @@ from ..serializers import (  WineDocumentSerializer,
                             ProducerSerializer, WineSerializer, CriticSerializer, 
                             MarketSerializer, ReviewSerializer, WineReviewSerializer, 
                             TerroirSerializer, CountrySerializer, VarietalSerializer,
-                            MasterVarietalSerializer, VarietalBlendSerializer,ProducerDocumentSerializer)
+                            VintageRegionSerializer,MasterVarietalSerializer, VarietalBlendSerializer,ProducerDocumentSerializer)
 from django_elasticsearch_dsl_drf.constants import (
     LOOKUP_FILTER_TERMS,
     LOOKUP_FILTER_RANGE,
@@ -66,14 +67,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from rest_framework import filters
-
-sidebar_inventory=[
-    {'id':'producer','name':'Producers'},
-    {'id':'region','name':'Wine Regions'},
-    {'id':'wine','name':'Wines'},
-    {'id':'varietalblend','name':'Varietal'}
-]
-
+from .viewhelper import sidebar_inventory
 
 class Dashboard(View):
     @method_decorator(login_required)
@@ -97,6 +91,16 @@ class Dashboard(View):
                     'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'varietalblend'][0],
                     'count' : VarietalBlend.objects.count(),
                     'section' : 'varietalblend',
+                },
+                {
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'vintage'][0],
+                    'count' : Vintage.objects.count(),
+                    'section' : 'vintage',
+                },
+                {
+                    'name' : [s['name'] for s in sidebar_inventory if s.get('id') == 'vintageregion'][0],
+                    'count' : VintageRegion.objects.count(),
+                    'section' : 'vintage-region',
                 }
         ]
        
@@ -107,13 +111,13 @@ class WineMarketView(SuccessMessageMixin, CreateView):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         wine = Wine.objects.get(pk=kwargs['wineid'])
-        form = WineMarketForm(initial={'name':wine, 'terroirname':wine.terroir, 'varietalname':wine.varietal})
+        form = WineMarketForm(initial={'name':wine, 'regionname':wine.region, 'varietalname':wine.varietal})
         return render(request,'wine/vintage/create.html', {'form': form,})   
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         wine = Wine.objects.get(pk=kwargs['wineid'])
-        form = WineMarketForm(request.POST, initial={'name':wine, 'terroirname':wine.terroir, 'varietalname':wine.varietal})
+        form = WineMarketForm(request.POST, initial={'name':wine, 'regionname':wine.region, 'varietalname':wine.varietal})
         if form.is_valid():
             form.save(wine=wine)
             messages.success(request, f"blah was created successfully")
@@ -151,21 +155,6 @@ class VarietalBlendUpdateView(SuccessMessageMixin, UpdateView):
     fields = ('mastervarietal','varietal')
     template_name = 'wine/varietalblend/detail.html'
     success_url ="/"
-
-class ProducerCreateView(SuccessMessageMixin, CreateView):
-
-    def get(self, request, *args, **kwargs):
-        context = {'form': ProducerForm()}
-        return render(request, 'wine/producer/create.html', context)
-    def post(self, request, *args, **kwargs):
-        form = ProducerForm(request.POST)
-        if form.is_valid():
-            producer = form.save(commit=False)
-            producer.save()            
-            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
-        else:
-             messages.add_message(request, messages.ERROR, 'Something went wrong!')
-        return render(request, 'wine/varietalblend/create.html', {'form': form})
 
 class VarietalBlendCreateView(SuccessMessageMixin, CreateView):
     def get(self, request, *args, **kwargs):
@@ -517,7 +506,7 @@ class VarietalBlendViewSet(viewsets.ModelViewSet):
     """
     queryset = VarietalBlend.objects.all()
     serializer_class = VarietalBlendSerializer
-    search_fields = ['mastervarietal']
+    search_fields = ['mastervarietal__name']
     filter_backends = (filters.SearchFilter,)
 
     def get_queryset(self):
@@ -555,6 +544,15 @@ class CriticViewSet(viewsets.ModelViewSet):
     """
     queryset = Critic.objects.order_by('-name')
     serializer_class = CriticSerializer
+
+class VintageRegionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows producers to be viewed or edited.
+    """
+    queryset = VintageRegion.objects.order_by('-name')
+    serializer_class = VintageRegionSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['name']
 
 class MarketViewSet(viewsets.ModelViewSet):
     """

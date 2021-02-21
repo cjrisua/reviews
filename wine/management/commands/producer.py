@@ -12,4 +12,4 @@ class Command(BaseCommand):
         print(f"Dataset Size {df.shape[0]}")
         for name, group in df.groupby('house'):
             producer, created = Producer.objects.get_or_create(slug=slugify(name), defaults={'name': name})
-            print(created)
+            #print(created)

@@ -11,32 +11,43 @@
         </div>
     {% endfor %}
 {% endif %}
-<div class=mt-5>
+<div class="mt-5" style="padding-left:1rem;padding-top:1rem;padding-right:1rem;width:100%;">
 {% with inventory|first as item %}
     {% if item.search == "ON" %}
-    <div class="pl-2 pr-2 form-group">
+    <div class="form-group pb-3">
         <input type="search" class="form-control" id="searchItem" placeholder="Search for {{item.section}}">
     </div>
     {% endif %}
 {% endwith %}
-    <div class="card ml-2 border-light" style="width:95%;">
+    <div class="card border-light" >
         <div class="card-header">
             Vinomío Inventory
         </div>
-        <ul class="list-group sidebar-list-group">
+        <ul class="list-group list-group-flush sidebar-list-group">
             {% for item in inventory %}
-                <li class="list-group-item justify-content-between align-items-center nopadding {% if section == item.name %}bg-dark{% endif %}"> 
-                    <div class="row no-gutters">
-                        <div class="col-7">
+                <li class="list-group-item  {% if section == item.name %}bg-dark{% endif %}"> 
+                    <div class="d-flex bd-highlight">
+                        <div class="flex-grow-1 bd-highlight">
+                            <a id="inventory-link" href="/wine/inventory/{{item.section}}" name={{item.section}} class="default-link nopadding">{{item.name}}</a>
+                        </div>
+                        <div class="px-4 bd-highlight">
+                            <small>{{ item.count|intcomma}}</small>
+                        </div>
+                        <div class="px-1 bd-highlight">
+                            <small><a href="/wine/inventory/{{item.section}}/add/">Add</a></small>
+                        </div>
+                    </div>
+                    <!--<div class="row">
+                        <div class="col-5">
                             <a id="inventory-link" href="/wine/inventory/{{item.section}}" name={{item.section}} class="default-link nopadding">{{item.name}}</a>
                         </div>
                         <div class="col-3 text-right">
-                            <span class="badge badge-primary badge-pill">{{ item.count|intcomma }}</span>
+                            <small>{{ item.count|intcomma }}</small>
                         </div>
-                        <div class="col-2 text-right">
-                            <a href="/wine/inventory/{{item.section}}/add/">Add</a>
+                        <div class="col-4 text-right" style="background-color: aqua;">
+                            <small><a href="/wine/inventory/{{item.section}}/add/">Add</a></small>
                         </div>
-                    </div>
+                    </div>-->
                 </li>
             {% endfor %}
         </ul> 

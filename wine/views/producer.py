@@ -11,6 +11,8 @@ from django.views.generic import UpdateView
 from wine.views.viewhelper import getInventory
 from wine.models import Producer
 from os.path import basename,splitext
+from django.views.generic.edit import CreateView
+from wine.forms import ProducerForm
 
 section = splitext(basename(__file__))[0]
 
@@ -30,3 +32,18 @@ class ProducerListView(ListView):
         context = super().get_context_data(**kwargs)
         context['inventory'] = getInventory(section)
         return context
+
+class ProducerCreateView(SuccessMessageMixin, CreateView):
+
+    def get(self, request, *args, **kwargs):
+        context = {'form': ProducerForm()}
+        return render(request, 'wine/producer/create.html', context)
+    def post(self, request, *args, **kwargs):
+        form = ProducerForm(request.POST)
+        if form.is_valid():
+            producer = form.save(commit=False)
+            producer.save()            
+            return HttpResponseRedirect(reverse_lazy('wine:wine_dashboard'))
+        else:
+             messages.add_message(request, messages.ERROR, 'Something went wrong!')
+        return render(request, 'wine/varietalblend/create.html', {'form': form})

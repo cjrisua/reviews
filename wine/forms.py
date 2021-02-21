@@ -1,10 +1,13 @@
 from django import forms
-from .models import Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer, Country, Region
+from .models import VintageRegion, Vintage, Market, Terroir, Wine, VarietalBlend, MasterVarietal,Varietal,Producer, Country, Region
 from django.utils.translation import gettext_lazy as _
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 import django.shortcuts 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Row, Column
+
 class VarietalBlendForm(forms.Form):
     name = forms.CharField(label='Master Varietal Name',
                            widget= forms.TextInput(attrs={'placeholder':'Master Varietal...',
@@ -160,8 +163,97 @@ class RegionForm(forms.Form):
                         }
                 )
             self.result = obj
+class VintageRegionForm(forms.Form):
+    region_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+    
+    name = forms.CharField(label='Terroir Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Vintage Region',
+                                                          'aria-label': 'Vintage Region'}
+                                                         ),required=False)
 
+    region = forms.CharField(label='Region Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Region name',
+                                                          'aria-label': 'Region name'}
+                                                         ),required=False)
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request',None)
+        super(VintageRegionForm, self).__init__(*args, **kwargs) 
+        self.result = None
+        self.helper = FormHelper()
+        self.fields['name'].widget.attrs['class'] = 'form-label'
+        self.helper.layout = Layout(
+            Row(
+                Column('name', css_class='col-md-6 mb-3'),
+                css_class='form-row'
+            ))
+    
+    def clean_name(self):
+        data = self.cleaned_data['name']
+        return data
 
+    def clean_region(self):
+        data = Region.objects.filter(pk__in=str(self.cleaned_data['region_hidden']).split(','))
+        return data
+
+    def save(self,**kwargs):
+        obj, created = VintageRegion.objects.update_or_create(
+                slug = slugify(self.cleaned_data['name']),
+                defaults={
+                        'name': self.cleaned_data['name'],
+                        }
+                )
+        if created:
+            for v in self.cleaned_data['region']:
+                obj.region.add(v)
+        self.result = obj
+   
+class VintageForm(forms.Form):
+    region_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+    varietal_hidden = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    region = forms.CharField(label='Region Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Region name',
+                                                          'aria-label': 'Region name'}
+                                                         ))
+    vintage = forms.CharField(label='Vintage',
+                           widget= forms.TextInput(attrs={'placeholder':'Vintage',
+                                                          'aria-label': 'Vintage'},
+                                                         ))
+    score = forms.CharField(label='Score',
+                           widget= forms.TextInput(attrs={'placeholder':'Score',
+                                                          'aria-label': 'Score'},
+                                                         ))
+    varietal = forms.CharField(label='Varietal Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name'}
+                                                         ),required=False)  
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request',None)
+        super(VintageForm, self).__init__(*args, **kwargs) 
+        self.result = None
+    
+    def clean_region(self):
+        data = VintageRegion.objects.get(pk=self.cleaned_data['region_hidden'])
+        return data
+    def clean_score(self):
+        data = self.cleaned_data['score']
+        return data
+    def clean_vintage(self):
+        data = self.cleaned_data['vintage']
+        return data
+    def clean_varietal(self):
+        data = VarietalBlend.objects.get(pk=self.cleaned_data['varietal_hidden'])
+        return data
+    def save(self,**kwargs):
+        obj, created = Vintage.objects.update_or_create(
+                region = self.cleaned_data['region'],
+                year = self.cleaned_data['vintage'],
+                varietal = self.cleaned_data['varietal'],
+                defaults={
+                        'score': self.cleaned_data['score']
+                        }
+                )
+        self.result = obj
 
 class TerroirForm(forms.Form):
     country = BaseChoiceField(label='Country Name',required=True)
@@ -255,7 +347,7 @@ class WineMarketForm(forms.Form):
                            widget= forms.TextInput(attrs={'placeholder':'Varietal name',
                                                           'aria-label': 'Varietal name',}
                                                          ),required=False) 
-    terroirname = forms.CharField(label='Terroir Name',
+    regionname = forms.CharField(label='Terroir Name',
                            widget= forms.TextInput(attrs={'placeholder':'Terroir name',
                                                           'aria-label': 'Terroir name'}
                                                          ),required=False)
@@ -271,7 +363,7 @@ class WineMarketForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(WineMarketForm, self).__init__(*args, **kwargs)
         self.fields['name'].disabled = True
-        self.fields['terroirname'].disabled = True
+        self.fields['regionname'].disabled = True
         self.fields['varietalname'].disabled = True
 
     def save(self,**kwargs):
@@ -289,9 +381,9 @@ class WineRegisterForm(forms.Form):
                            widget= forms.TextInput(attrs={'placeholder':'Producer name',
                                                           'aria-label': 'Producer name'},
                                                          )) 
-    terroirname = forms.CharField(label='Terroir Name',
-                           widget= forms.TextInput(attrs={'placeholder':'Terroir name',
-                                                          'aria-label': 'Terroir name'},
+    regionname = forms.CharField(label='Region Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Region name',
+                                                          'aria-label': 'Region name'},
                                                          )) 
     varietalname = forms.CharField(label='Primary Varietal Name',
                            widget= forms.TextInput(attrs={'placeholder':'Varietal name',
@@ -301,11 +393,11 @@ class WineRegisterForm(forms.Form):
                            widget= forms.TextInput(attrs={'placeholder':'Varietal name',
                                                           'aria-label': 'Varietal name'},
                                                          ))         
-    winetype = forms.ChoiceField(label='Wine Style')
+    #winetype = forms.ChoiceField(label='Wine Style')
 
     ''' Hidden Fileds '''
     producer = forms.CharField(widget=forms.HiddenInput)
-    terroir = forms.CharField(widget=forms.HiddenInput)
+    region = forms.CharField(widget=forms.HiddenInput)
     varietal = forms.CharField(widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
@@ -313,13 +405,12 @@ class WineRegisterForm(forms.Form):
 
     def save(self):
         producer = Producer.objects.get(pk=self.cleaned_data['producer'])
-        terroir = Terroir.objects.get(pk=self.cleaned_data['terroir'])
+        region = Region.objects.get(pk=self.cleaned_data['region'])
         varietal = VarietalBlend.objects.get(mastervarietal__id=self.cleaned_data['varietal'])
         wine = Wine(producer=producer,
-                    terroir=terroir,
+                    region=region,
                     varietal=varietal,
-                    name=self.cleaned_data['name'],
-                    wtype =self.cleaned_data['winetype'])
+                    name=self.cleaned_data['name'])
         wine.save()
 
         
