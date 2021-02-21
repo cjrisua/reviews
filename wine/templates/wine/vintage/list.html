@@ -21,32 +21,48 @@
   </div>
   <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
     <div class="card-body">
-      {% ifchanged country.grouper %}
-      <div class="row" style="background-color: aqua;">
-        <div class="col-auto"></div>
-        <div class="col-auto"></div>
+      <div class="row" >
+        <div class="col-3" ></div>
         {% for year in year_list%}
-        <div class="col-auto" style="border: 1px dotted;">
+        <div class="col-auto px-2">
           {{year.grouper}}
         </div>
         {%endfor%}
-        {% endifchanged %}
-        <!--
-        {% regroup country.list by region_name as region_list %}
-        {% for region in region_list %}
-        <div class="row" style="border: 1px dotted;">
-          {{region.grouper}}
-            {% regroup region.list by varietal.mastervarietal_name as mastervarietal_list %}
-            {% for varietal in mastervarietal_list %}
-            <div class="row" style="border: 1px dotted;">
-              {{varietal.grouper}}
-              {% for vintage in varietal.list %}
-              {{vintage.year}} [{{vintage.score}}]
-              {% endfor %}
-            </div>
-            {% endfor %}
-        </div>
-        {% endfor %}-->
+      </div>
+      {% regroup country.list by region_name as region_list %}
+      {% for region in region_list %}
+      <div class="row" style="background-color: lightblue;" >
+          <div class="col-2" >
+            {{region.grouper}}
+          </div>
+      </div>
+      {% regroup region.list|dictsortreversed:"year" by varietal.mastervarietal_name as mastervarietal_list %}
+      {% for varietal in mastervarietal_list %}
+      <div class="row" >
+          <div class="col-3">
+            <div class="text-end">{{varietal.grouper}}</div>
+          </div>
+          {%for year in year_list%}
+            <div class="col-auto" >{{year.grouper|is_in:mastervarietal_list}}</div>
+          {%endfor%}
+          <!--
+            {% for year in year_list%}
+              {% if year.grouper == vintage.year %}
+              <div class="col-auto" >{{vintage.year}}</div>
+              {% endif %}
+            {% endfor %}-->
+            <!--
+            {% for vintage in varietal.list %}
+            {% if year.grouper == vintage.year %}
+            <div class="col-auto" >{{vintage.year}}</div>
+            {%else%}
+            <div class="col-auto" >N/A</div>
+            {% endif %}
+
+            {% endfor %}-->
+      </div>
+      {% endfor %}
+      {% endfor %}
     </div>
     </div>
   </div>

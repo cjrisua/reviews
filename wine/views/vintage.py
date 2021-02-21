@@ -52,7 +52,7 @@ class VintageListView(Base):
         context = super().get_context_data(**kwargs)
         #content['vintage_chart'] = context['context'].objects.distinct('region__region__country')
         serializer = VintageChartSerializer(Vintage.objects.all(),many=True)
-        context['serializer'] = sorted(serializer.data, key=lambda x: (x['country_name'],x['region_name']), reverse=False)
+        context['serializer'] = sorted(serializer.data, key=lambda x: (x['country_name'],x['region_name'],x['year']), reverse=False)
         return context
 
 class VintageRegionListView(Base):
