@@ -22,31 +22,32 @@
   <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
     <div class="card-body">
       {% ifchanged country.grouper %}
-      <div class="row">
-      {% for year in year_list%}
-      <div class="col-auto">
-        {{year.grouper}}
-      </div>
-      
-      {%endfor%}
-      </div>
-      {% endifchanged %}
-
-      {% regroup country.list by region_name as region_list %}
-      {% for region in region_list %}
-      <div class="row">
-        {{region.grouper}}
-          {% regroup region.list by varietal.mastervarietal_name as mastervarietal_list %}
-          {% for varietal in mastervarietal_list %}
-          <div class="row px-4">
-            {{varietal.grouper}}
-            {% for vintage in varietal.list %}
-            {{vintage.year}} [{{vintage.score}}]
+      <div class="row" style="background-color: aqua;">
+        <div class="col-auto"></div>
+        <div class="col-auto"></div>
+        {% for year in year_list%}
+        <div class="col-auto" style="border: 1px dotted;">
+          {{year.grouper}}
+        </div>
+        {%endfor%}
+        {% endifchanged %}
+        <!--
+        {% regroup country.list by region_name as region_list %}
+        {% for region in region_list %}
+        <div class="row" style="border: 1px dotted;">
+          {{region.grouper}}
+            {% regroup region.list by varietal.mastervarietal_name as mastervarietal_list %}
+            {% for varietal in mastervarietal_list %}
+            <div class="row" style="border: 1px dotted;">
+              {{varietal.grouper}}
+              {% for vintage in varietal.list %}
+              {{vintage.year}} [{{vintage.score}}]
+              {% endfor %}
+            </div>
             {% endfor %}
-          </div>
-          {% endfor %}
-      </div>
-      {% endfor %}
+        </div>
+        {% endfor %}-->
+    </div>
     </div>
   </div>
 </div>
