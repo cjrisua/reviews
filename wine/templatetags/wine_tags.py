@@ -5,11 +5,13 @@ register = template.Library()
 
 @register.filter(name='is_in')
 def is_in(value,args):
-    result = [{'year':f['year'],'score':f['score']} for x in args for f in x.list if f['year'] == value]
+    year = [k for k in value.split('-')][1]
+    varietal = [k for k in value.split('-')][0]
+    result = [{'year':f['year'],'score':f['score']} for x in args for f in x.list if f['year'] == year and f['varietal']['mastervarietal_name'] == varietal]
     if len(result) > 0:
         return result[0]['score']
     else:
-        return 'N/A'
+        return '0'
 
 @register.filter(name='child_count')
 def region_traverse(value):

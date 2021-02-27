@@ -52,7 +52,7 @@ class VintageListView(Base):
         context = super().get_context_data(**kwargs)
         #content['vintage_chart'] = context['context'].objects.distinct('region__region__country')
         serializer = VintageChartSerializer(Vintage.objects.all(),many=True)
-        context['serializer'] = sorted(serializer.data, key=lambda x: (x['country_name'],x['region_name'],x['year']), reverse=False)
+        context['serializer'] = sorted(serializer.data, key=lambda x: (x['country_name'],x['region_name'],x['varietal']['mastervarietal_name'],x['year']), reverse=False)
         return context
 
 class VintageRegionListView(Base):
@@ -100,7 +100,18 @@ class VintageRegionCreateView(SuccessMessageMixin, CreateView):
 class VintageCreateView(SuccessMessageMixin, CreateView):
 
     def dispatch(self, *args, **kwargs):
-        self.__initial = {}
+        self.__initial = {
+            'vintage': self.kwargs.get('year',None),
+            }
+        if self.kwargs.get('region',None) and self.kwargs.get('grape',None):
+            instance = Vintage.objects.filter(
+                region__slug=self.kwargs['region'], 
+                varietal__mastervarietal__slug=self.kwargs['grape']).first()
+            self.__initial['region'] = instance.region
+            self.__initial['varietal'] = instance.varietal
+            self.__initial['region_hidden'] = instance.region.id
+            self.__initial['varietal_hidden'] = instance.varietal.id
+
         return super().dispatch(*args, **kwargs)
 
     @method_decorator(login_required)

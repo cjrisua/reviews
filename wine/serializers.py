@@ -132,7 +132,7 @@ class VintageChartSerializer(serializers.ModelSerializer):
     varietal = VarietalBlendSerializer()
     country_name = serializers.StringRelatedField(source='country',read_only=True)
     region_name = serializers.StringRelatedField(source='region',read_only=True)
-    mastervarietal_name = serializers.StringRelatedField(source='mastervarietal',read_only=True)
+    varietal_name = serializers.StringRelatedField(source='varietalblend',read_only=True)
     class Meta:
         model = Vintage
         fields = '__all__'

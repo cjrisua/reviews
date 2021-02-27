@@ -40,6 +40,7 @@ urlpatterns = [
     #path(r'inventory/wine/<int:vintage>/', views.register, name='inventory_wine_vintage'),
     path(r'inventory/market/<int:pk>/', views.MarketDetailListView.as_view(), name='market_detail'),
     path(r'inventory/vintage/', views.VintageListView.as_view(), name='vintage_list'),
+    path(r'inventory/vintage/<slug:region>/<slug:grape>/<int:year>/add/', views.VintageCreateView.as_view(), name='vintage_add'),
     path(r'inventory/vintage/add/', views.VintageCreateView.as_view(), name='vintage_add'),
     path(r'inventory/vintage-region/', views.VintageRegionListView.as_view(), name='vintageregion_list'),
     path(r'inventory/vintage-region/add/', views.VintageRegionCreateView.as_view(), name='vintageregion_add'),

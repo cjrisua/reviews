@@ -423,8 +423,11 @@ class Vintage(models.Model):
     @property
     def country(self):
         return [f for f in self.region.region.all()][0].country
+    @property
+    def mastervarietal_name(self):
+        return [f for f in self.region.region.all()][0].country
     class Meta:
-        unique_together = ['year','region']
+        unique_together = ['year','region','varietal']
     
     def __str__(self):
         return f"{self.year} {self.region.name} {self.varietal}"
