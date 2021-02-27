@@ -294,6 +294,9 @@ class Wine(models.Model):
         print(f'adding vintages_indexing...pk {self.id}')
         if self.name is not None:
             return [v.year for v in Market.objects.filter(wine__id=self.id)]
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Wine, self).save(*args, **kwargs)
 
     class Meta:
         unique_together = ['producer', 'name']

@@ -12,12 +12,14 @@
     <p class="h4 mt-2 pt-1 mx-5">{{item.wine.producer.name}}</p>
     <p class="text-muted mx-5">{{item.wine.name}}</p>
     <dl class="row mx-5">
-      <dt class="col-1">Score</dt>
-      <dd class="col-11">{{context.score|floatformat:1}}</dd>
-      <dt class="col-1">Country</dt>
-      <dd class="col-11">{{item.wine.region.country}}</dd>
-      <dt class="col-1">Region</dt>
-      <dd class="col-11">{{item.wine.region}}</dd>
+      <dt class="col-2">Score</dt>
+      <dd class="col-10">{{context.score|floatformat:1}}</dd>
+      <dt class="col-2">Country</dt>
+      <dd class="col-10">{{item.wine.region.country}}</dd>
+      <dt class="col-2">Region</dt>
+      <dd class="col-10">{{item.wine.region}}</dd>
+      <dt class="col-2">Average Price</dt>
+      <dd class="col-10">$0.00</dd>
     </dl>
 {%endwith%}
 <div class="accordion mx-5" id="accordionExample">
