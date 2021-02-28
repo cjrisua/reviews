@@ -17,7 +17,7 @@ def point_scoring(value,args):
     if args == 0:
         return 'VNS'
     else:
-        return f"{'+' if args-value > 0 else '' if args-value < 0 else ''}{int(args-value)}"
+        return f"{'' if args-value > 0 else '+' if args-value < 0 else ''}{int(args-value)}"
 @register.filter(name='vintage_score')
 def vintage_score(value,args):
     score =  0 if not args.filter(year=value).exists() else args.get(year=value).score
