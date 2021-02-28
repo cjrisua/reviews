@@ -14,7 +14,7 @@ from django.db.models import Q, F, Avg
 from wine.views.viewhelper import getInventory
 from os.path import basename,splitext
 
-from wine.models import Wine,Market, Review, Vintage
+from wine.models import Wine,Market, Review, Vintage, Region
 from wine.forms import WineRegisterForm
 from functools import reduce
 
@@ -39,9 +39,29 @@ class WineDetailListView(ListView):
           averages = [s.user_score for s in qs['market'] if s.user_score]
           qs['score'] = 0 if len(averages) == 0 else reduce(lambda a, b: a + b, averages) / len(averages)
           
-          vintagescores = Vintage.objects.filter(region__region__country__slug=qs['market'][0].wine.region.country.slug, 
-                                                 year__in=[y.year for y in qs['market']])
+          query = '''
+             WITH RECURSIVE c AS (
+                SELECT id, 
+                       region_id,
+                       slug
+                FROM wine_region
+                where id =  %s
+                UNION ALL
+                SELECT t.id,
+                        t.region_id,
+                        t.slug
+                FROM wine_region as t
+                INNER JOIN c on c.region_id = t.id
+                )
+                SELECT c.id, c.slug from c;
+            '''
+          parent_regions = Region.objects.raw(query,[qs['market'][0].wine.region.id])
 
+          vintagescores = Vintage.objects.filter(region__region__country__slug=qs['market'][0].wine.region.country.slug, 
+                                                 year__in=[y.year for y in qs['market']],
+                                                 region__region__id__in=[f.id for f in parent_regions],
+                                                 varietal__id=qs['market'][0].wine.varietal_id)
+          qs['vintagescore'] = vintagescores
           return qs
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

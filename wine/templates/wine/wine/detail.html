@@ -12,14 +12,20 @@
     <p class="h4 mt-2 pt-1 mx-5">{{item.wine.producer.name}}</p>
     <p class="text-muted mx-5">{{item.wine.name}}</p>
     <dl class="row mx-5">
-      <dt class="col-2">Score</dt>
-      <dd class="col-10">{{context.score|floatformat:1}}</dd>
-      <dt class="col-2">Country</dt>
-      <dd class="col-10">{{item.wine.region.country}}</dd>
-      <dt class="col-2">Region</dt>
-      <dd class="col-10">{{item.wine.region}}</dd>
-      <dt class="col-2">Average Price</dt>
-      <dd class="col-10">$0.00</dd>
+      <dt class="col-3">Score</dt>
+      <dd class="col-9">{{context.score|floatformat:1}}</dd>
+      <dt class="col-3">Country</dt>
+      <dd class="col-9">{{item.wine.region.country}}</dd>
+      <dt class="col-3">Region</dt>
+      <dd class="col-9">{{item.wine.region}}</dd>
+      <dt class="col-3">Average Price</dt>
+      <dd class="col-9">$0.00</dd>
+      <dt class="col-3">Vintage Region</dt>
+      <dd class="col-9">
+        {%with context.vintagescore|first as vintage%}
+            {{vintage.region}} ({{vintage.varietal.mastervarietal}})
+        {%endwith%}
+      </dd>
     </dl>
 {%endwith%}
 <div class="accordion mx-5" id="accordionExample">
@@ -38,7 +44,9 @@
                             {{item.year}}
                         </div>
                         <div class="col-sm">
-                          {{item.average_rating|floatformat:0}}
+                          {%with item.year|vintage_score:context.vintagescore as vintage_score%}
+                          {{item.average_rating|floatformat:0}} <sup class="text-muted">{{item.average_rating|point_scoring:vintage_score}}</sup>
+                          {%endwith%}
                       </div>
                         <div class="col-sm">
                           ${{item.price}}
