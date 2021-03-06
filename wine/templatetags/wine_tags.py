@@ -13,11 +13,11 @@ def is_in(value,args):
     else:
         return '0'
 @register.filter(name='point_scoring')
-def point_scoring(value,args):
-    if args == 0:
+def point_scoring(value,vintage_score):
+    if vintage_score == 0:
         return 'VNS'
     else:
-        return f"{'+' if args-value > 0 else '-' if args-value < 0 else ''}{int(args-value)}"
+        return f"{'+' if value - vintage_score > 0 else '-' if value - vintage_score < 0 else ''}{abs(int(value - vintage_score))}"
 @register.filter(name='vintage_score')
 def vintage_score(value,args):
     score =  0 if not args.filter(year=value).exists() else args.get(year=value).score

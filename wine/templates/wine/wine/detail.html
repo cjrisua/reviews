@@ -4,7 +4,7 @@
 {% block title %}Wine Region {% endblock %}
 {% load humanize %}
 {%block sidenavcontent %}
-   
+  <canvas class="mt-5" id="mixed-chart" width="800" height="450"></canvas>
 {% endblock %}
 
 {% block content %}
@@ -20,7 +20,7 @@
       <dd class="col-9">{{item.wine.region}}</dd>
       <dt class="col-3">Average Price</dt>
       <dd class="col-9">$0.00</dd>
-      <dt class="col-3">Vintage Region</dt>
+      <dt class="col-3">Vintage Region?</dt>
       <dd class="col-9">
         {%with context.vintagescore|first as vintage%}
             {{vintage.region}} ({{vintage.varietal.mastervarietal}})
@@ -74,9 +74,32 @@
     </div>
     {%endfor%}
 </div>
-
+{{ context.data|json_script:"chart-data" }}
 {% endblock %}
 
 {% block  javascript %}
+<script>
+const data = JSON.parse(document.getElementById('chart-data').textContent);
+
+new Chart(document.getElementById("mixed-chart"), {
+  type: 'bar',
+  data: data,
+  options: {
+    title: {
+      display: true,
+      text: 'Vintage Score'
+    },
+    legend: { display: false },
+    scales: {
+            yAxes: [{
+                ticks: {
+                    suggestedMin: 80,
+                    suggestedMax: 100
+                }
+            }]
+        }
+  }
+});
+</script>
 
 {% endblock %}

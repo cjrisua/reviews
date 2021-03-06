@@ -62,6 +62,40 @@ class WineDetailListView(ListView):
                                                  region__region__id__in=[f.id for f in parent_regions],
                                                  varietal__id=qs['market'][0].wine.varietal_id)
           qs['vintagescore'] = vintagescores
+          market_data = {f.year:f.average_rating for f in qs['market']}
+          vintage = {f.year:f.score for f in qs['vintagescore']}
+          new_data = sorted({**market_data , **vintage}.items(),key=lambda x : {x[0]})
+          qs['data'] = {
+                        'labels': [f[0]  for f in new_data if f[1]],
+                        'datasets': [{
+                            'label': "Wine",
+                            'type': "line",
+                            'borderColor': "#8e5ea2",
+                            'data': [0 if not f[0] in market_data else  market_data[f[0]] for f in new_data if f[1]],
+                            'fill': 'false'
+                            }, 
+                            {
+                            'label': "Vinate",
+                            'type': "line",
+                            'borderColor': "#3e95cd",
+                            'data': [0 if not f[0] in vintage else  vintage[f[0]] for f in new_data if f[1]],
+                            'fill': 'false'
+                            },
+                            {
+                            'label': "Wine",
+                            'type': "bar",
+                            'backgroundColor': "#3377ff",
+                            'data': [0 if not f[0] in market_data else  market_data[f[0]] for f in new_data if f[1]],
+                            }, 
+                            {
+                            'label': "Vinate",
+                            'type': "bar",
+                            'backgroundColor': "rgba(0,0,0,0.2)",
+                            'backgroundColorHover': "#3e95cd",
+                            'data': [0 if not f[0] in vintage else  vintage[f[0]] for f in new_data if f[1]],
+                            }
+                        ]
+                        }
           return qs
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
