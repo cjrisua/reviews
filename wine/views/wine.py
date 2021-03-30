@@ -13,12 +13,38 @@ from django.views.generic.edit import CreateView
 from django.db.models import Q, F, Avg
 from wine.views.viewhelper import getInventory
 from os.path import basename,splitext
-
+from rest_framework import viewsets
+from rest_framework import filters
+from django_elasticsearch_dsl_drf.constants import (
+    LOOKUP_FILTER_TERMS,
+    LOOKUP_FILTER_RANGE,
+    LOOKUP_FILTER_PREFIX,
+    LOOKUP_FILTER_WILDCARD,
+    LOOKUP_QUERY_IN,
+    LOOKUP_QUERY_GT,
+    LOOKUP_QUERY_GTE,
+    LOOKUP_QUERY_LT,
+    LOOKUP_QUERY_LTE,
+    LOOKUP_QUERY_EXCLUDE,
+    SUGGESTER_COMPLETION,
+)
 from wine.models import Wine,Market, Review, Vintage, Region
 from wine.forms import WineRegisterForm
 from functools import reduce
 
+from wine.serializers import WineSerializer
+
 section = splitext(basename(__file__))[0]
+
+class WineViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows producers to be viewed or edited.
+    """
+    queryset = Wine.objects.order_by('-name')
+    serializer_class = WineSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['name', 'producer__name']
+    lookup_field = 'id'
 
 class WineDetailListView(ListView):
     model = Market
@@ -59,8 +85,15 @@ class WineDetailListView(ListView):
 
           vintagescores = Vintage.objects.filter(region__region__country__slug=qs['market'][0].wine.region.country.slug, 
                                                  year__in=[y.year for y in qs['market']],
+                                                 region__region__id__in=[[f.id for f in parent_regions][0]],
+                                                 varietal__id=qs['market'][0].wine.varietal_id)
+          if len(vintagescores) == 0:
+              vintagescores = Vintage.objects.filter(region__region__country__slug=qs['market'][0].wine.region.country.slug, 
+                                                 year__in=[y.year for y in qs['market']],
                                                  region__region__id__in=[f.id for f in parent_regions],
                                                  varietal__id=qs['market'][0].wine.varietal_id)
+          
+
           qs['vintagescore'] = vintagescores
           market_data = {f.year:f.average_rating for f in qs['market']}
           vintage = {f.year:f.score for f in qs['vintagescore']}
@@ -75,7 +108,7 @@ class WineDetailListView(ListView):
                             'fill': 'false'
                             }, 
                             {
-                            'label': "Vinate",
+                            'label': "Vintage",
                             'type': "line",
                             'borderColor': "#3e95cd",
                             'data': [0 if not f[0] in vintage else  vintage[f[0]] for f in new_data if f[1]],
@@ -88,7 +121,7 @@ class WineDetailListView(ListView):
                             'data': [0 if not f[0] in market_data else  market_data[f[0]] for f in new_data if f[1]],
                             }, 
                             {
-                            'label': "Vinate",
+                            'label': "Vintage",
                             'type': "bar",
                             'backgroundColor': "rgba(0,0,0,0.2)",
                             'backgroundColorHover': "#3e95cd",

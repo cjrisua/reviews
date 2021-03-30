@@ -7,30 +7,9 @@
 
 {% block content %}
     <div id="inventory-body" ></div>
+   
 {% endblock %}
 
 {% block  javascript %}
- <!--<script>
-   $( document ).ready(function() {
-       $(document).on( 'click','#inventory-link', function(){
-            event.preventDefault();
-            $(".sidebar-list-group li").removeClass("selected")
-            $(this).parent().addClass("selected")
 
-            $.ajax({
-                url: "/wine/inventory/"+$(this).attr('name')+"/",
-                context: document.body,
-                    success: function successCallback(response){
-                        $("#inventory-body").empty()
-                        $("#inventory-body").append(($(response).find('main.bd-content')[0].innerHTML))
-                    },
-                    error: function (textStatus, errorThrown) {
-                        alert(textStatus)
-                         console.log(textStatus)
-                         console.log(errorThrown)
-                    }
-                });
-       });
-   });
-</script>-->
 {% endblock %}

@@ -69,6 +69,32 @@
    $( document ).ready(function() {
     var showonly = 7
 
+    $("#id_wine_searcher").autocomplete({
+        minLength: 0,
+        source: function( request, response ) {
+          $.ajax({
+                    url: "/api/wine/",
+                    type: 'get',
+                    dataType: "json",
+                    data: {
+                        search: request.term
+                    },
+                    success:function( data ) {
+                      response( $.map( data.results, function( item ) {
+                            var object = new Object();
+                            object.id = item.id;
+                            object.label = item.name;
+                            object.value = item.name;
+                            return object
+                        }));
+                    },
+                    failure: function(errMsg) {console.log("failure")}
+                  });
+        },
+        select: function (event, ui) {
+                console.log("event:" + ui.item.value)
+            }
+     });
      $(".showall").on('click', function(event){
        targetrow = $(this).closest('.winelisting').find('.hideme')
        vintage_cnt = $(targetrow).parent().find('.vintage-tag').length;

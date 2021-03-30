@@ -530,14 +530,6 @@ class ProducerViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ['name']
 
-class WineViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows producers to be viewed or edited.
-    """
-    queryset = Wine.objects.order_by('-name')
-    serializer_class = WineSerializer
-    lookup_field = 'id'
-
 class CriticViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows producers to be viewed or edited.

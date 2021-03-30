@@ -180,7 +180,7 @@ class WineSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Wine
-        fields = ['producer','varietal','terroir','name','id']
+        fields = ['producer','varietal','region','name','id']
 
     #def create(self, validated_data):
     #    wine = Wine.objects.create(**validated_data)

@@ -15,7 +15,7 @@
 {% with inventory|first as item %}
     {% if item.search == "ON" %}
     <div class="form-group pb-3">
-        <input type="search" class="form-control" id="searchItem" placeholder="Search for {{item.section}}">
+        <input type="search" class="form-control" id="id_wine_searcher" placeholder="Search for {{item.section}}">
     </div>
     {% endif %}
 {% endwith %}
