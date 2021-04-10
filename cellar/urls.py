@@ -11,5 +11,6 @@ urlpatterns = [
     path('regions/', wineviews.WineRegionsListView.as_view(), name='wine_region'),
     path('regions/<regionid>/', wineviews.WineRegionsListView.as_view(), name='wine_region_detail'),
     path('regions/v2/<regionid>/', wineviews.WineRegions2ListView.as_view(), name='wine_region_list'),
-    #path('terroir/detail/', wineviews.terrori_detail, name='terroir_detail')
+    path('wishlist/', views.WishlistListView.as_view(), name='wishlist'),
+    path('wishlist/add/', views.WishlistCreateView.as_view(), name='wishlist_create'),
 ]

@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic import CreateView, UpdateView
-from .forms import AllocationForm, ProducerForm,AllocationModelForm, AllocationUpdateForm
+from .forms import AllocationForm, ProducerForm,AllocationModelForm, AllocationUpdateForm,WishlistForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
@@ -69,6 +69,21 @@ class AllocationListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['section'] = 'allocation'
+        return context
+
+class WishlistCreateView(CreateView):
+     def get(self, request, *args, **kwargs):
+        context = {'form': WishlistForm(),'section': 'wishlist',}
+        return render(request, 'wishlist/create.html', context)
+        
+class WishlistListView(ListView):
+    template_name = 'wishlist/list.html'
+    queryset = Collection.objects.filter(status='wishitem')
+    context_object_name ='wishlist'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['section'] = 'wishlist'
         return context
 
 class CollectionViewSet(viewsets.ModelViewSet):

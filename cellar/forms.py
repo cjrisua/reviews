@@ -51,7 +51,14 @@ class AllocationUpdateForm(AllocationModelForm, forms.Form):
                 )
             return updated
 
-        
+class WishlistForm(forms.Form):
+    name = forms.CharField(label='Wine Name',
+                           widget= forms.TextInput(attrs={'placeholder':'Varietal name',
+                                                          'aria-label': 'Varietal name',}
+                                                         ),required=False) 
+    def __init__(self, *args, **kwargs):
+        super(WishlistForm, self).__init__(*args, **kwargs)
+
 class ProducerForm(forms.ModelForm):
     class Meta:
         model = Producer

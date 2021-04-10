@@ -10,12 +10,14 @@ COLLECTION_CHOICES = (
         ('drunk', 'Drunk'),
         ('curated','Curated'),
         ('removed', 'Removed'),
+        ('wishitem','Wish Item')
     )
 ALLOCATION_CHOICES = (
     ('waiting', 'Waiting'),
     ('active', 'Active'),
     ('atfault','At Fault'),
 )
+
 class ActiveAllocationManager(models.Manager):
     def get_queryset(self):
         return super(ActiveAllocationManager,self).get_queryset().filter(status='active')
@@ -60,6 +62,10 @@ class Location(models.Model):
         ordering = ('-location',)
     def __str__(self):
         return self.location
+
+class CollectionWishlistManager(models.Manager):
+    def get_queryset(self):
+        return super(CollectionWishlistManager,self).get_queryset().filter(status='wishitem')
 
 class Collection(models.Model):
     collectible = models.ForeignKey(Market, on_delete=models.CASCADE, related_name="wine_market")

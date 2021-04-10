@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{%block content %}
+{%for item in wishlist%}
+{%empty%}
+There are no wish items yet.
+{% endfor %}
+<p><a href="{% url "cellar:wishlist_create" %}">Add</a></p>
+{%endblock%}
