@@ -176,3 +176,15 @@ ul li:hover a {
 .navbar {
     top: 0px
 }
+
+.winesearch_input:focus{
+  border: 2px solid #dd1742;
+  background-color: #f1f4f5;
+}
+
+.winesearch_input{
+    padding: 5px 248px 5px 48px;
+    border: 2px solid transparent;
+    background-color: #f1f4f5;
+    font-size: 14px;
+}

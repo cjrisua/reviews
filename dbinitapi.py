@@ -8,7 +8,8 @@ from progress.bar import IncrementalBar
 from functools import lru_cache
 import numpy
 
-URL = f'http://{socket.gethostname()}:8000'
+#URL = f'http://{socket.gethostname()}:8000'
+#URL = f'http://tokalon.fios-router.home:8000'
 country_regions = []
 cache_region ={}
 
@@ -17,9 +18,12 @@ def FormatDate(input):
     if rmatch != None:
         return f'{rmatch[1]}-01-01'
     return "{:%Y-%m-%d}".format(datetime.strptime(input,'%d-%b-%y'))
-def Get(page):
+def Get(page, hostname=None):
+    if hostname is None:
+        hostname = f'http://{socket.gethostname()}:8000'
     try:
-        response = requests.get(f"{URL}/{page}")
+        print(f"{hostname}/{page}")
+        response = requests.get(f"{hostname}/{page}",auth=HTTPBasicAuth('admin','password123'))
         response.raise_for_status()
         # access JSOn content
         return response.json()
@@ -30,20 +34,25 @@ def Get(page):
     except Exception as err:
         print(f'Other error occurred: {err}')
 
-def GetAll(page):
+def GetAll(page, hostname=None):
+    if hostname is None:
+        hostname = f'http://{socket.gethostname()}:8000'
     data = []
-    r = Get(f"{page}")
+    r = Get(f"{page}",hostname)
     count = r["count"]
     itemsperset = len(r["results"])
     while r["next"] != None:
         data.extend(r["results"])
-        r = Get(re.match(URL+"/(.+?$)",r["next"]).groups(0)[0])
+        r = Get(re.match(hostname+"/(.+?$)",r["next"]).groups(0)[0],hostname)
     data.extend(r["results"])
     return data
 
-def Post(page, **kargs):
+def Post(page,hostname=None, **kargs):
+    if hostname is None:
+        hostname = f'http://{socket.gethostname()}:8000'
+
     headers = {'content-type': 'application/json'}
-    return requests.post(f"{URL}/{page}" , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(kargs["payload"]), headers=headers)
+    return requests.post(f"{hostname}/{page}" , auth=HTTPBasicAuth('admin','password123'), data=json.dumps(kargs["payload"]), headers=headers)
 
 
 def RegionLookup(name):
@@ -110,6 +119,28 @@ def ProcessTerroir(terroirs, countryid):
     country_regions.append(json.loads(response.content))
     parentid = json.loads(response.content)['id']
     '''
+def LoadRegionAPI():
+    tokalon = 'http://tokalon.fios-router.home:8000'
+    
+    localcountries = [c for c in GetAll("api/country/")]
+    localregions = [c for c in GetAll("api/region/")]
+    remoteregions = [c for c in GetAll("api/region/",hostname=tokalon)]
+
+    parents = [p for p in remoteregions if p['region'] is not None]
+    for p in parents:
+
+        remoteparent = [r for r in remoteregions if r['id'] == p['region']][0]
+        localparent = [l for l in localregions if l['id'] == remoteparent['id']]
+        if len(localparent) == 0:
+            continue
+
+        payload={}
+        payload['country'] = [country['id']  for country in localcountries if country['slug']==p['country_slug']][0]
+        payload['region'] = localparent[0]['id']
+        payload['name'] = p['name']
+        payload['slug'] = slugify(p['name'])
+        response = Post("api/region/",payload = payload)
+        print(response)
 
 def LoadCountry():
     #Load Country
@@ -239,11 +270,12 @@ def LoadBlendVarietal():
         response = Post("api/mastervarietal/",payload = {"name":mblend,"slug":mblend})
     
 if __name__ == "__main__":
-    print("Loading country")
+    #print("Loading country")
     #LoadCountry()
     #print("Load Regions")
     #LoadRegions()
     #print("Loading varietal")
     #LoadVarietal()
-    print("Loading belnding")
-    LoadBlendVarietal()
+    #print("Loading belnding")
+    #LoadBlendVarietal()
+    LoadRegionAPI()

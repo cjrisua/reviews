@@ -3,20 +3,6 @@
 
 {% block sidenavcontent %}
 <form role="search" class="bd-search d-flex align-items-center">
-  <!--
-  <span class="algolia-autocomplete" style="position: relative; display: inline-block; direction: ltr;"><input
-      type="search" class="form-control ds-input" id="search-input" placeholder="Search..." aria-label="Search for..."
-      autocomplete="off" data-docs-version="4.5" spellcheck="false" role="combobox" aria-autocomplete="list"
-      aria-expanded="false" aria-owns="algolia-autocomplete-listbox-0" dir="auto"
-      style="position: relative; vertical-align: top;">
-    <pre aria-hidden="true"
-      style="position: absolute; visibility: hidden; white-space: pre; font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, Arial, &quot;Noto Sans&quot;, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;, &quot;Noto Color Emoji&quot;; font-size: 16px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-variant-east-asian: normal; font-variant-position: normal; font-weight: normal; word-spacing: 0px; letter-spacing: normal; text-indent: 0px; text-rendering: auto; text-transform: none;"></pre>
-    <span class="ds-dropdown-menu" role="listbox" id="algolia-autocomplete-listbox-0"
-      style="position: absolute; top: 100%; z-index: 100; display: none; left: 0px; right: auto;">
-      <div class="ds-dataset-1"></div>
-    </span>
-  </span>
--->
   <button class="btn bd-search-docs-toggle d-md-none p-0 ml-3" type="button" data-toggle="collapse"
     data-target="#bd-docs-nav" aria-controls="bd-docs-nav" aria-expanded="false"
     aria-label="Toggle docs navigation"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
@@ -36,10 +22,7 @@
     href="{% url "account:password_change" %}">change your password</a>.</p>-->
     <!--<div class="search-box"> -->
     <div class="container-fluid" style="margin-left:4rem; max-width: 50rem;">
-      <div id="main-search" class="input-group mb-0">
-        <input id="main-search-input" type="text" class="form-control vinomio-search" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon2">
-        <span id="search-img"><i class="fas fa-search"></i></span>
-      </div>
+      
       <h3 class="mt-1 py-2">Hot reviews</h3>
       <div class="card">
         <div class="card-body">
@@ -74,12 +57,14 @@
 {% block  javascript %}
  <script>
    $( document ).ready(function() {
+    alert("hello");
+
    $(document).on('focusout','.vinomio-search',function(){
       console.log('fired focusout')
       //$('.search-results').remove()
     })
     var clickfired = false
-    $('#main-search-input')
+    $('#winesearch_input')
       .autocomplete({
             minLength: 0,
             source: function( request, response ) {

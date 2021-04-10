@@ -1,6 +1,10 @@
 
 'use strict';
 
+function winefetch(){
+    console.log("call api!")
+}
+
 function toggleSidebarScrollBar()
 {
     //alert("action")

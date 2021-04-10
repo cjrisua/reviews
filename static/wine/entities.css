@@ -296,8 +296,9 @@ thead{
 #search-img {
   position:absolute;
   color: #888;
-  top: 8px;
+  top: 5px;
   left: 25px;;
+  z-index: 10;
 }
 
 .search-box {
