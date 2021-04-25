@@ -42,267 +42,671 @@
       </tbody>
     </table>
   </div>
-  <div class="table-responsive">
-    <table class="table">
-      ...
-    </table>
+  <div class="card mb-3 mb-lg-5">
+    <div class="card-header">
+      <div class="row justify-content-between align-items-center flex-grow-1">
+        <div class="col-12 col-md">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-header-title">In-flight</h5>
+
+            <!-- Datatable Info -->
+            <div id="datatableCounterInfo" style="display: none;">
+              <div class="d-flex align-items-center">
+                <span class="font-size-sm mr-3">
+                  <span id="datatableCounter">0</span>
+                  Selected
+                </span>
+                <a class="btn btn-sm btn-outline-danger" href="javascript:;">
+                  <i class="tio-delete-outlined"></i> Delete
+                </a>
+              </div>
+            </div>
+            <!-- End Datatable Info -->
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="row align-items-sm-center">
+            <div class="col-sm-auto">
+              <div class="d-flex align-items-center mx-2">
+                <span class="text-secondary mx-2">Status:</span>
+
+                <select class="js-select2-custom js-datatable-filter custom-select-sm 
+                select2-hidden-accessible" size="1" style="opacity: 0;" data-target-column-index="2"
+                  sdata-select2-id="1" tabindex="-1" aria-hidden="true">
+                  <option value="" data-select2-id="3">All</option>
+                  <option value="successful" data-select2-id="4">Successful</option>
+                  <option value="overdue" data-select2-id="5">Overdue</option>
+                  <option value="pending" data-select2-id="6">Pending</option>
+                </select>
+
+                <!-- End Select -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive datatable-custom">
+      <div id="datatable_wrapper" class="dataTables_wrapper no-footer">
+        <div class="dataTables_length" id="datatable_length"><label>Show <select name="datatable_length"
+              aria-controls="datatable" class="">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select> entries</label></div>
+        <div id="datatable_filter" class="dataTables_filter"><label>Search:<input type="search" class="" placeholder=""
+              aria-controls="datatable"></label></div>
+        <table id="datatable"
+          class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer"
+          data-hs-datatables-options="{
+               &quot;columnDefs&quot;: [{
+                  &quot;targets&quot;: [0, 1, 4],
+                  &quot;orderable&quot;: false
+                }],
+               &quot;order&quot;: [],
+               &quot;info&quot;: {
+                 &quot;totalQty&quot;: &quot;#datatableWithPaginationInfoTotalQty&quot;
+               },
+               &quot;search&quot;: &quot;#datatableSearch&quot;,
+               &quot;entries&quot;: &quot;#datatableEntries&quot;,
+               &quot;pageLength&quot;: 8,
+               &quot;isResponsive&quot;: false,
+               &quot;isShowPaging&quot;: false,
+               &quot;pagination&quot;: &quot;datatablePagination&quot;
+             }" role="grid" aria-describedby="datatable_info">
+          <thead class="thead-light">
+            <tr role="row">
+              <th scope="col" class="table-column-pr-0 sorting_disabled" rowspan="1" colspan="1" aria-label="
+              
+                
+                
+              
+            " style="width: 24px;">
+                <div class="custom-control custom-checkbox">
+                  <input id="datatableCheckAll" type="checkbox" class="custom-control-input">
+                  <label class="custom-control-label" for="datatableCheckAll"></label>
+                </div>
+              </th>
+              <th class="table-column-pl-0 sorting_disabled" rowspan="1" colspan="1" aria-label="Full name"
+                style="width: 171px;">Full name</th>
+              <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1" colspan="1"
+                aria-label="Status: activate to sort column ascending" style="width: 83px;">Status</th>
+              <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1" colspan="1"
+                aria-label="Type: activate to sort column ascending" style="width: 113px;">Type</th>
+              <th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Email" style="width: 154px;">Email</th>
+              <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1" colspan="1"
+                aria-label="Signed up: activate to sort column ascending" style="width: 90px;">Signed up</th>
+              <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1" colspan="1"
+                aria-label="User ID: activate to sort column ascending" style="width: 65px;">User ID</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <tr role="row" class="odd">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck2">
+                  <label class="custom-control-label" for="usersDataCheck2"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img10.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Amanda Harvey <i class="tio-verified text-primary"
+                        data-toggle="tooltip" data-placement="top" title=""
+                        data-original-title="Top endorsed"></i></span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-success"></span>Successful
+              </td>
+              <td>Unassigned</td>
+              <td>amanda@example.com</td>
+              <td>1 year ago</td>
+              <td>67989</td>
+            </tr>
+            <tr role="row" class="even">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck3">
+                  <label class="custom-control-label" for="usersDataCheck3"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-soft-primary avatar-circle mr-2">
+                    <span class="avatar-initials">A</span>
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Anne Richard</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-success"></span>Successful
+              </td>
+              <td>Subscription</td>
+              <td>anne@example.com</td>
+              <td>6 months ago</td>
+              <td>67326</td>
+            </tr>
+            <tr role="row" class="odd">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck4">
+                  <label class="custom-control-label" for="usersDataCheck4"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img3.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">David Harrison</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-danger"></span>Overdue
+              </td>
+              <td>Non-subscription</td>
+              <td>david@example.com</td>
+              <td>6 months ago</td>
+              <td>55821</td>
+            </tr>
+            <tr role="row" class="even">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck5">
+                  <label class="custom-control-label" for="usersDataCheck5"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img5.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Finch Hoot</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-warning"></span>Pending
+              </td>
+              <td>Subscription</td>
+              <td>finch@example.com</td>
+              <td>1 year ago</td>
+              <td>85214</td>
+            </tr>
+            <tr role="row" class="odd">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck6">
+                  <label class="custom-control-label" for="usersDataCheck6"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-soft-dark avatar-circle mr-2">
+                    <span class="avatar-initials">B</span>
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Bob Dean</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-success"></span>Successful
+              </td>
+              <td>Subscription</td>
+              <td>bob@example.com</td>
+              <td>6 months ago</td>
+              <td>75470</td>
+            </tr>
+            <tr role="row" class="even">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck7">
+                  <label class="custom-control-label" for="usersDataCheck7"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img9.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Ella Lauda <i class="tio-verified text-primary"
+                        data-toggle="tooltip" data-placement="top" title=""
+                        data-original-title="Top endorsed"></i></span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-warning"></span>Pending
+              </td>
+              <td>Subscription</td>
+              <td>Ella@example.com</td>
+              <td>1 year ago</td>
+              <td>37534</td>
+            </tr>
+            <tr role="row" class="odd">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck8">
+                  <label class="custom-control-label" for="usersDataCheck8"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img4.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Sam Kart</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-success"></span>Successful
+              </td>
+              <td>Non-subscription</td>
+              <td>sam@example.com</td>
+              <td>1 year ago</td>
+              <td>57300</td>
+            </tr>
+            <tr role="row" class="even">
+              <td class="table-column-pr-0">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="usersDataCheck9">
+                  <label class="custom-control-label" for="usersDataCheck9"></label>
+                </div>
+              </td>
+              <td class="table-column-pl-0">
+                <a class="media align-items-center" href="./user-profile.html">
+                  <div class="avatar avatar-sm avatar-circle mr-2">
+                    <img class="avatar-img" src="./assets/img/160x160/img6.jpg" alt="Image Description">
+                  </div>
+                  <div class="media-body">
+                    <span class="h5 text-hover-primary mb-0">Costa Quinn</span>
+                  </div>
+                </a>
+              </td>
+              <td>
+                <span class="legend-indicator bg-danger"></span>Overdue
+              </td>
+              <td>Unassigned</td>
+              <td>costa@example.com</td>
+              <td>1 year ago</td>
+              <td>71288</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="dataTables_info" id="datatable_info" role="status" aria-live="polite">Showing 1 to 8 of 17 entries
+        </div>
+      </div>
+    </div>
   </div>
-</div>      
+</div>
 {% endblock %}
 
 {% block  javascript %}
- <script>
-   $( document ).ready(function() {
+<script>
+  $(document).ready(function () {
     //alert("hello");
+    $(".js-select2-custom").select2({
+      minimumResultsForSearch: Infinity,
+      customClass: "custom-select custom-select-sm custom-select-borderless",
+      dropdownAutoWidth: true,
+      width: true
+    });
 
-   $(document).on('focusout','.vinomio-search',function(){
+    $(document).on('focusout', '.vinomio-search', function () {
       console.log('fired focusout')
       //$('.search-results').remove()
     })
     var clickfired = false
     $('#winesearch_input')
       .autocomplete({
-            minLength: 0,
-            source: function( request, response ) {
-                $.ajax({
-                    url: "/wine/p/",
-                    type: 'get',
-                    dataType: "json",
-                    data: {
-                        search_simple_query_string:function(){
-                          string = request.term.replace(/\s+/g, '+')
-                          //console.log(request.term.length)
-                          return string + (request.term.length > 0 ? "*" : "");
-                          
-                        }
-                    },
-                    success: function( data ) {
-                        clickfired = true;
-                        wine_items = $.map( data.results, function( item ) {
-                          var object = new Object();
-                          object.id = item.id
-                          object.producer = item.producer
-                          object.wine = item.wine
-                          object.vintage = item.vintage;
-                          return object
-                        });
-                        //console.log(wine_items)
-                        //Producers
-                        producers_matches = [...new Set(wine_items.map(x => x.producer))]
-                        producers_list = $.map(producers_matches, function(item){
-                          slug = Slugify.get(item)
-                          return {'type':'p','list_item':'<li><a href="/wine/inventory/wine/?producer='+slug+'" class="default-link mr-2"><span class="vinomio-search-item">'+item+'</span></a></li>'}
-                        });
-                        wine_matches = [...new Set(wine_items.map(x => x.producer+'%'+x.wine))]
-                        //console.log(wine_matches)
-                        wine_list = $.map(wine_matches, function(item){
-                          vintage = ""
-                          producer = Slugify.get(item.split("%")[0])
-                          wine = Slugify.get(item.split("%")[1])
-                          //console.log(wine_items[0])
-                          q = "?producer="+producer
-                          q += "&wine="+ wine 
-                          
-                          if(/[0-9]{4}/.test(request.term)){
-                            vintage = String(request.term).match(/[0-9]{4}/) + " " ;
-                            q += "&vintage="+ vintage 
-                          }
-                          return {'type':'w','list_item':'<li><a href="/wine/inventory/wine/'+q+'" class="default-link mr-2"><span class="vinomio-search-item">'+vintage+' '+item.replace("%"," ")+'</span></a></li>'}
-                        });
+        minLength: 0,
+        source: function (request, response) {
+          $.ajax({
+            url: "/wine/p/",
+            type: 'get',
+            dataType: "json",
+            data: {
+              search_simple_query_string: function () {
+                string = request.term.replace(/\s+/g, '+')
+                //console.log(request.term.length)
+                return string + (request.term.length > 0 ? "*" : "");
 
-                        $('.search-results').remove()
-                        
-                        //console.log(wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" "))
-
-                        $('#main-search').append(
-                            '<div class="search-results">'+
-                              '<div class="search-result-detail">'+
-                                (producers_list.filter(p => p.type =='p').length == 0 ? "" : '<div class=""><strong>Producer</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">'+producers_list.filter(p => p.type =='p').map(i => i.list_item).join(" ") +'</ul></div>')+
-                                (wine_list.filter(p => p.type =='w').length == 0 ? "" : '<div class=""><strong>Wine</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">'+wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" ") +'</ul></div>'+
-                              '</div>'+
-                            '</div>')
-                           );
-                        //console.log(results)
-                    }
-                });
+              }
             },
-            select: function (event, ui) {
-                //console.log(ui.item)
-                $("#id_varietalId").text(ui.item.id)
+            success: function (data) {
+              clickfired = true;
+              wine_items = $.map(data.results, function (item) {
+                var object = new Object();
+                object.id = item.id
+                object.producer = item.producer
+                object.wine = item.wine
+                object.vintage = item.vintage;
+                return object
+              });
+              //console.log(wine_items)
+              //Producers
+              producers_matches = [...new Set(wine_items.map(x => x.producer))]
+              producers_list = $.map(producers_matches, function (item) {
+                slug = Slugify.get(item)
+                return {
+                  'type': 'p',
+                  'list_item': '<li><a href="/wine/inventory/wine/?producer=' + slug +
+                    '" class="default-link mr-2"><span class="vinomio-search-item">' + item +
+                    '</span></a></li>'
+                }
+              });
+              wine_matches = [...new Set(wine_items.map(x => x.producer + '%' + x.wine))]
+              //console.log(wine_matches)
+              wine_list = $.map(wine_matches, function (item) {
+                vintage = ""
+                producer = Slugify.get(item.split("%")[0])
+                wine = Slugify.get(item.split("%")[1])
+                //console.log(wine_items[0])
+                q = "?producer=" + producer
+                q += "&wine=" + wine
+
+                if (/[0-9]{4}/.test(request.term)) {
+                  vintage = String(request.term).match(/[0-9]{4}/) + " ";
+                  q += "&vintage=" + vintage
+                }
+                return {
+                  'type': 'w',
+                  'list_item': '<li><a href="/wine/inventory/wine/' + q +
+                    '" class="default-link mr-2"><span class="vinomio-search-item">' + vintage + ' ' +
+                    item.replace("%", " ") + '</span></a></li>'
+                }
+              });
+
+              $('.search-results').remove()
+
+              //console.log(wine_list.filter(p => p.type =='w').map(i => i.list_item).join(" "))
+
+              $('#main-search').append(
+                '<div class="search-results">' +
+                '<div class="search-result-detail">' +
+                (producers_list.filter(p => p.type == 'p').length == 0 ? "" :
+                  '<div class=""><strong>Producer</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">' +
+                  producers_list.filter(p => p.type == 'p').map(i => i.list_item).join(" ") +
+                  '</ul></div>') +
+                (wine_list.filter(p => p.type == 'w').length == 0 ? "" :
+                  '<div class=""><strong>Wine</strong><ul class="m-0" style="list-style-type: none;padding-left: 15px;">' +
+                  wine_list.filter(p => p.type == 'w').map(i => i.list_item).join(" ") + '</ul></div>' +
+                  '</div>' +
+                  '</div>')
+              );
+              //console.log(results)
             }
-        })
-       .on('click', function(){ 
-          $('#main-search').append('<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">'+
-          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Wine..</span></li>'+
-          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Region..</span></li>'+
-          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Tasting Note..</span></li>'+
+          });
+        },
+        select: function (event, ui) {
+          //console.log(ui.item)
+          $("#id_varietalId").text(ui.item.id)
+        }
+      })
+      .on('click', function () {
+        $('#main-search').append(
+          '<div class="search-results"><div class="search-result-detail"><h6>Try Searching For:</h6><ul style="list-style-type: none;padding-left: 15px;">' +
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Wine..</span></li>' +
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Region..</span></li>' +
+          '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Tasting Note..</span></li>' +
           '<li><i class="fas fa-search mr-2" style="color: #888;"></i></span><span class="vinomio-search-item">Producer..</span></li>' +
           '</ul><div></div>');
-        })
-        .on('focusout',function() {
-          if(!clickfired)
-            $('.search-results').remove()
-       });
-    $('.crop-text').toArray().forEach( function(e){
-        clientHeight = $(e)[0].clientHeight;
-        ct = $(e).first().css("-webkit-line-clamp","4")
-        newclientHeight = $(e)[0].clientHeight;
-        if(clientHeight == newclientHeight)
-            $(e).parent().find("a.hide-more").css("visibility", "hidden")
+      })
+      .on('focusout', function () {
+        if (!clickfired)
+          $('.search-results').remove()
+      });
+    $('.crop-text').toArray().forEach(function (e) {
+      clientHeight = $(e)[0].clientHeight;
+      ct = $(e).first().css("-webkit-line-clamp", "4")
+      newclientHeight = $(e)[0].clientHeight;
+      if (clientHeight == newclientHeight)
+        $(e).parent().find("a.hide-more").css("visibility", "hidden")
     });
     var $carousel = $('.carousel').flickity({
-          initialIndex: 3,
-          cellAlign: 'left',
-          contain: true
+      initialIndex: 3,
+      cellAlign: 'left',
+      contain: true
     });
-    $carousel.on( 'select.flickity', function( event, index ) {
-      $('.card-title').text($(event.currentTarget).find('.carousel-cell.is-selected')[0].id + " Comte Lafon Montrachet")
+    $carousel.on('select.flickity', function (event, index) {
+      $('.card-title').text($(event.currentTarget).find('.carousel-cell.is-selected')[0].id +
+        " Comte Lafon Montrachet")
       $('div.card-reviews').empty()
-      if(index %2 == 0)
-        $('div.card-reviews').html('<p class="card-text mb-0 text-muted">Carlos Rivera wrote:</p><p class="card-text">July 12, 2020 - Thankfully, the 2016 Meursault 1er Cru Genevrieres was a normal crop from Dominique Lafon, comprising ten and a half barrels. It has a vivid, hazelnut and flinty bouquet that is a little stricter than other years but very well focused. ...<small class="text-muted">More</small></p>');
+      if (index % 2 == 0)
+        $('div.card-reviews').html(
+          '<p class="card-text mb-0 text-muted">Carlos Rivera wrote:</p><p class="card-text">July 12, 2020 - Thankfully, the 2016 Meursault 1er Cru Genevrieres was a normal crop from Dominique Lafon, comprising ten and a half barrels. It has a vivid, hazelnut and flinty bouquet that is a little stricter than other years but very well focused. ...<small class="text-muted">More</small></p>'
+          );
       else
-      $('div.card-reviews').html('<p class="card-text mb-0 text-muted" >Victor Perez-Tort wrote:</p><p class="card-text">Jan 12, 2008 - 🍷🍷 wow excelente vino con 24 meses de barrica nueva Roble Francés excelente fruta y estructura para ...<small class="text-muted">More</small></p>');
+        $('div.card-reviews').html(
+          '<p class="card-text mb-0 text-muted" >Victor Perez-Tort wrote:</p><p class="card-text">Jan 12, 2008 - 🍷🍷 wow excelente vino con 24 meses de barrica nueva Roble Francés excelente fruta y estructura para ...<small class="text-muted">More</small></p>'
+          );
     });
 
     /* chart.js chart examples */
 
     // chart colors
-    var colors = ['#007bff','#00cc66','#ff4d4d','#c3e6cb','#dc3545','#6c757d'];
+    var colors = ['#007bff', '#00cc66', '#ff4d4d', '#c3e6cb', '#dc3545', '#6c757d'];
 
     var chBar = document.getElementById("chBar");
     var chartData = {
       labels: ["USA", "France", "Argentina", "Germany", "Spain", "Portugal", "Chile", "Other"],
       datasets: [{
-        label: 'Region',
-        barThickness: 12,
-        data: [150, 25, 2, 1, 10, 2, 4,75],
-        backgroundColor: colors[0]
-      },
-      {
-        label: 'Limit',
-        barThickness: 12,
-        data: [0, 25, 10, 20, 10, 49, 40,10],
-        backgroundColor: colors[1]
-      },
-      {
-        barThickness: 12,
-        data: [-10, 0, 0, 0, 0, 0, 0,0],
-        backgroundColor: colors[2]
-      },/*
-      {
-        data: [639, 465, 493, 478, 589, 632, 674],
-        backgroundColor: colors[4]
-      }*/]
+          label: 'Region',
+          barThickness: 12,
+          data: [150, 25, 2, 1, 10, 2, 4, 75],
+          backgroundColor: colors[0]
+        },
+        {
+          label: 'Limit',
+          barThickness: 12,
+          data: [0, 25, 10, 20, 10, 49, 40, 10],
+          backgroundColor: colors[1]
+        },
+        {
+          barThickness: 12,
+          data: [-10, 0, 0, 0, 0, 0, 0, 0],
+          backgroundColor: colors[2]
+        },
+        /*
+              {
+                data: [639, 465, 493, 478, 589, 632, 674],
+                backgroundColor: colors[4]
+              }*/
+      ]
     };
 
     var chBubble = document.getElementById("chBubble");
     var chartBubbleData = {
-                  datasets:[
-                        {
-                          backgroundColor:  [
-                              'rgba(255, 99, 132, 0.2)',
-                              'rgba(54, 162, 235, 0.2)',
-                              'rgba(255, 206, 86, 0.2)',
-                              'rgba(75, 192, 192, 0.2)',
-                              'rgba(153, 102, 255, 0.2)',
-                              'rgba(255, 159, 64, 0.2)'
-                          ],
-                          label: 'Cabernet Sauvignon',
-                          data:[{x:1,y:1,r:3},
-                                {x:1,y:2,r:2}]
-                          
-                        },
-                        {
-                          label: 'Pinot Noir',
-                          data:[{x:1,y:1,r:3},
-                                {x:2,y:3,r:15}]
-                        },
-                        {
-                          label: 'Other',
-                          data:[{x:1,y:1,r:8},
-                                {x:2,y:3,r:5}]
-                        },
-                  ]
+      datasets: [{
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+          ],
+          label: 'Cabernet Sauvignon',
+          data: [{
+              x: 1,
+              y: 1,
+              r: 3
+            },
+            {
+              x: 1,
+              y: 2,
+              r: 2
+            }
+          ]
+
+        },
+        {
+          label: 'Pinot Noir',
+          data: [{
+              x: 1,
+              y: 1,
+              r: 3
+            },
+            {
+              x: 2,
+              y: 3,
+              r: 15
+            }
+          ]
+        },
+        {
+          label: 'Other',
+          data: [{
+              x: 1,
+              y: 1,
+              r: 8
+            },
+            {
+              x: 2,
+              y: 3,
+              r: 5
+            }
+          ]
+        },
+      ]
     };
     var options = {
-                    scaleShowValues: true,
-                    scales: { xAxes: [{ticks:{
-                                              autoSkip: false,
-                                              min: 0,
-                                              max:5,
-                                              userCallback: function(label, index, labels) {
-                                                  // when the floored value is the same as the value we have a whole number
-                                                  if (Math.floor(label) === label) {
-                                                    if(Math.floor(label) == 1)
-                                                        return "USA"
-                                                      else if(Math.floor(label) == 2)
-                                                        return "France"
-                                                      else if(Math.floor(label) == 3)
-                                                        return "Italy"
-                                                      else if(Math.floor(label) == 4)
-                                                        return "Spain"
-                                                        else if(Math.floor(label) == 5)
-                                                        return "Other"
-                                                      return label;
-                                                    }
-                                                },
-                                            }},],
-                              yAxes: [{ticks:{
-                                              autoSkip: false,
-                                              min: 0,
-                                              max:4,
-                                              userCallback: function(label, index, labels) {
-                                                  // when the floored value is the same as the value we have a whole number
-                                                  if (Math.floor(label) === label) {
-                                                      if(Math.floor(label) == 1)
-                                                        return "1st Qtr"
-                                                      else if(Math.floor(label) == 2)
-                                                        return "2nd Qtr"
-                                                      else if(Math.floor(label) == 3)
-                                                        return "3rd Qtr"
-                                                      else if(Math.floor(label) == 4)
-                                                        return "4th Qtr"
-                                                      return label;
-                                                    }
-                                                },
-                                      }},]
-                              },
-                    responsive: true,
-                    title:{display:true,text:'Consumption Chart'},
-                    tooltips: {mode: 'point'}
-                  };
+      scaleShowValues: true,
+      scales: {
+        xAxes: [{
+          ticks: {
+            autoSkip: false,
+            min: 0,
+            max: 5,
+            userCallback: function (label, index, labels) {
+              // when the floored value is the same as the value we have a whole number
+              if (Math.floor(label) === label) {
+                if (Math.floor(label) == 1)
+                  return "USA"
+                else if (Math.floor(label) == 2)
+                  return "France"
+                else if (Math.floor(label) == 3)
+                  return "Italy"
+                else if (Math.floor(label) == 4)
+                  return "Spain"
+                else if (Math.floor(label) == 5)
+                  return "Other"
+                return label;
+              }
+            },
+          }
+        }, ],
+        yAxes: [{
+          ticks: {
+            autoSkip: false,
+            min: 0,
+            max: 4,
+            userCallback: function (label, index, labels) {
+              // when the floored value is the same as the value we have a whole number
+              if (Math.floor(label) === label) {
+                if (Math.floor(label) == 1)
+                  return "1st Qtr"
+                else if (Math.floor(label) == 2)
+                  return "2nd Qtr"
+                else if (Math.floor(label) == 3)
+                  return "3rd Qtr"
+                else if (Math.floor(label) == 4)
+                  return "4th Qtr"
+                return label;
+              }
+            },
+          }
+        }, ]
+      },
+      responsive: true,
+      title: {
+        display: true,
+        text: 'Consumption Chart'
+      },
+      tooltips: {
+        mode: 'point'
+      }
+    };
     if (chBubble) {
       new Chart(chBubble, {
-                              type: 'bubble',
-                              data: chartBubbleData,
-                              options: options
-                             });
+        type: 'bubble',
+        data: chartBubbleData,
+        options: options
+      });
     }
 
     if (chBar) {
       new Chart(chBar, {
-                          type: 'horizontalBar',
-                          data: chartData,
-                          options: {
-                            scales: {
-                            xAxes: [{
-                              ticks: {},
-                              stacked: true
-                            }],
-                            yAxes: [{
-                                      stacked: true
-                                    }]
-                            },
-                            responsive : true,
-                            legend: false,
-                            title: {
-                                    display:true, 
-                                    text:'Region Tracker'
-                            }
-                          },
-                        });
+        type: 'horizontalBar',
+        data: chartData,
+        options: {
+          scales: {
+            xAxes: [{
+              ticks: {},
+              stacked: true
+            }],
+            yAxes: [{
+              stacked: true
+            }]
+          },
+          responsive: true,
+          legend: false,
+          title: {
+            display: true,
+            text: 'Region Tracker'
+          }
+        },
+      });
     }
   });
-
- </script>
+</script>
 {% endblock %}
