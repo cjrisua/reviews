@@ -85,6 +85,8 @@
                             object.id = item.id;
                             object.label = item.name;
                             object.value = item.name;
+                            object.additionaldata = item
+                            //console.log(item)
                             return object
                         }));
                     },
@@ -92,8 +94,9 @@
                   });
         },
         select: function (event, ui) {
-                console.log("event:" + ui.item.value)
-            }
+            data = ui.item.additionaldata;
+            window.location.href = `?producer=${data.producer_slug}`
+          }
      });
      $(".showall").on('click', function(event){
        targetrow = $(this).closest('.winelisting').find('.hideme')

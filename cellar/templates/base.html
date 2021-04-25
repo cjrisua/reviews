@@ -47,10 +47,11 @@
                 {% endif %}
             </div>
             <div class="navbar-nav ms-5">
-              <div id="main-search" class="input-group mb-0">
-                <input id="" type="search" class="form-control winesearch_input" placeholder="Search a wine" aria-label="Search a wine" aria-describedby="basic-addon2" autocomplete="false">
+              <div id="main-search" class="input-group mb-0" style="width: 700px;">
+                <input id="" type="search" class="form-control winesearch_input input-lg" placeholder="Search a wine" aria-label="Search a wine" aria-describedby="basic-addon2" autocomplete="false" result="5">
                 <span id="search-img"><i class="fas fa-search"></i></span>
               </div>
+              <span id="spinner" class="spinner" style="z-index:3000; margin-top:5px;margin-left: -25px;"><i class="fa fa-spinner fa-spin"></i></span>
             </div>
             <div class="navbar-nav ms-auto">
               {% if request.user.is_authenticated %}
@@ -133,8 +134,9 @@
         $( document ).ready(function() {
           $('.winesearch_input')
             .autocomplete({
-            minLength: 0,
+            minLength: 3,
             source: function( request, response ) {
+                $('body').addClass('busy');
             $.ajax({
                     url: "/wine/p/",
                     type: 'get',
@@ -146,13 +148,54 @@
                         }
                     },
                     success: function( data ) {
+                      const producers = new Map(Object.entries(groupBy(data.results, 'producer')));
                       response( $.map( data.results, function( item ) {
                             var object = new Object();
-                            object.label = item.producer;
-                            object.value = item.producer;
-                            console.log(data)
+                            //object.label = item.producer;
+                            //object.value = item.producer;
+                            //console.log(data)
                             return object
                         }));
+                        $("#ui-id-1").empty()
+                        set = [...new Set(producers.keys())]
+                        addproducerheader = true;
+                        set.forEach((value, index, set) => {
+                          index++;
+                          if((new RegExp(request.term, "gi")).test(value)){   
+                               
+                            let item = value.replace(new RegExp(request.term, "gi"), (match) => `<strong>${match}</strong>`);
+                            $("#ui-id-1").append(`<li data-category="1" order=${index} class="producer-item">${item}</li>`)
+                          }                          
+                          producers.get(value).forEach((i) =>{
+                            let value = `${i.producer} ${i.wine} ${i.vintage}`
+                            value = value.replace("\s+", " ")
+                            request.term.split(" ").forEach(function(token){
+                                if(token.trim() =="")
+                                  return;
+                                value = value.replace(
+                                  new RegExp(`(?:<strong>.+?<\/strong>)|${token}`, "gi"), function(match)
+                                    { 
+                                      const regex = new RegExp('<strong>.+?<\/strong>');
+                                      if (regex.test(match))
+                                        return match
+                                      return `<strong>${match}</strong>`
+                                    }
+                                  );
+                              })   
+                              //console.log(value)   
+                            //value=value.replace(new RegExp('xsw',"gi"), (match) => `strong`)      
+                            $("#ui-id-1").append(`<li data-category="2" order=${index} class="wine-item">${value}</li>`)
+                          })
+                          
+                        });
+                        var deferred = sortMeBy("data-category", "ul#ui-id-1", "li", "asc");
+                        if ($("#ui-id-1 li[data-category='1'").length > 0){
+                           $("<li>Producer</li>").insertBefore($("#ui-id-1 li[data-category='1'").first())
+                        }
+                        if ($("#ui-id-1 li[data-category='2'").length > 0){
+                           $("<li>Wine</li>").insertBefore($("#ui-id-1 li[data-category='2'").first())
+                        }
+                        $('body').removeClass('busy');
                     }
                   });
             },

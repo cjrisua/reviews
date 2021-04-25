@@ -274,6 +274,12 @@ class ProducerDocumentViewSet(DocumentViewSet):
         'wine' :  {'boost': 2},
         'vintage' :  {'boost': 1},
     }
+    ordering = (
+        'producer',
+    )
+    #ordering_fields = {
+    #    'producer': 'producer',
+    #}
     '''
     suggester_fields = {
         'wine_suggest': {

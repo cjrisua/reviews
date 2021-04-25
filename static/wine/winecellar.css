@@ -183,8 +183,12 @@ ul li:hover a {
 }
 
 .winesearch_input{
-    padding: 5px 248px 5px 48px;
+    padding: 5px 48px 5px 48px;
+    width: 500px;
     border: 2px solid transparent;
     background-color: #f1f4f5;
     font-size: 14px;
 }
+
+#spinner{display:none}
+body.busy .spinner { display:block !important;}

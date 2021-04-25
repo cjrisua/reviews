@@ -1,8 +1,10 @@
 from elasticsearch_dsl import analyzer
 from django_elasticsearch_dsl import Document, Index, fields, Nested
 from django_elasticsearch_dsl_drf.compat import KeywordField, StringField
+from django_elasticsearch_dsl_drf.analyzers import edge_ngram_completion
 from django_elasticsearch_dsl.registries import registry
 from django.conf import settings
+#from .analyzers import html_strip
 
 from ..models import Market, VarietalBlend, Wine, Producer, Terroir, ProducerWine
 
@@ -18,14 +20,32 @@ INDEX.settings(
 html_strip = analyzer(
     'html_strip',
     tokenizer="standard",
-    filter=[ "lowercase", "stop", "snowball"],
+    #tokenizer="keyword",
+    filter=[ "lowercase"],
     char_filter=["html_strip"]
 ) 
 
 @INDEX.doc_type
 class ProducerDocument(Document):
     id = fields.IntegerField(attr='id')
-    producer = fields.TextField(attr='producername_indexing')
+    #producer = fields.KeywordField(attr='producername_indexing')
+    
+    producer = StringField(
+         analyzer=html_strip,
+         attr='producername_indexing',
+    )
+    '''
+    producer = StringField(
+        analyzer=html_strip,
+        fields={
+            'raw': KeywordField(),
+            'suggest': fields.CompletionField(),
+            'edge_ngram_completion': StringField(
+                analyzer=edge_ngram_completion
+            ),
+            'mlt': StringField(analyzer='english'),
+        }
+    )'''
     wine = fields.TextField(attr='winename_indexing')
     vintage = fields.TextField(attr='winevintage_indexing')
     #wine = fields.NestedField(attr='winename_indexing')

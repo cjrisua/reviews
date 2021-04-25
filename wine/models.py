@@ -291,7 +291,7 @@ class Wine(models.Model):
         """Wine for indexing.
         Used in Elasticsearch indexing.
         """
-        print(f'adding vintages_indexing...pk {self.id}')
+        #print(f'adding vintages_indexing...pk {self.id}')
         if self.name is not None:
             return [v.year for v in Market.objects.filter(wine__id=self.id)]
     def save(self, *args, **kwargs):
@@ -384,17 +384,22 @@ class ProducerWine(models.Model):
     class Meta:
         managed = False
         db_table = 'wine_searchindexview'
+        ordering = ['producer__name','-market__year']
 
     @property
     def producername_indexing(self):
+        print("producername_indexing")
         if self.producer is not None:
-             return self.producer.name
+            return self.producer.name
+        
     @property
     def winename_indexing(self):
+        print("winename_indexing")
         if self.wine is not None:
-             return self.wine.name
+            return self.wine.name
     @property
     def winevintage_indexing(self):
+        print("winevintage_indexing")
         if self.market is not None:
              return self.market.year
 

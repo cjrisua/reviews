@@ -5,6 +5,61 @@ function winefetch(){
     console.log("call api!")
 }
 
+function sortMeBy(arg, sel, elem, order) {
+    var $selector = $(sel),
+    $element = $selector.children(elem);
+    $element.sort(function(a, b) {
+            var an = parseInt(a.getAttribute(arg)),
+            bn = parseInt(b.getAttribute(arg));
+            if (order == "asc") {
+                    if (an > bn)
+                    return 1;
+                    if (an < bn)
+                    return -1;
+            } else if (order == "desc") {
+                    if (an < bn)
+                    return 1;
+                    if (an > bn)
+                    return -1;
+            }
+            return 0;
+    });
+    $element.detach().appendTo($selector);
+}
+
+function sortMeBy(arg, sel, elem, order) {
+    var $selector = $(sel),
+    $element = $selector.children(elem);
+    $element.sort(function(a, b) {
+            var an = parseInt(a.getAttribute(arg)),
+            bn = parseInt(b.getAttribute(arg));
+            if (order == "asc") {
+                    if (an > bn)
+                    return 1;
+                    if (an < bn)
+                    return -1;
+            } else if (order == "desc") {
+                    if (an < bn)
+                    return 1;
+                    if (an > bn)
+                    return -1;
+            }
+            return 0;
+    });
+    $element.detach().appendTo($selector);
+}
+function groupBy(objectArray, property) {
+    return objectArray.reduce((acc, obj) => {
+       const key = obj[property];
+       if (!acc[key]) {
+          acc[key] = [];
+       }
+       // Add object to list for given key's value
+       acc[key].push(obj);
+       return acc;
+    }, {});
+ }
+
 function toggleSidebarScrollBar()
 {
     //alert("action")

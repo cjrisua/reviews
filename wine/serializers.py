@@ -177,10 +177,12 @@ class WineSerializer(serializers.ModelSerializer):
     #producer = ProducerSerializer(many=False)
     #terroir = TerroirSerializer(many=False)
     #varietal = MasterVarietalSerializer(many=False)
+    producer_slug = serializers.SlugRelatedField(source='producer',read_only=True,slug_field='slug')
+    #wine_slug = serializers.SlugRelatedField(source='wine',read_only=True,slug_field='slug')
     
     class Meta:
         model = Wine
-        fields = ['producer','varietal','region','name','id']
+        fields = ['producer','producer_slug','varietal','region','name','slug','id']
 
     #def create(self, validated_data):
     #    wine = Wine.objects.create(**validated_data)

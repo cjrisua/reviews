@@ -17,47 +17,43 @@
 {% endblock %}
 
 {% block content %}
-<!--<h1>Dashboard</h1>
-<p>Welcome to your dashboard. You can <a href="{% url "account:edit" %}">edit your profile</a> or <a
-    href="{% url "account:password_change" %}">change your password</a>.</p>-->
-    <!--<div class="search-box"> -->
-    <div class="container-fluid" style="margin-left:4rem; max-width: 50rem;">
-      
-      <h3 class="mt-1 py-2">Hot reviews</h3>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">2016 Comte Lafon Montrachet</h5>
-          <h6 class="card-subtitle mb-4 text-muted">Burgundy, France</h6>
-          <div class="card-reviews">
-            <p class="card-text mb-0">Victor Perez-Tort <span class="text-muted">(@vpwines)</span><span class="h4 text-muted align-top"><sup> . </sup></span><small class="text-muted">Jan 12,2021</small></p>
-            <p class="card-text review"><span class="crop-text">🍷🍷 Very well integrated and powerful wine that screams for attention. This was my first hillstone, first observation, this wine needs time to reach its full potential. Even after a double-decant and 3+ hours open before consumption, it was very tight. I won't open this wine for another 3-5 years. Purple rich with a combination of black-red fruit. On the nose dark berry, currant, notes of cigar box, and black licorice. Tannins and acidy well integrated with a hint of bitterness on the post taste. Still very young and not even close of leaving its primary drinking window. Lastly the finish is just a summary of everything you can smell and taste, and very prolonged. I'm starting to think 2010 will be one of those vintage that need cellar time. But would they ever show the the sweet spot I'm looking for???...I can only hope</span><a class='hide-more' href="#">More</a></p>
-            <p class="card-text mb-0">Victor Perez-Tort <span class="text-muted">(@vpwines)</span><span class="h4 text-muted align-top"><sup> . </sup></span><small class="text-muted">Jan 12,2021</small></p>
-            <p class="card-text review"><span class="crop-text">🍷🍷 Very well integrated and powerful wine that screams for attention.</span><a class='hide-more' href="#">More</a></p>
-          </div>
-          <!--<a href="#" class="card-link">Card link</a>-->
-          <!--<a href="#" class="card-link">Another link</a>-->
-          <div class="carousel mt-4"  data-flickity='{ "initialIndex": 2 }'>
-            <div id="2001" class="carousel-cell cell1"><img src="/media/Comte_Lafon_Montrachet.jpg" alt="orange tree"/></div>
-            <div id="2002" class="carousel-cell cell2"><img src="/media/2004-CVNE-Imperial-Gran-Reserva-Spain-Red-750-ml-63284-750-XX4_83.jpg" alt="orange tree"/></div>
-            <div id="2003" class="carousel-cell"><img src="/media/2010-Murrieta-Ygay-Gran-Reserva-Especial-Spain-Red-750-ml-90060-750-AI_61.jpg" alt="orange tree"/></div>
-            <div id="2004" class="carousel-cell"><img src="/media/2015-Barbi-Brunello-di-Montalcino-Brunello-750-ml-88091-750-AI_70.jpg" alt="orange tree"/></div>
-            <div id="2005" class="carousel-cell"><img src="/media/2015-San-Filippo-Brunello-di-Montalcino-Brunello-750-ml-88217-750-AI_123.jpg" alt="orange tree"/></div>
-            <div id="2006" class="carousel-cell"><img src="/media/2016-Ulysses-California-Red-750-ml-91502-750-AI_73.jpg" alt="orange tree"/></div>
-            <div id="2007" class="carousel-cell"><img src="/media/2017-Quilceda-Creek-CVR-Columbia-Valley-Red-Wine-Washington-Red-750-ml-91380-750_88.jpg" alt="orange tree"></div>
-          </div>
-      </div>
-    </div>
-    </div>
-    <br/>
-    <h4>Upcoming Allocations</h4>
-
-      
+<div class="card">
+  <div class="card-header">
+    Cellar Expenses
+  </div>
+  <div class="card-body" style="width: 25rem;">
+    <h6 class="card-subtitle mb-2 text-muted">Budget</h6>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Planned</th>
+          <th scope="col">Allocated</th>
+          <th scope="col">Actual</th>
+          <th scope="col">Wishlist</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>$3,600</td>
+          <td>$1,200</td>
+          <td>$2,500</td>
+          <td>$5,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      ...
+    </table>
+  </div>
+</div>      
 {% endblock %}
 
 {% block  javascript %}
  <script>
    $( document ).ready(function() {
-    alert("hello");
+    //alert("hello");
 
    $(document).on('focusout','.vinomio-search',function(){
       console.log('fired focusout')

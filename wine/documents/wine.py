@@ -21,7 +21,7 @@ html_strip = analyzer(
     char_filter=["html_strip"]
 ) 
 
-@INDEX.doc_type
+#@INDEX.doc_type
 class WineDocument(Document):
     id = fields.IntegerField(attr='id')
     winename = fields.TextField(attr='wine_indexing')
